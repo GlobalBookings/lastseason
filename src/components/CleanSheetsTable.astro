@@ -1,0 +1,35 @@
+---
+import type { CleanSheet } from "../types";
+
+interface Props {
+  cleanSheets: CleanSheet[];
+}
+
+const { cleanSheets } = Astro.props;
+---
+
+<div class="section">
+  <h2 class="section-title">Clean Sheet Leaders</h2>
+  <div class="table-wrap">
+    <table class="stats-table">
+      <thead>
+        <tr>
+          <th class="num">#</th>
+          <th>Goalkeeper</th>
+          <th>Club</th>
+          <th class="num">Clean Sheets</th>
+        </tr>
+      </thead>
+      <tbody>
+        {cleanSheets.map((cs, i) => (
+          <tr>
+            <td class="num">{i + 1}</td>
+            <td><a href={`/players/${cs.playerSlug}/`}>{cs.name}</a></td>
+            <td><a href={`/clubs/${cs.clubSlug}/`}>{cs.club}</a></td>
+            <td class="num"><strong>{cs.cleanSheets}</strong></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>

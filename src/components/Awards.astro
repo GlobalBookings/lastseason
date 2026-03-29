@@ -1,0 +1,27 @@
+---
+import type { Award } from "../types";
+
+interface Props {
+  awards: Award[];
+}
+
+const { awards } = Astro.props;
+---
+
+<div class="section">
+  <h2 class="section-title">Season Awards</h2>
+  <div class="awards-grid">
+    {awards.map((award) => (
+      <div class="award-card">
+        <div class="award-title">{award.title}</div>
+        <div class="award-winner">
+          {award.playerSlug ? (
+            <a href={`/players/${award.playerSlug}/`}>{award.winner}</a>
+          ) : (
+            award.winner
+          )}
+        </div>
+      </div>
+    ))}
+  </div>
+</div>

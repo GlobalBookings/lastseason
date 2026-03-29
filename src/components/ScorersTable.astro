@@ -1,0 +1,38 @@
+---
+import type { Scorer } from "../types";
+
+interface Props {
+  scorers: Scorer[];
+  title?: string;
+}
+
+const { scorers, title = "Top Scorers" } = Astro.props;
+---
+
+<div class="section">
+  <h2 class="section-title">{title}</h2>
+  <div class="table-wrap">
+    <table class="stats-table">
+      <thead>
+        <tr>
+          <th class="num">#</th>
+          <th>Player</th>
+          <th>Club</th>
+          <th class="num">Goals</th>
+          <th class="num">Assists</th>
+        </tr>
+      </thead>
+      <tbody>
+        {scorers.map((s, i) => (
+          <tr>
+            <td class="num">{i + 1}</td>
+            <td><a href={`/players/${s.playerSlug}/`}>{s.name}</a></td>
+            <td><a href={`/clubs/${s.clubSlug}/`}>{s.club}</a></td>
+            <td class="num"><strong>{s.goals}</strong></td>
+            <td class="num">{s.assists}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>

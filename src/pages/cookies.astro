@@ -1,0 +1,23 @@
+---
+import Base from "../layouts/Base.astro";
+---
+
+<Base title="Cookie Policy" description="Cookie policy for lastseason.co.uk" canonical="/cookies/">
+  <div class="container">
+    <section class="page-hero">
+      <h1>Cookie Policy</h1>
+    </section>
+    <section class="section narrative">
+      <p>Last updated: {new Date().toLocaleDateString("en-GB", { year: "numeric", month: "long", day: "numeric" })}</p>
+      <p>This site uses cookies to improve your experience and to support our advertising and affiliate revenue.</p>
+      <h2 class="section-title">Essential cookies</h2>
+      <p>These cookies are necessary for the site to function. They cannot be disabled.</p>
+      <h2 class="section-title">Analytics cookies</h2>
+      <p>We use Google Analytics 4 to understand how visitors use our site. These cookies collect anonymous data about page views and user behaviour.</p>
+      <h2 class="section-title">Advertising cookies</h2>
+      <p>Our advertising partner Ezoic uses cookies to serve relevant advertisements. These cookies help fund the free content on this site.</p>
+      <h2 class="section-title">Managing cookies</h2>
+      <p>You can control and delete cookies through your browser settings. Disabling cookies may affect the functionality of this site. For more information about cookies, visit <a href="https://www.allaboutcookies.org" rel="nofollow" target="_blank">allaboutcookies.org</a>.</p>
+    </section>
+  </div>
+</Base>

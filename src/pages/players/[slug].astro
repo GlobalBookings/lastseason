@@ -1,0 +1,134 @@
+---
+import Base from "../../layouts/Base.astro";
+import { getAllLoadedSeasons } from "../../utils/data";
+
+export function getStaticPaths() {
+  const allSeasons = getAllLoadedSeasons();
+  const playerMap = new Map<string, { name: string; slug: string; appearances: any[] }>();
+
+  for (const season of allSeasons) {
+    for (const scorer of season.scorers) {
+      if (!playerMap.has(scorer.playerSlug)) {
+        playerMap.set(scorer.playerSlug, { name: scorer.name, slug: scorer.playerSlug, appearances: [] });
+      }
+      playerMap.get(scorer.playerSlug)!.appearances.push({
+        season: season.season,
+        league: season.league,
+        leagueSlug: season.leagueSlug,
+        club: scorer.club,
+        clubSlug: scorer.clubSlug,
+        goals: scorer.goals,
+        assists: scorer.assists,
+        type: "scorer",
+      });
+    }
+    for (const assister of season.assisters) {
+      if (!playerMap.has(assister.playerSlug)) {
+        playerMap.set(assister.playerSlug, { name: assister.name, slug: assister.playerSlug, appearances: [] });
+      }
+      const existing = playerMap.get(assister.playerSlug)!.appearances;
+      const alreadyAdded = existing.find(
+        (a: any) => a.season === season.season && a.leagueSlug === season.leagueSlug
+      );
+      if (!alreadyAdded) {
+        existing.push({
+          season: season.season,
+          league: season.league,
+          leagueSlug: season.leagueSlug,
+          club: assister.club,
+          clubSlug: assister.clubSlug,
+          goals: 0,
+          assists: assister.assists,
+          type: "assister",
+        });
+      }
+    }
+    for (const cs of season.cleanSheets) {
+      if (!playerMap.has(cs.playerSlug)) {
+        playerMap.set(cs.playerSlug, { name: cs.name, slug: cs.playerSlug, appearances: [] });
+      }
+      const existing = playerMap.get(cs.playerSlug)!.appearances;
+      const alreadyAdded = existing.find(
+        (a: any) => a.season === season.season && a.leagueSlug === season.leagueSlug
+      );
+      if (!alreadyAdded) {
+        existing.push({
+          season: season.season,
+          league: season.league,
+          leagueSlug: season.leagueSlug,
+          club: cs.club,
+          clubSlug: cs.clubSlug,
+          goals: 0,
+          assists: 0,
+          cleanSheets: cs.cleanSheets,
+          type: "goalkeeper",
+        });
+      }
+    }
+  }
+
+  return Array.from(playerMap.values()).map((player) => ({
+    params: { slug: player.slug },
+    props: { player },
+  }));
+}
+
+const { player } = Astro.props;
+const sortedAppearances = player.appearances.sort((a: any, b: any) => b.season.localeCompare(a.season));
+const totalGoals = player.appearances.reduce((sum: number, a: any) => sum + (a.goals || 0), 0);
+const totalAssists = player.appearances.reduce((sum: number, a: any) => sum + (a.assists || 0), 0);
+---
+
+<Base
+  title={`${player.name} — Career Stats`}
+  description={`${player.name} season-by-season stats including goals, assists and career history at Last Season.`}
+  canonical={`/players/${player.slug}/`}
+>
+  <div class="container">
+    <nav class="breadcrumbs">
+      <a href="/">Home</a>
+      <span>/</span>
+      <a href="/players/">Players</a>
+      <span>/</span>
+      {player.name}
+    </nav>
+
+    <section class="page-hero">
+      <h1>{player.name}</h1>
+      <p class="subtitle">
+        {totalGoals > 0 && <span>{totalGoals} goals</span>}
+        {totalGoals > 0 && totalAssists > 0 && <span> &mdash; </span>}
+        {totalAssists > 0 && <span>{totalAssists} assists</span>}
+        <span> (tracked seasons)</span>
+      </p>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Season-by-Season Stats</h2>
+      <div class="table-wrap">
+        <table class="stats-table">
+          <thead>
+            <tr>
+              <th>Season</th>
+              <th>League</th>
+              <th>Club</th>
+              <th class="num">Goals</th>
+              <th class="num">Assists</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sortedAppearances.map((a: any) => (
+              <tr>
+                <td><a href={`/${a.leagueSlug}/${a.season}/`}>{a.season}</a></td>
+                <td><a href={`/${a.leagueSlug}/`}>{a.league}</a></td>
+                <td><a href={`/clubs/${a.clubSlug}/`}>{a.club}</a></td>
+                <td class="num">{a.goals || "-"}</td>
+                <td class="num">{a.assists || "-"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</Base>

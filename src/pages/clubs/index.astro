@@ -1,0 +1,48 @@
+---
+import Base from "../../layouts/Base.astro";
+import { getAllLoadedSeasons } from "../../utils/data";
+
+const allSeasons = getAllLoadedSeasons();
+const clubMap = new Map<string, { name: string; slug: string; count: number }>();
+
+for (const season of allSeasons) {
+  for (const row of season.standings) {
+    if (!clubMap.has(row.clubSlug)) {
+      clubMap.set(row.clubSlug, { name: row.club, slug: row.clubSlug, count: 0 });
+    }
+    clubMap.get(row.clubSlug)!.count++;
+  }
+}
+
+const clubs = Array.from(clubMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+---
+
+<Base
+  title="All Clubs"
+  description="Browse all football clubs tracked at Last Season with season-by-season history and stats."
+  canonical="/clubs/"
+>
+  <div class="container">
+    <nav class="breadcrumbs">
+      <a href="/">Home</a>
+      <span>/</span>
+      Clubs
+    </nav>
+
+    <section class="page-hero">
+      <h1>All Clubs</h1>
+      <p class="subtitle">{clubs.length} clubs tracked</p>
+    </section>
+
+    <section class="section">
+      <div class="card-grid">
+        {clubs.map((club) => (
+          <a href={`/clubs/${club.slug}/`} class="card">
+            <h3>{club.name}</h3>
+            <p class="meta">{club.count} season{club.count !== 1 ? "s" : ""} tracked</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  </div>
+</Base>

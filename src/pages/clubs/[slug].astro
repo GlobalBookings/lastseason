@@ -1,0 +1,80 @@
+---
+import Base from "../../layouts/Base.astro";
+import { getAllLoadedSeasons } from "../../utils/data";
+
+export function getStaticPaths() {
+  const allSeasons = getAllLoadedSeasons();
+  const clubMap = new Map<string, { name: string; slug: string; seasons: any[] }>();
+
+  for (const season of allSeasons) {
+    for (const row of season.standings) {
+      if (!clubMap.has(row.clubSlug)) {
+        clubMap.set(row.clubSlug, { name: row.club, slug: row.clubSlug, seasons: [] });
+      }
+      clubMap.get(row.clubSlug)!.seasons.push({
+        season: season.season,
+        league: season.league,
+        leagueSlug: season.leagueSlug,
+        position: row.pos,
+        points: row.pts,
+      });
+    }
+  }
+
+  return Array.from(clubMap.values()).map((club) => ({
+    params: { slug: club.slug },
+    props: { club },
+  }));
+}
+
+const { club } = Astro.props;
+const sortedSeasons = club.seasons.sort((a: any, b: any) => b.season.localeCompare(a.season));
+const bestFinish = Math.min(...club.seasons.map((s: any) => s.position));
+---
+
+<Base
+  title={`${club.name} — Season History`}
+  description={`${club.name} season-by-season stats, league positions and history across all tracked leagues at Last Season.`}
+  canonical={`/clubs/${club.slug}/`}
+>
+  <div class="container">
+    <nav class="breadcrumbs">
+      <a href="/">Home</a>
+      <span>/</span>
+      <a href="/clubs/">Clubs</a>
+      <span>/</span>
+      {club.name}
+    </nav>
+
+    <section class="page-hero">
+      <h1>{club.name}</h1>
+      <p class="subtitle">Best recorded finish: {bestFinish}{bestFinish === 1 ? "st" : bestFinish === 2 ? "nd" : bestFinish === 3 ? "rd" : "th"}</p>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Season History</h2>
+      <div class="table-wrap">
+        <table class="stats-table">
+          <thead>
+            <tr>
+              <th>Season</th>
+              <th>League</th>
+              <th class="num">Position</th>
+              <th class="num">Points</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sortedSeasons.map((s: any) => (
+              <tr>
+                <td><a href={`/${s.leagueSlug}/${s.season}/`}>{s.season}</a></td>
+                <td><a href={`/${s.leagueSlug}/`}>{s.league}</a></td>
+                <td class="num">{s.position}</td>
+                <td class="num">{s.points}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</Base>

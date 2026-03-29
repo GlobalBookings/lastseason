@@ -1,0 +1,51 @@
+---
+import type { Standing } from "../types";
+
+interface Props {
+  standings: Standing[];
+  leagueSlug: string;
+}
+
+const { standings, leagueSlug } = Astro.props;
+---
+
+<div class="table-wrap">
+  <table class="stats-table">
+    <thead>
+      <tr>
+        <th class="num">#</th>
+        <th>Club</th>
+        <th class="num">P</th>
+        <th class="num">W</th>
+        <th class="num">D</th>
+        <th class="num">L</th>
+        <th class="num">GF</th>
+        <th class="num">GA</th>
+        <th class="num">GD</th>
+        <th class="num">Pts</th>
+      </tr>
+    </thead>
+    <tbody>
+      {standings.map((row) => (
+        <tr class={row.zone ? `zone-${row.zone}` : ""}>
+          <td class="num">{row.pos}</td>
+          <td><a href={`/clubs/${row.clubSlug}/`}>{row.club}</a></td>
+          <td class="num">{row.p}</td>
+          <td class="num">{row.w}</td>
+          <td class="num">{row.d}</td>
+          <td class="num">{row.l}</td>
+          <td class="num">{row.gf}</td>
+          <td class="num">{row.ga}</td>
+          <td class="num">{row.gd > 0 ? `+${row.gd}` : row.gd}</td>
+          <td class="num"><strong>{row.pts}</strong></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+<div class="table-legend">
+  <span><span class="dot dot-cl"></span> Champions League</span>
+  <span><span class="dot dot-el"></span> Europa League</span>
+  <span><span class="dot dot-ecl"></span> Conference League</span>
+  <span><span class="dot dot-rel"></span> Relegation</span>
+</div>

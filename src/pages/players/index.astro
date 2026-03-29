@@ -1,0 +1,48 @@
+---
+import Base from "../../layouts/Base.astro";
+import { getAllLoadedSeasons } from "../../utils/data";
+
+const allSeasons = getAllLoadedSeasons();
+const playerMap = new Map<string, { name: string; slug: string; goals: number }>();
+
+for (const season of allSeasons) {
+  for (const scorer of season.scorers) {
+    if (!playerMap.has(scorer.playerSlug)) {
+      playerMap.set(scorer.playerSlug, { name: scorer.name, slug: scorer.playerSlug, goals: 0 });
+    }
+    playerMap.get(scorer.playerSlug)!.goals += scorer.goals;
+  }
+}
+
+const players = Array.from(playerMap.values()).sort((a, b) => b.goals - a.goals);
+---
+
+<Base
+  title="All Players"
+  description="Browse all football players tracked at Last Season with career stats across multiple leagues and seasons."
+  canonical="/players/"
+>
+  <div class="container">
+    <nav class="breadcrumbs">
+      <a href="/">Home</a>
+      <span>/</span>
+      Players
+    </nav>
+
+    <section class="page-hero">
+      <h1>All Players</h1>
+      <p class="subtitle">{players.length} players tracked</p>
+    </section>
+
+    <section class="section">
+      <div class="card-grid">
+        {players.map((player) => (
+          <a href={`/players/${player.slug}/`} class="card">
+            <h3>{player.name}</h3>
+            <p class="meta">{player.goals} goals (tracked seasons)</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  </div>
+</Base>

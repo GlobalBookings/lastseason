@@ -1,0 +1,35 @@
+---
+import type { Assister } from "../types";
+
+interface Props {
+  assisters: Assister[];
+}
+
+const { assisters } = Astro.props;
+---
+
+<div class="section">
+  <h2 class="section-title">Top Assisters</h2>
+  <div class="table-wrap">
+    <table class="stats-table">
+      <thead>
+        <tr>
+          <th class="num">#</th>
+          <th>Player</th>
+          <th>Club</th>
+          <th class="num">Assists</th>
+        </tr>
+      </thead>
+      <tbody>
+        {assisters.map((a, i) => (
+          <tr>
+            <td class="num">{i + 1}</td>
+            <td><a href={`/players/${a.playerSlug}/`}>{a.name}</a></td>
+            <td><a href={`/clubs/${a.clubSlug}/`}>{a.club}</a></td>
+            <td class="num"><strong>{a.assists}</strong></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,111 @@
+---
+import Base from "../../layouts/Base.astro";
+import StandingsTable from "../../components/StandingsTable.astro";
+import ScorersTable from "../../components/ScorersTable.astro";
+import AssistersTable from "../../components/AssistersTable.astro";
+import CleanSheetsTable from "../../components/CleanSheetsTable.astro";
+import Awards from "../../components/Awards.astro";
+import RelegationPromotion from "../../components/RelegationPromotion.astro";
+import BettingCta from "../../components/BettingCta.astro";
+import { leagues } from "../../data/leagues/index";
+import { getSeasonData, getAdjacentSeasons, getLeague } from "../../utils/data";
+import { buildSeasonSchema } from "../../utils/schema";
+
+export function getStaticPaths() {
+  const paths: any[] = [];
+  for (const league of leagues) {
+    for (const season of league.seasons) {
+      paths.push({
+        params: { league: league.slug, season },
+        props: { leagueSlug: league.slug, season },
+      });
+    }
+  }
+  return paths;
+}
+
+const { leagueSlug, season } = Astro.props;
+const data = getSeasonData(leagueSlug, season);
+const league = getLeague(leagueSlug);
+const { prev, next } = getAdjacentSeasons(leagueSlug, season);
+
+if (!data || !league) {
+  return Astro.redirect("/404");
+}
+
+const schema = buildSeasonSchema(data);
+const narrativeParagraphs = data.narrative.split("\n\n").filter(Boolean);
+---
+
+<Base
+  title={data.metaTitle}
+  description={data.metaDescription}
+  canonical={`/${leagueSlug}/${season}/`}
+  schema={schema}
+  accentColor={league.accentColor}
+>
+  <div class="container">
+    <nav class="breadcrumbs">
+      <a href="/">Home</a>
+      <span>/</span>
+      <a href={`/${leagueSlug}/`}>{data.league}</a>
+      <span>/</span>
+      {data.seasonDisplay}
+    </nav>
+
+    <section class="page-hero">
+      <h1>{data.league} {data.seasonDisplay}</h1>
+      <p class="subtitle">
+        Champion: <strong>{data.champion}</strong> &mdash;
+        Top scorer: <strong>{data.topScorer}</strong> ({data.topScorerGoals} goals) &mdash;
+        {data.totalGoals} total goals
+      </p>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Final Table</h2>
+      <StandingsTable standings={data.standings} leagueSlug={leagueSlug} />
+    </section>
+
+    <ScorersTable scorers={data.scorers} />
+    <AssistersTable assisters={data.assisters} />
+    <CleanSheetsTable cleanSheets={data.cleanSheets} />
+    <Awards awards={data.awards} />
+
+    <section class="section">
+      <h2 class="section-title">Season Review</h2>
+      <div class="narrative">
+        {narrativeParagraphs.map((p) => <p>{p}</p>)}
+      </div>
+    </section>
+
+    <BettingCta league={data.league} />
+
+    <RelegationPromotion relegated={data.relegated} promoted={data.promoted} />
+
+    {data.notableMoments.length > 0 && (
+      <section class="section">
+        <h2 class="section-title">Notable Moments</h2>
+        <ul class="moments-list">
+          {data.notableMoments.map((moment) => (
+            <li>{moment}</li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    <nav class="season-nav">
+      {prev ? (
+        <a href={`/${leagueSlug}/${prev}/`}>&larr; {prev}</a>
+      ) : (
+        <span></span>
+      )}
+      <a href={`/${leagueSlug}/`}>All {data.league} seasons</a>
+      {next ? (
+        <a href={`/${leagueSlug}/${next}/`}>{next} &rarr;</a>
+      ) : (
+        <span></span>
+      )}
+    </nav>
+  </div>
+</Base>

@@ -1,0 +1,77 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description: string;
+  canonical?: string;
+  schema?: string;
+  accentColor?: string;
+}
+
+const { title, description, canonical, schema, accentColor } = Astro.props;
+const siteUrl = "https://lastseason.co.uk";
+const fullCanonical = canonical ? `${siteUrl}${canonical}` : siteUrl;
+---
+
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title} | Last Season</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={fullCanonical} />
+    <meta name="robots" content="index, follow" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={fullCanonical} />
+    <meta property="og:site_name" content="Last Season" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {schema && <script type="application/ld+json" set:html={schema} />}
+    {accentColor && <style set:html={`:root { --accent: ${accentColor}; }`} />}
+    <!-- Ezoic: add script tag here once account is active -->
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <a href="/" class="site-logo">last<span>season</span></a>
+        <nav class="site-nav" aria-label="Main navigation">
+          <a href="/premier-league/">Premier League</a>
+          <a href="/championship/">Championship</a>
+          <a href="/la-liga/">La Liga</a>
+          <a href="/bundesliga/">Bundesliga</a>
+          <a href="/serie-a/">Serie A</a>
+          <a href="/ligue-1/">Ligue 1</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <div class="footer-inner">
+          <div>
+            <p>&copy; {new Date().getFullYear()} lastseason.co.uk — Every season. Every stat.</p>
+            <div class="footer-links">
+              <a href="/privacy/">Privacy Policy</a>
+              <a href="/cookies/">Cookie Policy</a>
+            </div>
+          </div>
+        </div>
+        <div class="gambling-disclaimer">
+          18+ | BeGambleAware.org | When the fun stops, stop. Affiliate links on this site may earn commission. All betting links are marked with rel="nofollow sponsored". T&Cs apply to all offers.
+        </div>
+      </div>
+    </footer>
+
+    <!-- GA4: add tracking script here -->
+  </body>
+</html>

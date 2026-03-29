@@ -1,0 +1,23 @@
+---
+import Base from "../layouts/Base.astro";
+---
+
+<Base title="Privacy Policy" description="Privacy policy for lastseason.co.uk" canonical="/privacy/">
+  <div class="container">
+    <section class="page-hero">
+      <h1>Privacy Policy</h1>
+    </section>
+    <section class="section narrative">
+      <p>Last updated: {new Date().toLocaleDateString("en-GB", { year: "numeric", month: "long", day: "numeric" })}</p>
+      <p>lastseason.co.uk ("we", "us") respects your privacy. This policy explains what data we collect and how we use it.</p>
+      <h2 class="section-title">Data we collect</h2>
+      <p>We collect anonymous usage data via Google Analytics 4, including pages visited, time on site, device type and approximate location (country level). We do not collect personally identifiable information unless you contact us directly.</p>
+      <h2 class="section-title">Cookies</h2>
+      <p>We use essential cookies for site functionality and analytics cookies via Google Analytics. Our advertising partner Ezoic may also set cookies to serve relevant advertisements. You can manage cookie preferences in your browser settings.</p>
+      <h2 class="section-title">Third-party links</h2>
+      <p>This site contains affiliate links to betting operators and retail partners. These links are clearly marked and use rel="nofollow sponsored" attributes. We earn commission from qualifying actions but this does not affect our editorial content. Third-party sites have their own privacy policies.</p>
+      <h2 class="section-title">Your rights</h2>
+      <p>Under UK GDPR, you have the right to access, rectify, or delete any personal data we hold about you. Contact us at privacy@lastseason.co.uk for any data requests.</p>
+    </section>
+  </div>
+</Base>
