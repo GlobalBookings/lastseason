@@ -1,10 +1,10 @@
 ---
 import Base from "../../layouts/Base.astro";
-import { allClubKits } from "../../data/kits/index";
+import { allClubKitArchives } from "../../data/kits/index";
 import { leagues } from "../../data/leagues/index";
 
 export function getStaticPaths() {
-  return allClubKits.map((club) => ({
+  return allClubKitArchives.map((club) => ({
     params: { slug: club.clubSlug },
     props: { club },
   }));
@@ -12,6 +12,13 @@ export function getStaticPaths() {
 
 const { club } = Astro.props;
 const league = leagues.find(l => l.slug === club.leagueSlug);
+
+const kitsBySeason = new Map<string, typeof club.kits>();
+for (const kit of club.kits) {
+  if (!kitsBySeason.has(kit.season)) kitsBySeason.set(kit.season, []);
+  kitsBySeason.get(kit.season)!.push(kit);
+}
+const seasons = [...kitsBySeason.keys()].sort((a, b) => b.localeCompare(a));
 
 const breadcrumbSchema = JSON.stringify({
   "@context": "https://schema.org",
@@ -23,17 +30,12 @@ const breadcrumbSchema = JSON.stringify({
   ],
 });
 
-const kitTypeLabels: Record<string, string> = {
-  home: "Home Kit",
-  away: "Away Kit",
-  third: "Third Kit",
-  goalkeeper: "Goalkeeper Kit",
-};
+const typeLabel: Record<string, string> = { home: "Home", away: "Away", third: "Third", goalkeeper: "GK" };
 ---
 
 <Base
-  title={`${club.club} Kits 2024-25 — Where to Buy | Price Comparison`}
-  description={`Compare prices on ${club.club} 2024-25 football kits. Home, away and third shirts from JD Sports, Kitbag, Nike, Adidas and more.`}
+  title={`${club.club} Kit History — Every Home & Away Kit`}
+  description={`Complete ${club.club} kit archive. Every home and away shirt from ${seasons[seasons.length - 1]} to ${seasons[0]}. Browse by season and find where to buy retro kits.`}
   canonical={`/kits/${club.clubSlug}/`}
   accentColor={league?.accentColor}
 >
@@ -49,56 +51,125 @@ const kitTypeLabels: Record<string, string> = {
     </nav>
 
     <section class="page-hero">
-      <h1>{club.club} Kits 2024-25</h1>
+      <h1>{club.club} Kit History</h1>
       <p class="subtitle">
-        <a href={`/${club.leagueSlug}/`}>{club.league}</a> &mdash;
-        {club.kits.length} kit{club.kits.length !== 1 ? "s" : ""} available &mdash;
-        Manufactured by {[...new Set(club.kits.map(k => k.manufacturer))].join(", ")}
+        <a href={`/${club.leagueSlug}/`}>{club.league}</a>
+        {club.founded && <span> &mdash; Founded {club.founded}</span>}
       </p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="hero-stat-value">{club.kits.length}</span>
+          <span class="hero-stat-label">Kits Archived</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">{seasons.length}</span>
+          <span class="hero-stat-label">Seasons</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">{[...new Set(club.kits.map(k => k.manufacturer))].length}</span>
+          <span class="hero-stat-label">Manufacturers</span>
+        </div>
+      </div>
     </section>
 
-    {club.kits.map((kit) => (
-      <section class="section">
-        <h2 class="section-title">{kitTypeLabels[kit.type] || kit.type} — {kit.season}</h2>
-        <div class="kit-details">
-          <p class="kit-manufacturer">Made by <strong>{kit.manufacturer}</strong></p>
-        </div>
-        <div class="table-wrap" role="region" aria-label={`${kitTypeLabels[kit.type]} price comparison`} tabindex="0">
-          <table class="stats-table" aria-label={`${club.club} ${kitTypeLabels[kit.type]} retailers`}>
-            <thead>
-              <tr>
-                <th scope="col">Retailer</th>
-                <th scope="col">Price</th>
-                <th scope="col">Link</th>
-              </tr>
-            </thead>
-            <tbody>
-              {kit.retailers.map((r) => (
-                <tr>
-                  <td><strong>{r.name}</strong></td>
-                  <td>{r.price || "Check site"}</td>
-                  <td>
-                    <a href={r.url} rel="nofollow sponsored" target="_blank" class="kit-buy-link">
-                      Buy now &rarr;
-                    </a>
-                  </td>
-                </tr>
+    <section class="section">
+      <h2 class="section-title">All Kits by Season</h2>
+
+      {seasons.map((season) => {
+        const kits = kitsBySeason.get(season)!;
+        return (
+          <div class="kit-season-row" id={season}>
+            <h3 class="kit-season-heading">{season}</h3>
+            <div class="kit-cards-row">
+              {kits.map((kit) => (
+                <a href={`/kits/${club.clubSlug}/${season}-${kit.type}/`} class="kit-card">
+                  <div class="kit-shirt-preview" aria-hidden="true">
+                    <svg viewBox="0 0 100 120" class="kit-shirt-svg">
+                      <path d="M25,0 L0,20 L15,25 L15,120 L85,120 L85,25 L100,20 L75,0 Z"
+                        fill={kit.primaryColor} stroke={kit.secondaryColor} stroke-width="2"/>
+                      <path d="M35,0 L50,15 L65,0" fill="none" stroke={kit.secondaryColor} stroke-width="2"/>
+                    </svg>
+                  </div>
+                  <span class="kit-card-type">{typeLabel[kit.type] || kit.type}</span>
+                  <span class="kit-card-brand">{kit.manufacturer}</span>
+                  {kit.sponsor && <span class="kit-card-sponsor">{kit.sponsor}</span>}
+                </a>
               ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-    ))}
+            </div>
+          </div>
+        );
+      })}
+    </section>
 
     <section class="section">
       <h2 class="section-title">Club Stats</h2>
-      <p>View <a href={`/clubs/${club.clubSlug}/`}>{club.club}'s season history and stats</a>.</p>
+      <p>View <a href={`/clubs/${club.clubSlug}/`}>{club.club}'s season history and league positions</a>.</p>
     </section>
-
-    <aside class="betting-cta" aria-label="Affiliate disclaimer">
-      <p class="disclaimer" style="margin:0;">
-        Prices are for adult replica shirts and may vary. Links on this page are affiliate links — we earn a small commission at no extra cost to you. Prices correct at time of publishing.
-      </p>
-    </aside>
   </div>
 </Base>
+
+<style>
+  .kit-season-row {
+    margin-bottom: 1.75rem;
+    padding-bottom: 1.75rem;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .kit-season-row:last-child { border-bottom: none; }
+  .kit-season-heading {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--text-secondary);
+  }
+  .kit-cards-row {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  .kit-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 120px;
+    padding: 1rem 0.75rem;
+    background: var(--bg-alt);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .kit-card:hover {
+    border-color: var(--border);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+    text-decoration: none;
+  }
+  .kit-shirt-preview {
+    width: 60px;
+    height: 72px;
+    margin-bottom: 0.5rem;
+  }
+  .kit-shirt-svg { width: 100%; height: 100%; }
+  .kit-card-type {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .kit-card-brand {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 0.15rem;
+  }
+  .kit-card-sponsor {
+    font-size: 0.62rem;
+    color: var(--text-muted);
+    opacity: 0.7;
+    margin-top: 0.1rem;
+  }
+  @media (max-width: 480px) {
+    .kit-card { width: calc(50% - 0.375rem); }
+  }
+</style>

@@ -1,30 +1,41 @@
 ---
 import Base from "../../layouts/Base.astro";
-import { allClubKits } from "../../data/kits/index";
+import { allClubKitArchives, getKitArchivesByLeague } from "../../data/kits/index";
 import { leagues } from "../../data/leagues/index";
 
-const kitsByLeague = new Map<string, typeof allClubKits>();
-for (const club of allClubKits) {
-  if (!kitsByLeague.has(club.leagueSlug)) kitsByLeague.set(club.leagueSlug, []);
-  kitsByLeague.get(club.leagueSlug)!.push(club);
-}
+const totalKits = allClubKitArchives.reduce((sum, c) => sum + c.kits.length, 0);
+const totalClubs = allClubKitArchives.length;
 ---
 
 <Base
-  title="Football Kits 2024-25 — Where to Buy | Price Comparison"
-  description="Compare prices on 2024-25 football kits from the Premier League, La Liga, Bundesliga, Serie A and more. Find the best deals at JD Sports, Kitbag, Nike and Adidas."
+  title="Football Kit Archive — Every Club, Every Season"
+  description="Browse the complete football kit archive. Home, away and third kits for clubs across the Premier League, La Liga, Bundesliga, Serie A and more. Find where to buy vintage and retro shirts."
   canonical="/kits/"
 >
   <section class="home-hero kits-hero" style="background-image: url('/img/hero-stadium.jpg');">
     <div class="container">
-      <h1>Football Kits<br />2024-25</h1>
-      <p class="subtitle">Compare prices across JD Sports, Kitbag, Nike, Adidas and Puma. Find the best deals on home, away and third kits.</p>
+      <h1>Football Kit<br />Archive</h1>
+      <p class="subtitle">Every club. Every season. Home and away kits from the 1980s to today, with links to buy vintage and retro shirts.</p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="hero-stat-value">{totalClubs}</span>
+          <span class="hero-stat-label">Clubs</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">{totalKits.toLocaleString()}</span>
+          <span class="hero-stat-label">Kits Archived</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">{leagues.length}</span>
+          <span class="hero-stat-label">Leagues</span>
+        </div>
+      </div>
     </div>
   </section>
 
   <div class="container home-leagues">
     {leagues.map((league) => {
-      const clubs = kitsByLeague.get(league.slug);
+      const clubs = getKitArchivesByLeague(league.slug);
       if (!clubs || clubs.length === 0) return null;
       return (
         <section class="league-section">
@@ -33,15 +44,20 @@ for (const club of allClubKits) {
           </div>
           <div class="card-grid">
             {clubs.map((club) => {
-              const homeKit = club.kits.find(k => k.type === "home");
               const kitCount = club.kits.length;
-              const lowestPrice = homeKit?.retailers[0]?.price || "TBC";
+              const decades = new Set(club.kits.map(k => k.season.slice(0, 3) + "0s"));
+              const yearsRange = club.kits.length > 0
+                ? `${club.kits[club.kits.length - 1].season} — ${club.kits[0].season}`
+                : "";
               return (
                 <a href={`/kits/${club.clubSlug}/`} class="card card-accent" style={`border-top-color: ${league.accentColor}`}>
-                  <span class="card-tag">{homeKit?.manufacturer || "TBC"}</span>
+                  <div class="kit-color-preview">
+                    <span class="kit-swatch" style={`background: ${club.kits[0]?.primaryColor || '#ccc'}`}></span>
+                    <span class="kit-swatch" style={`background: ${club.kits[0]?.secondaryColor || '#ccc'}`}></span>
+                  </div>
                   <h3>{club.club}</h3>
-                  <p class="meta">{kitCount} kit{kitCount !== 1 ? "s" : ""} available</p>
-                  <p class="meta">From <strong>{lowestPrice}</strong></p>
+                  <p class="meta"><strong>{kitCount} kits</strong> archived</p>
+                  <p class="meta">{yearsRange}</p>
                 </a>
               );
             })}
@@ -49,12 +65,5 @@ for (const club of allClubKits) {
         </section>
       );
     })}
-
-    <section class="section">
-      <h2 class="section-title">About Kit Prices</h2>
-      <div class="narrative">
-        <p>Prices shown are for adult replica shirts and are sourced from major UK retailers. Prices may vary and are subject to availability. Authentic/player versions are typically more expensive. Links on this page are affiliate links — we earn a small commission at no extra cost to you.</p>
-      </div>
-    </section>
   </div>
 </Base>

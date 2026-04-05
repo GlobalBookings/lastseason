@@ -1025,6 +1025,19 @@ main > .container {
   background-position: center 30%;
 }
 
+.kit-color-preview {
+  display: flex;
+  gap: 0.35rem;
+  margin-bottom: 0.65rem;
+}
+
+.kit-swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+}
+
 /* ============================================
    FOCUS STATES (accessibility)
    ============================================ */

@@ -1,0 +1,302 @@
+---
+import Base from "../../../layouts/Base.astro";
+import { allClubKitArchives } from "../../../data/kits/index";
+import { leagues } from "../../../data/leagues/index";
+
+export function getStaticPaths() {
+  const paths: any[] = [];
+  for (const club of allClubKitArchives) {
+    for (const kit of club.kits) {
+      paths.push({
+        params: { slug: club.clubSlug, kit: `${kit.season}-${kit.type}` },
+        props: { club, kit },
+      });
+    }
+  }
+  return paths;
+}
+
+const { club, kit } = Astro.props;
+const league = leagues.find(l => l.slug === club.leagueSlug);
+const typeLabel: Record<string, string> = { home: "Home Kit", away: "Away Kit", third: "Third Kit", goalkeeper: "Goalkeeper Kit" };
+const label = typeLabel[kit.type] || kit.type;
+
+const breadcrumbSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://lastseason.co.uk/" },
+    { "@type": "ListItem", "position": 2, "name": "Kits", "item": "https://lastseason.co.uk/kits/" },
+    { "@type": "ListItem", "position": 3, "name": club.club, "item": `https://lastseason.co.uk/kits/${club.clubSlug}/` },
+    { "@type": "ListItem", "position": 4, "name": `${kit.season} ${label}` },
+  ],
+});
+
+const otherKitsSameSeason = club.kits.filter(k => k.season === kit.season && k.type !== kit.type);
+const adjacentSeasons = [...new Set(club.kits.map(k => k.season))].sort((a, b) => b.localeCompare(a));
+const currentIdx = adjacentSeasons.indexOf(kit.season);
+const prevSeason = currentIdx < adjacentSeasons.length - 1 ? adjacentSeasons[currentIdx + 1] : null;
+const nextSeason = currentIdx > 0 ? adjacentSeasons[currentIdx - 1] : null;
+---
+
+<Base
+  title={`${club.club} ${kit.season} ${label} — ${kit.manufacturer}`}
+  description={`${club.club} ${kit.season} ${label.toLowerCase()} made by ${kit.manufacturer}${kit.sponsor ? `, sponsored by ${kit.sponsor}` : ""}. Find where to buy this shirt on eBay and other retailers.`}
+  canonical={`/kits/${club.clubSlug}/${kit.season}-${kit.type}/`}
+  accentColor={league?.accentColor}
+>
+  <script type="application/ld+json" set:html={breadcrumbSchema} />
+
+  <div class="container">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a href="/">Home</a>
+      <span class="sep">/</span>
+      <a href="/kits/">Kits</a>
+      <span class="sep">/</span>
+      <a href={`/kits/${club.clubSlug}/`}>{club.club}</a>
+      <span class="sep">/</span>
+      <span class="current">{kit.season} {label}</span>
+    </nav>
+
+    <section class="page-hero">
+      <h1>{club.club} {kit.season} {label}</h1>
+      <p class="subtitle">
+        Made by <strong>{kit.manufacturer}</strong>
+        {kit.sponsor && <span> &mdash; Sponsored by <strong>{kit.sponsor}</strong></span>}
+      </p>
+    </section>
+
+    <div class="kit-detail-layout">
+      <div class="kit-detail-visual">
+        <div class="kit-large-preview" aria-label={`${club.club} ${kit.season} ${label} colour preview`}>
+          <svg viewBox="0 0 200 240" class="kit-large-svg">
+            <path d="M50,0 L0,40 L30,50 L30,240 L170,240 L170,50 L200,40 L150,0 Z"
+              fill={kit.primaryColor} stroke={kit.secondaryColor} stroke-width="3"/>
+            <path d="M70,0 L100,30 L130,0" fill="none" stroke={kit.secondaryColor} stroke-width="3"/>
+            {kit.sponsor && (
+              <text x="100" y="130" text-anchor="middle" fill={kit.secondaryColor}
+                font-family="Inter, sans-serif" font-size="14" font-weight="700" opacity="0.6">
+                {kit.sponsor}
+              </text>
+            )}
+            {kit.tertiaryColor && (
+              <line x1="30" y1="50" x2="170" y2="50" stroke={kit.tertiaryColor} stroke-width="2"/>
+            )}
+          </svg>
+        </div>
+
+        <div class="kit-colour-swatches">
+          <div class="swatch-item">
+            <span class="swatch-dot" style={`background: ${kit.primaryColor}`}></span>
+            <span class="swatch-label">Primary</span>
+          </div>
+          <div class="swatch-item">
+            <span class="swatch-dot" style={`background: ${kit.secondaryColor}`}></span>
+            <span class="swatch-label">Secondary</span>
+          </div>
+          {kit.tertiaryColor && (
+            <div class="swatch-item">
+              <span class="swatch-dot" style={`background: ${kit.tertiaryColor}`}></span>
+              <span class="swatch-label">Tertiary</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div class="kit-detail-info">
+        <div class="section">
+          <h2 class="section-title">Kit Details</h2>
+          <div class="kit-specs">
+            <div class="kit-spec-row">
+              <span class="kit-spec-label">Club</span>
+              <span class="kit-spec-value"><a href={`/clubs/${club.clubSlug}/`}>{club.club}</a></span>
+            </div>
+            <div class="kit-spec-row">
+              <span class="kit-spec-label">Season</span>
+              <span class="kit-spec-value">{kit.season}</span>
+            </div>
+            <div class="kit-spec-row">
+              <span class="kit-spec-label">Type</span>
+              <span class="kit-spec-value">{label}</span>
+            </div>
+            <div class="kit-spec-row">
+              <span class="kit-spec-label">Manufacturer</span>
+              <span class="kit-spec-value">{kit.manufacturer}</span>
+            </div>
+            {kit.sponsor && (
+              <div class="kit-spec-row">
+                <span class="kit-spec-label">Sponsor</span>
+                <span class="kit-spec-value">{kit.sponsor}</span>
+              </div>
+            )}
+            <div class="kit-spec-row">
+              <span class="kit-spec-label">League</span>
+              <span class="kit-spec-value"><a href={`/${club.leagueSlug}/`}>{club.league}</a></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2 class="section-title">Where to Buy</h2>
+          <div class="kit-buy-grid">
+            {kit.retailers.map((r) => (
+              <a href={r.url} rel="nofollow sponsored" target="_blank" class="kit-buy-button">
+                <span class="kit-buy-name">{r.name}</span>
+                <span class="kit-buy-action">Search &rarr;</span>
+              </a>
+            ))}
+            <a href={`https://www.ebay.co.uk/sch/i.html?_nkw=${encodeURIComponent(`${club.club} ${kit.season} ${kit.type} shirt retro`)}&_sacat=0&LH_TitleDesc=0`}
+              rel="nofollow sponsored" target="_blank" class="kit-buy-button">
+              <span class="kit-buy-name">eBay (Retro)</span>
+              <span class="kit-buy-action">Search &rarr;</span>
+            </a>
+            <a href={`https://www.classicfootballshirts.co.uk/search?q=${encodeURIComponent(`${club.club} ${kit.season}`)}`}
+              rel="nofollow sponsored" target="_blank" class="kit-buy-button">
+              <span class="kit-buy-name">Classic Football Shirts</span>
+              <span class="kit-buy-action">Search &rarr;</span>
+            </a>
+            <a href={`https://www.vintagefootballshirts.com/search?q=${encodeURIComponent(`${club.club} ${kit.season}`)}`}
+              rel="nofollow sponsored" target="_blank" class="kit-buy-button">
+              <span class="kit-buy-name">Vintage Football Shirts</span>
+              <span class="kit-buy-action">Search &rarr;</span>
+            </a>
+          </div>
+          <p class="kit-buy-disclaimer">
+            Links open external sites. Prices vary. Some shirts may be out of stock.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    {otherKitsSameSeason.length > 0 && (
+      <section class="section">
+        <h2 class="section-title">Other {kit.season} Kits</h2>
+        <div class="kit-cards-row">
+          {otherKitsSameSeason.map((k) => (
+            <a href={`/kits/${club.clubSlug}/${k.season}-${k.type}/`} class="kit-card">
+              <div class="kit-shirt-preview">
+                <svg viewBox="0 0 100 120" class="kit-shirt-svg">
+                  <path d="M25,0 L0,20 L15,25 L15,120 L85,120 L85,25 L100,20 L75,0 Z"
+                    fill={k.primaryColor} stroke={k.secondaryColor} stroke-width="2"/>
+                  <path d="M35,0 L50,15 L65,0" fill="none" stroke={k.secondaryColor} stroke-width="2"/>
+                </svg>
+              </div>
+              <span class="kit-card-type">{k.type}</span>
+              <span class="kit-card-brand">{k.manufacturer}</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <nav class="season-nav" aria-label="Kit season navigation">
+      {prevSeason ? (
+        <a href={`/kits/${club.clubSlug}/${prevSeason}-${kit.type}/`}>&larr; {prevSeason}</a>
+      ) : <span></span>}
+      <a href={`/kits/${club.clubSlug}/`}>All {club.club} kits</a>
+      {nextSeason ? (
+        <a href={`/kits/${club.clubSlug}/${nextSeason}-${kit.type}/`}>{nextSeason} &rarr;</a>
+      ) : <span></span>}
+    </nav>
+  </div>
+</Base>
+
+<style>
+  .kit-detail-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 2.5rem;
+    margin-bottom: 2rem;
+  }
+  .kit-large-preview {
+    background: var(--bg-alt);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .kit-large-svg { width: 160px; height: 192px; }
+  .kit-colour-swatches {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+    justify-content: center;
+  }
+  .swatch-item { display: flex; align-items: center; gap: 0.35rem; }
+  .swatch-dot {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+  }
+  .swatch-label { font-size: 0.7rem; color: var(--text-muted); }
+  .kit-specs { border: 1px solid var(--border-light); border-radius: var(--radius-lg); overflow: hidden; }
+  .kit-spec-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.65rem 1rem;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 0.88rem;
+  }
+  .kit-spec-row:last-child { border-bottom: none; }
+  .kit-spec-row:nth-child(even) { background: var(--bg-alt); }
+  .kit-spec-label { color: var(--text-muted); font-weight: 500; }
+  .kit-spec-value { font-weight: 600; color: var(--text); text-align: right; }
+  .kit-spec-value a { color: var(--text); }
+  .kit-spec-value a:hover { color: var(--link); }
+  .kit-buy-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.6rem;
+  }
+  .kit-buy-button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: var(--bg-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    text-decoration: none;
+    transition: all 0.2s;
+    color: var(--text);
+  }
+  .kit-buy-button:hover {
+    border-color: var(--accent);
+    box-shadow: var(--shadow);
+    text-decoration: none;
+    transform: translateY(-1px);
+  }
+  .kit-buy-name { font-weight: 650; font-size: 0.85rem; }
+  .kit-buy-action { font-size: 0.78rem; color: var(--link); font-weight: 600; }
+  .kit-buy-disclaimer {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-top: 0.75rem;
+  }
+  .kit-cards-row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+  .kit-card {
+    display: flex; flex-direction: column; align-items: center;
+    width: 120px; padding: 1rem 0.75rem;
+    background: var(--bg-alt); border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg); text-decoration: none; color: var(--text);
+    transition: all 0.2s; text-align: center;
+  }
+  .kit-card:hover { border-color: var(--border); box-shadow: var(--shadow-md); transform: translateY(-2px); text-decoration: none; }
+  .kit-shirt-preview { width: 60px; height: 72px; margin-bottom: 0.5rem; }
+  .kit-shirt-svg { width: 100%; height: 100%; }
+  .kit-card-type { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; }
+  .kit-card-brand { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.15rem; }
+
+  @media (max-width: 768px) {
+    .kit-detail-layout {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    .kit-large-preview { padding: 1.5rem; }
+    .kit-large-svg { width: 120px; height: 144px; }
+    .kit-buy-grid { grid-template-columns: 1fr; }
+  }
+</style>

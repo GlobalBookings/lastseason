@@ -1,21 +1,28 @@
 export interface KitRetailer {
   name: string;
-  slug: string;
   url: string;
   price?: string;
 }
 
-export interface Kit {
-  type: "home" | "away" | "third" | "goalkeeper";
+export interface HistoricKit {
+  club: string;
+  clubSlug: string;
   season: string;
+  type: "home" | "away" | "third" | "goalkeeper";
   manufacturer: string;
+  sponsor?: string;
+  primaryColor: string;
+  secondaryColor: string;
+  tertiaryColor?: string;
+  description?: string;
   retailers: KitRetailer[];
 }
 
-export interface ClubKits {
+export interface ClubKitArchive {
   club: string;
   clubSlug: string;
   league: string;
   leagueSlug: string;
-  kits: Kit[];
+  founded?: number;
+  kits: HistoricKit[];
 }
