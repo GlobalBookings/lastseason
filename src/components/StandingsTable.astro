@@ -7,22 +7,23 @@ interface Props {
 }
 
 const { standings, leagueSlug } = Astro.props;
+const hasPromotion = standings.some(s => s.zone === "promotion");
 ---
 
-<div class="table-wrap">
-  <table class="stats-table">
+<div class="table-wrap" role="region" aria-label="League standings table" tabindex="0">
+  <table class="stats-table" aria-label="Final league table">
     <thead>
       <tr>
-        <th class="num">#</th>
-        <th>Club</th>
-        <th class="num">P</th>
-        <th class="num">W</th>
-        <th class="num">D</th>
-        <th class="num">L</th>
-        <th class="num">GF</th>
-        <th class="num">GA</th>
-        <th class="num">GD</th>
-        <th class="num">Pts</th>
+        <th class="num" scope="col" abbr="Position">#</th>
+        <th scope="col">Club</th>
+        <th class="num" scope="col" abbr="Played">P</th>
+        <th class="num" scope="col" abbr="Won">W</th>
+        <th class="num" scope="col" abbr="Drawn">D</th>
+        <th class="num" scope="col" abbr="Lost">L</th>
+        <th class="num" scope="col" abbr="Goals For">GF</th>
+        <th class="num" scope="col" abbr="Goals Against">GA</th>
+        <th class="num" scope="col" abbr="Goal Difference">GD</th>
+        <th class="num" scope="col" abbr="Points">Pts</th>
       </tr>
     </thead>
     <tbody>
@@ -43,9 +44,10 @@ const { standings, leagueSlug } = Astro.props;
     </tbody>
   </table>
 </div>
-<div class="table-legend">
+<div class="table-legend" aria-label="Table legend">
   <span><span class="dot dot-cl"></span> Champions League</span>
   <span><span class="dot dot-el"></span> Europa League</span>
   <span><span class="dot dot-ecl"></span> Conference League</span>
   <span><span class="dot dot-rel"></span> Relegation</span>
+  {hasPromotion && <span><span class="dot dot-promo"></span> Promotion</span>}
 </div>

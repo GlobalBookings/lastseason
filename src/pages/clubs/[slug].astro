@@ -30,37 +30,59 @@ export function getStaticPaths() {
 const { club } = Astro.props;
 const sortedSeasons = club.seasons.sort((a: any, b: any) => b.season.localeCompare(a.season));
 const bestFinish = Math.min(...club.seasons.map((s: any) => s.position));
+const suffix = bestFinish === 1 ? "st" : bestFinish === 2 ? "nd" : bestFinish === 3 ? "rd" : "th";
+
+const breadcrumbSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://lastseason.co.uk/" },
+    { "@type": "ListItem", "position": 2, "name": "Clubs", "item": "https://lastseason.co.uk/clubs/" },
+    { "@type": "ListItem", "position": 3, "name": club.name },
+  ],
+});
 ---
 
 <Base
-  title={`${club.name} — Season History`}
+  title={`${club.name} — Season History & Stats`}
   description={`${club.name} season-by-season stats, league positions and history across all tracked leagues at Last Season.`}
   canonical={`/clubs/${club.slug}/`}
 >
+  <script type="application/ld+json" set:html={breadcrumbSchema} />
+
   <div class="container">
-    <nav class="breadcrumbs">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
       <a href="/">Home</a>
-      <span>/</span>
+      <span class="sep">/</span>
       <a href="/clubs/">Clubs</a>
-      <span>/</span>
-      {club.name}
+      <span class="sep">/</span>
+      <span class="current">{club.name}</span>
     </nav>
 
     <section class="page-hero">
       <h1>{club.name}</h1>
-      <p class="subtitle">Best recorded finish: {bestFinish}{bestFinish === 1 ? "st" : bestFinish === 2 ? "nd" : bestFinish === 3 ? "rd" : "th"}</p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="hero-stat-value">{bestFinish}{suffix}</span>
+          <span class="hero-stat-label">Best Finish</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">{club.seasons.length}</span>
+          <span class="hero-stat-label">Seasons Tracked</span>
+        </div>
+      </div>
     </section>
 
     <section class="section">
       <h2 class="section-title">Season History</h2>
-      <div class="table-wrap">
-        <table class="stats-table">
+      <div class="table-wrap" role="region" aria-label="Season history table" tabindex="0">
+        <table class="stats-table" aria-label="Season history">
           <thead>
             <tr>
-              <th>Season</th>
-              <th>League</th>
-              <th class="num">Position</th>
-              <th class="num">Points</th>
+              <th scope="col">Season</th>
+              <th scope="col">League</th>
+              <th class="num" scope="col">Position</th>
+              <th class="num" scope="col">Points</th>
             </tr>
           </thead>
           <tbody>
@@ -69,7 +91,7 @@ const bestFinish = Math.min(...club.seasons.map((s: any) => s.position));
                 <td><a href={`/${s.leagueSlug}/${s.season}/`}>{s.season}</a></td>
                 <td><a href={`/${s.leagueSlug}/`}>{s.league}</a></td>
                 <td class="num">{s.position}</td>
-                <td class="num">{s.points}</td>
+                <td class="num"><strong>{s.points}</strong></td>
               </tr>
             ))}
           </tbody>

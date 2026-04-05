@@ -9,17 +9,17 @@ interface Props {
 const { scorers, title = "Top Scorers" } = Astro.props;
 ---
 
-<div class="section">
+<section class="section" id="scorers">
   <h2 class="section-title">{title}</h2>
-  <div class="table-wrap">
-    <table class="stats-table">
+  <div class="table-wrap" role="region" aria-label="Top scorers table" tabindex="0">
+    <table class="stats-table" aria-label={title}>
       <thead>
         <tr>
-          <th class="num">#</th>
-          <th>Player</th>
-          <th>Club</th>
-          <th class="num">Goals</th>
-          <th class="num">Assists</th>
+          <th class="num" scope="col">#</th>
+          <th scope="col">Player</th>
+          <th scope="col">Club</th>
+          <th class="num" scope="col">Goals</th>
+          <th class="num" scope="col">Assists</th>
         </tr>
       </thead>
       <tbody>
@@ -35,4 +35,4 @@ const { scorers, title = "Top Scorers" } = Astro.props;
       </tbody>
     </table>
   </div>
-</div>
+</section>

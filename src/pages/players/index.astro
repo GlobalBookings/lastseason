@@ -3,14 +3,16 @@ import Base from "../../layouts/Base.astro";
 import { getAllLoadedSeasons } from "../../utils/data";
 
 const allSeasons = getAllLoadedSeasons();
-const playerMap = new Map<string, { name: string; slug: string; goals: number }>();
+const playerMap = new Map<string, { name: string; slug: string; goals: number; clubs: Set<string> }>();
 
 for (const season of allSeasons) {
   for (const scorer of season.scorers) {
     if (!playerMap.has(scorer.playerSlug)) {
-      playerMap.set(scorer.playerSlug, { name: scorer.name, slug: scorer.playerSlug, goals: 0 });
+      playerMap.set(scorer.playerSlug, { name: scorer.name, slug: scorer.playerSlug, goals: 0, clubs: new Set() });
     }
-    playerMap.get(scorer.playerSlug)!.goals += scorer.goals;
+    const p = playerMap.get(scorer.playerSlug)!;
+    p.goals += scorer.goals;
+    p.clubs.add(scorer.club);
   }
 }
 
@@ -18,20 +20,20 @@ const players = Array.from(playerMap.values()).sort((a, b) => b.goals - a.goals)
 ---
 
 <Base
-  title="All Players"
-  description="Browse all football players tracked at Last Season with career stats across multiple leagues and seasons."
+  title="All Players — Career Stats & Goal Records"
+  description="Browse all football players tracked at Last Season with career goals, assists and season-by-season stats across multiple leagues."
   canonical="/players/"
 >
   <div class="container">
-    <nav class="breadcrumbs">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
       <a href="/">Home</a>
-      <span>/</span>
-      Players
+      <span class="sep">/</span>
+      <span class="current">Players</span>
     </nav>
 
     <section class="page-hero">
       <h1>All Players</h1>
-      <p class="subtitle">{players.length} players tracked</p>
+      <p class="subtitle">{players.length} players tracked, sorted by total goals</p>
     </section>
 
     <section class="section">
@@ -39,7 +41,8 @@ const players = Array.from(playerMap.values()).sort((a, b) => b.goals - a.goals)
         {players.map((player) => (
           <a href={`/players/${player.slug}/`} class="card">
             <h3>{player.name}</h3>
-            <p class="meta">{player.goals} goals (tracked seasons)</p>
+            <p class="meta"><strong>{player.goals} goals</strong> (tracked seasons)</p>
+            <p class="meta">{Array.from(player.clubs).join(", ")}</p>
           </a>
         ))}
       </div>

@@ -8,16 +8,16 @@ interface Props {
 const { assisters } = Astro.props;
 ---
 
-<div class="section">
+<section class="section" id="assists">
   <h2 class="section-title">Top Assisters</h2>
-  <div class="table-wrap">
-    <table class="stats-table">
+  <div class="table-wrap" role="region" aria-label="Top assisters table" tabindex="0">
+    <table class="stats-table" aria-label="Top assisters">
       <thead>
         <tr>
-          <th class="num">#</th>
-          <th>Player</th>
-          <th>Club</th>
-          <th class="num">Assists</th>
+          <th class="num" scope="col">#</th>
+          <th scope="col">Player</th>
+          <th scope="col">Club</th>
+          <th class="num" scope="col">Assists</th>
         </tr>
       </thead>
       <tbody>
@@ -32,4 +32,4 @@ const { assisters } = Astro.props;
       </tbody>
     </table>
   </div>
-</div>
+</section>

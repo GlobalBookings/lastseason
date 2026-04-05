@@ -3,14 +3,16 @@ import Base from "../../layouts/Base.astro";
 import { getAllLoadedSeasons } from "../../utils/data";
 
 const allSeasons = getAllLoadedSeasons();
-const clubMap = new Map<string, { name: string; slug: string; count: number }>();
+const clubMap = new Map<string, { name: string; slug: string; count: number; leagues: Set<string> }>();
 
 for (const season of allSeasons) {
   for (const row of season.standings) {
     if (!clubMap.has(row.clubSlug)) {
-      clubMap.set(row.clubSlug, { name: row.club, slug: row.clubSlug, count: 0 });
+      clubMap.set(row.clubSlug, { name: row.club, slug: row.clubSlug, count: 0, leagues: new Set() });
     }
-    clubMap.get(row.clubSlug)!.count++;
+    const club = clubMap.get(row.clubSlug)!;
+    club.count++;
+    club.leagues.add(season.league);
   }
 }
 
@@ -18,20 +20,20 @@ const clubs = Array.from(clubMap.values()).sort((a, b) => a.name.localeCompare(b
 ---
 
 <Base
-  title="All Clubs"
-  description="Browse all football clubs tracked at Last Season with season-by-season history and stats."
+  title="All Clubs — Season History & Stats"
+  description="Browse all football clubs tracked at Last Season with season-by-season history, league positions and stats."
   canonical="/clubs/"
 >
   <div class="container">
-    <nav class="breadcrumbs">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
       <a href="/">Home</a>
-      <span>/</span>
-      Clubs
+      <span class="sep">/</span>
+      <span class="current">Clubs</span>
     </nav>
 
     <section class="page-hero">
       <h1>All Clubs</h1>
-      <p class="subtitle">{clubs.length} clubs tracked</p>
+      <p class="subtitle">{clubs.length} clubs tracked across {allSeasons.length} seasons</p>
     </section>
 
     <section class="section">
@@ -40,6 +42,7 @@ const clubs = Array.from(clubMap.values()).sort((a, b) => a.name.localeCompare(b
           <a href={`/clubs/${club.slug}/`} class="card">
             <h3>{club.name}</h3>
             <p class="meta">{club.count} season{club.count !== 1 ? "s" : ""} tracked</p>
+            <p class="meta">{Array.from(club.leagues).join(", ")}</p>
           </a>
         ))}
       </div>

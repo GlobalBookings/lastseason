@@ -8,16 +8,16 @@ interface Props {
 const { cleanSheets } = Astro.props;
 ---
 
-<div class="section">
+<section class="section" id="clean-sheets">
   <h2 class="section-title">Clean Sheet Leaders</h2>
-  <div class="table-wrap">
-    <table class="stats-table">
+  <div class="table-wrap" role="region" aria-label="Clean sheet leaders table" tabindex="0">
+    <table class="stats-table" aria-label="Clean sheet leaders">
       <thead>
         <tr>
-          <th class="num">#</th>
-          <th>Goalkeeper</th>
-          <th>Club</th>
-          <th class="num">Clean Sheets</th>
+          <th class="num" scope="col">#</th>
+          <th scope="col">Goalkeeper</th>
+          <th scope="col">Club</th>
+          <th class="num" scope="col">Clean Sheets</th>
         </tr>
       </thead>
       <tbody>
@@ -32,4 +32,4 @@ const { cleanSheets } = Astro.props;
       </tbody>
     </table>
   </div>
-</div>
+</section>

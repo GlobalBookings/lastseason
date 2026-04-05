@@ -6,12 +6,12 @@ interface Props {
 const { league = "the Premier League" } = Astro.props;
 ---
 
-<div class="betting-cta">
+<aside class="betting-cta" aria-label="Betting affiliate promotion">
   <p>
-    Follow this season's title race &mdash; compare the latest odds at
+    Fancy a flutter on the current {league} season? Compare the latest odds at
     <a href="https://www.bet365.com" rel="nofollow sponsored" target="_blank">Bet365</a>
   </p>
   <p class="disclaimer">
     18+ | <a href="https://www.begambleaware.org" rel="nofollow" target="_blank">BeGambleAware.org</a> | T&Cs apply. Gambling can be addictive. Please play responsibly.
   </p>
-</div>
+</aside>

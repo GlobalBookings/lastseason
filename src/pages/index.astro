@@ -2,28 +2,54 @@
 import Base from "../layouts/Base.astro";
 import SeasonCard from "../components/SeasonCard.astro";
 import { leagues } from "../data/leagues/index";
-import { getSeasonData } from "../utils/data";
+import { getSeasonData, getAllLoadedSeasons } from "../utils/data";
+
+const allSeasons = getAllLoadedSeasons();
+const totalSeasons = allSeasons.length;
+const totalClubs = new Set(allSeasons.flatMap(s => s.standings.map(r => r.clubSlug))).size;
+const totalGoals = allSeasons.reduce((sum, s) => sum + s.totalGoals, 0);
 ---
 
 <Base
-  title="Every Season. Every Stat."
+  title="Every Season. Every Stat. — Football History Archived"
   description="Last season's football stats archived. Final tables, top scorers, season reviews for the Premier League, La Liga, Bundesliga, Serie A and more."
   canonical="/"
 >
-  <div class="container">
-    <section class="page-hero">
-      <h1>Every season. Every stat.</h1>
-      <p class="subtitle">Last season's football, archived.</p>
-    </section>
+  <section class="home-hero">
+    <div class="container">
+      <h1>Every season.<br />Every stat.</h1>
+      <p class="subtitle">Historical football data archived. Final tables, top scorers and full season reviews across Europe's top leagues.</p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="hero-stat-value">{leagues.length}</span>
+          <span class="hero-stat-label">Leagues</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">{totalSeasons}</span>
+          <span class="hero-stat-label">Seasons</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">{totalClubs}+</span>
+          <span class="hero-stat-label">Clubs</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">{(totalGoals / 1000).toFixed(0)}k+</span>
+          <span class="hero-stat-label">Goals tracked</span>
+        </div>
+      </div>
+    </div>
+  </section>
 
+  <div class="container home-leagues">
     {leagues.map((league) => {
       const latestSeason = league.seasons[0];
       const data = getSeasonData(league.slug, latestSeason);
       return (
-        <section class="section">
-          <h2 class="section-title">
-            <a href={`/${league.slug}/`}>{league.name}</a>
-          </h2>
+        <section class="league-section">
+          <div class="league-section-header">
+            <h2><a href={`/${league.slug}/`}>{league.name}</a></h2>
+            <a href={`/${league.slug}/`} class="view-all">All seasons &rarr;</a>
+          </div>
           {data ? (
             <div class="card-grid">
               <SeasonCard

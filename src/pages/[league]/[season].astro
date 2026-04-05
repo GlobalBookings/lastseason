@@ -35,6 +35,42 @@ if (!data || !league) {
 
 const schema = buildSeasonSchema(data);
 const narrativeParagraphs = data.narrative.split("\n\n").filter(Boolean);
+
+const breadcrumbSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://lastseason.co.uk/" },
+    { "@type": "ListItem", "position": 2, "name": data.league, "item": `https://lastseason.co.uk/${leagueSlug}/` },
+    { "@type": "ListItem", "position": 3, "name": data.seasonDisplay },
+  ],
+});
+
+const faqSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": `Who won the ${data.league} in ${data.seasonDisplay}?`,
+      "acceptedAnswer": { "@type": "Answer", "text": `${data.champion} won the ${data.league} ${data.seasonDisplay} season.` },
+    },
+    {
+      "@type": "Question",
+      "name": `Who was the top scorer in the ${data.league} ${data.seasonDisplay}?`,
+      "acceptedAnswer": { "@type": "Answer", "text": `${data.topScorer} was the top scorer with ${data.topScorerGoals} goals.` },
+    },
+    {
+      "@type": "Question",
+      "name": `Who was relegated from the ${data.league} in ${data.seasonDisplay}?`,
+      "acceptedAnswer": { "@type": "Answer", "text": data.relegated.length > 0 ? `${data.relegated.join(", ")} were relegated.` : "No teams were relegated." },
+    },
+  ],
+});
+
+const combinedSchema = `${schema}
+<script type="application/ld+json">${breadcrumbSchema}</script>
+<script type="application/ld+json">${faqSchema}</script>`;
 ---
 
 <Base
@@ -44,25 +80,42 @@ const narrativeParagraphs = data.narrative.split("\n\n").filter(Boolean);
   schema={schema}
   accentColor={league.accentColor}
 >
+  <script type="application/ld+json" set:html={breadcrumbSchema} />
+  <script type="application/ld+json" set:html={faqSchema} />
+
   <div class="container">
-    <nav class="breadcrumbs">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
       <a href="/">Home</a>
-      <span>/</span>
+      <span class="sep">/</span>
       <a href={`/${leagueSlug}/`}>{data.league}</a>
-      <span>/</span>
-      {data.seasonDisplay}
+      <span class="sep">/</span>
+      <span class="current">{data.seasonDisplay}</span>
     </nav>
 
     <section class="page-hero">
       <h1>{data.league} {data.seasonDisplay}</h1>
-      <p class="subtitle">
-        Champion: <strong>{data.champion}</strong> &mdash;
-        Top scorer: <strong>{data.topScorer}</strong> ({data.topScorerGoals} goals) &mdash;
-        {data.totalGoals} total goals
-      </p>
+      <p class="subtitle">Final table, top scorers, season awards and full review.</p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="hero-stat-value">{data.champion}</span>
+          <span class="hero-stat-label">Champion</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">{data.topScorer}</span>
+          <span class="hero-stat-label">Top Scorer ({data.topScorerGoals} goals)</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">{data.totalGoals.toLocaleString()}</span>
+          <span class="hero-stat-label">Total Goals</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">{data.standings.length}</span>
+          <span class="hero-stat-label">Clubs</span>
+        </div>
+      </div>
     </section>
 
-    <section class="section">
+    <section class="section" id="table">
       <h2 class="section-title">Final Table</h2>
       <StandingsTable standings={data.standings} leagueSlug={leagueSlug} />
     </section>
@@ -72,7 +125,7 @@ const narrativeParagraphs = data.narrative.split("\n\n").filter(Boolean);
     <CleanSheetsTable cleanSheets={data.cleanSheets} />
     <Awards awards={data.awards} />
 
-    <section class="section">
+    <section class="section" id="review">
       <h2 class="section-title">Season Review</h2>
       <div class="narrative">
         {narrativeParagraphs.map((p) => <p>{p}</p>)}
@@ -94,7 +147,7 @@ const narrativeParagraphs = data.narrative.split("\n\n").filter(Boolean);
       </section>
     )}
 
-    <nav class="season-nav">
+    <nav class="season-nav" aria-label="Season navigation">
       {prev ? (
         <a href={`/${leagueSlug}/${prev}/`}>&larr; {prev}</a>
       ) : (
