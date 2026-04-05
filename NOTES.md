@@ -195,6 +195,36 @@ Example for `/premier-league/2023-24/`:
 | `astro.config.mjs` | Astro config, sitemap, site URL |
 | `public/robots.txt` | Crawler rules |
 | `NOTES.md` | This file |
+| `src/data/kits/index.ts` | Kit data with AWIN retailer links (update URLs here) |
+| `src/data/kits/types.ts` | Kit TypeScript interfaces |
+| `src/pages/kits/index.astro` | Kits hub page |
+| `src/pages/kits/[slug].astro` | Individual club kit page template |
+| `public/img/` | Hero background images (Pexels, free license) |
+
+## Kits Section
+- Full `/kits/` section with price comparison across retailers
+- 18 clubs covered: Man City, Arsenal, Liverpool, Chelsea, Man Utd, Spurs, Villa, Newcastle, Real Madrid, Barcelona, Bayern Munich, Dortmund, Inter, AC Milan, Juventus, PSG, Celtic, Rangers
+- Retailers: JD Sports, Kitbag, Nike, Adidas, Puma
+- All links use `rel="nofollow sponsored"` for affiliate compliance
+- AWIN placeholder URLs in `src/data/kits/index.ts` — swap for real tracked deep links once publisher account is approved
+- Each club has home/away/third kits with price per retailer
+
+### How to Add a New Club to Kits
+1. Add a new `ClubKits` object to the `allClubKits` array in `src/data/kits/index.ts`
+2. Run `npm run build` — new kit page auto-generates at `/kits/[club-slug]/`
+3. Push to GitHub
+
+### How to Update Prices / URLs
+1. Edit the retailer objects in `src/data/kits/index.ts`
+2. Replace placeholder URLs with real AWIN tracked links: `https://www.awin1.com/cread.php?awinmid=XXXXX&awinaffid=YYYYY&ued=PRODUCT_URL`
+
+## Hero Images
+- `public/img/hero-floodlights.jpg` — Anfield crowd shot (used on homepage hero)
+- `public/img/hero-stadium.jpg` — Ball on pitch in empty stadium (used on kits hub)
+- `public/img/hero-pitch.jpg` — Ball at sunset
+- `public/img/hero-goal.jpg` — Ball close-up on pitch
+- `public/img/hero-ball.jpg` — Ball in stadium
+- All from Pexels (free license, no attribution required)
 
 ## How to Add a New Season
 1. Create `src/data/leagues/[league-slug]/[season].ts` following the `SeasonData` type
@@ -208,3 +238,7 @@ Example for `/premier-league/2023-24/`:
 - 2025-03-29: Connected to Cloudflare Pages for deployment
 - 2025-03-29: Visual & SEO overhaul — Inter font, mobile nav, accessibility, BreadcrumbList/FAQPage schema, hero stats, 404 page, print styles
 - 2025-03-29: Updated NOTES.md with full project documentation
+- 2025-04-05: Added hero background images (Pexels) with dark gradient overlay on homepage
+- 2025-04-05: Built full /kits/ section — hub page + 18 club kit pages with retailer price comparison
+- 2025-04-05: Added Kits link to desktop nav, mobile nav, and footer
+- 2025-04-05: 473 total pages now (up from 454)
