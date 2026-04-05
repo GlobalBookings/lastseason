@@ -1,0 +1,60 @@
+---
+import Base from "../../layouts/Base.astro";
+import { allClubKits } from "../../data/kits/index";
+import { leagues } from "../../data/leagues/index";
+
+const kitsByLeague = new Map<string, typeof allClubKits>();
+for (const club of allClubKits) {
+  if (!kitsByLeague.has(club.leagueSlug)) kitsByLeague.set(club.leagueSlug, []);
+  kitsByLeague.get(club.leagueSlug)!.push(club);
+}
+---
+
+<Base
+  title="Football Kits 2024-25 — Where to Buy | Price Comparison"
+  description="Compare prices on 2024-25 football kits from the Premier League, La Liga, Bundesliga, Serie A and more. Find the best deals at JD Sports, Kitbag, Nike and Adidas."
+  canonical="/kits/"
+>
+  <section class="home-hero kits-hero" style="background-image: url('/img/hero-stadium.jpg');">
+    <div class="container">
+      <h1>Football Kits<br />2024-25</h1>
+      <p class="subtitle">Compare prices across JD Sports, Kitbag, Nike, Adidas and Puma. Find the best deals on home, away and third kits.</p>
+    </div>
+  </section>
+
+  <div class="container home-leagues">
+    {leagues.map((league) => {
+      const clubs = kitsByLeague.get(league.slug);
+      if (!clubs || clubs.length === 0) return null;
+      return (
+        <section class="league-section">
+          <div class="league-section-header">
+            <h2><a href={`/${league.slug}/`}>{league.name}</a></h2>
+          </div>
+          <div class="card-grid">
+            {clubs.map((club) => {
+              const homeKit = club.kits.find(k => k.type === "home");
+              const kitCount = club.kits.length;
+              const lowestPrice = homeKit?.retailers[0]?.price || "TBC";
+              return (
+                <a href={`/kits/${club.clubSlug}/`} class="card card-accent" style={`border-top-color: ${league.accentColor}`}>
+                  <span class="card-tag">{homeKit?.manufacturer || "TBC"}</span>
+                  <h3>{club.club}</h3>
+                  <p class="meta">{kitCount} kit{kitCount !== 1 ? "s" : ""} available</p>
+                  <p class="meta">From <strong>{lowestPrice}</strong></p>
+                </a>
+              );
+            })}
+          </div>
+        </section>
+      );
+    })}
+
+    <section class="section">
+      <h2 class="section-title">About Kit Prices</h2>
+      <div class="narrative">
+        <p>Prices shown are for adult replica shirts and are sourced from major UK retailers. Prices may vary and are subject to availability. Authentic/player versions are typically more expensive. Links on this page are affiliate links — we earn a small commission at no extra cost to you.</p>
+      </div>
+    </section>
+  </div>
+</Base>

@@ -846,10 +846,26 @@ main > .container {
 .home-hero {
   background: var(--bg-dark);
   color: #fff;
-  padding: 4rem 0 3.5rem;
+  padding: 5rem 0 4rem;
   margin-bottom: 0;
   position: relative;
   overflow: hidden;
+  background-size: cover;
+  background-position: center 40%;
+  background-repeat: no-repeat;
+}
+
+.home-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(15, 25, 35, 0.92) 0%,
+    rgba(15, 25, 35, 0.78) 50%,
+    rgba(15, 25, 35, 0.65) 100%
+  );
+  z-index: 1;
 }
 
 .home-hero::after {
@@ -858,25 +874,49 @@ main > .container {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 120px;
+  height: 100px;
   background: linear-gradient(to top, var(--bg), transparent);
   pointer-events: none;
+  z-index: 2;
+}
+
+.home-hero > .container {
+  position: relative;
+  z-index: 3;
 }
 
 .home-hero h1 {
-  font-size: 3rem;
+  font-size: 3.25rem;
   font-weight: 800;
   letter-spacing: -0.04em;
-  line-height: 1.1;
-  margin-bottom: 0.75rem;
+  line-height: 1.08;
+  margin-bottom: 0.85rem;
   max-width: 18ch;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
 }
 
 .home-hero .subtitle {
   font-size: 1.1rem;
-  color: rgba(255,255,255,0.6);
-  max-width: 40ch;
-  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.75);
+  max-width: 44ch;
+  line-height: 1.65;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.2);
+}
+
+.home-hero .hero-stats {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.home-hero .hero-stat-value {
+  color: #fff;
+  font-size: 1.75rem;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.2);
+}
+
+.home-hero .hero-stat-label {
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .home-leagues {
@@ -950,6 +990,39 @@ main > .container {
   opacity: 0.9;
   text-decoration: none;
   transform: translateY(-1px);
+}
+
+/* ============================================
+   KITS
+   ============================================ */
+.kit-details {
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.kit-buy-link {
+  display: inline-block;
+  padding: 0.35rem 0.85rem;
+  background: var(--accent);
+  color: #fff;
+  border-radius: var(--radius);
+  font-size: 0.8rem;
+  font-weight: 650;
+  transition: all var(--duration);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.kit-buy-link:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+  text-decoration: none;
+  color: #fff;
+}
+
+.kits-hero {
+  background-position: center 30%;
 }
 
 /* ============================================

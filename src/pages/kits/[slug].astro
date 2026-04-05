@@ -1,0 +1,104 @@
+---
+import Base from "../../layouts/Base.astro";
+import { allClubKits } from "../../data/kits/index";
+import { leagues } from "../../data/leagues/index";
+
+export function getStaticPaths() {
+  return allClubKits.map((club) => ({
+    params: { slug: club.clubSlug },
+    props: { club },
+  }));
+}
+
+const { club } = Astro.props;
+const league = leagues.find(l => l.slug === club.leagueSlug);
+
+const breadcrumbSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://lastseason.co.uk/" },
+    { "@type": "ListItem", "position": 2, "name": "Kits", "item": "https://lastseason.co.uk/kits/" },
+    { "@type": "ListItem", "position": 3, "name": club.club },
+  ],
+});
+
+const kitTypeLabels: Record<string, string> = {
+  home: "Home Kit",
+  away: "Away Kit",
+  third: "Third Kit",
+  goalkeeper: "Goalkeeper Kit",
+};
+---
+
+<Base
+  title={`${club.club} Kits 2024-25 — Where to Buy | Price Comparison`}
+  description={`Compare prices on ${club.club} 2024-25 football kits. Home, away and third shirts from JD Sports, Kitbag, Nike, Adidas and more.`}
+  canonical={`/kits/${club.clubSlug}/`}
+  accentColor={league?.accentColor}
+>
+  <script type="application/ld+json" set:html={breadcrumbSchema} />
+
+  <div class="container">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a href="/">Home</a>
+      <span class="sep">/</span>
+      <a href="/kits/">Kits</a>
+      <span class="sep">/</span>
+      <span class="current">{club.club}</span>
+    </nav>
+
+    <section class="page-hero">
+      <h1>{club.club} Kits 2024-25</h1>
+      <p class="subtitle">
+        <a href={`/${club.leagueSlug}/`}>{club.league}</a> &mdash;
+        {club.kits.length} kit{club.kits.length !== 1 ? "s" : ""} available &mdash;
+        Manufactured by {[...new Set(club.kits.map(k => k.manufacturer))].join(", ")}
+      </p>
+    </section>
+
+    {club.kits.map((kit) => (
+      <section class="section">
+        <h2 class="section-title">{kitTypeLabels[kit.type] || kit.type} — {kit.season}</h2>
+        <div class="kit-details">
+          <p class="kit-manufacturer">Made by <strong>{kit.manufacturer}</strong></p>
+        </div>
+        <div class="table-wrap" role="region" aria-label={`${kitTypeLabels[kit.type]} price comparison`} tabindex="0">
+          <table class="stats-table" aria-label={`${club.club} ${kitTypeLabels[kit.type]} retailers`}>
+            <thead>
+              <tr>
+                <th scope="col">Retailer</th>
+                <th scope="col">Price</th>
+                <th scope="col">Link</th>
+              </tr>
+            </thead>
+            <tbody>
+              {kit.retailers.map((r) => (
+                <tr>
+                  <td><strong>{r.name}</strong></td>
+                  <td>{r.price || "Check site"}</td>
+                  <td>
+                    <a href={r.url} rel="nofollow sponsored" target="_blank" class="kit-buy-link">
+                      Buy now &rarr;
+                    </a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    ))}
+
+    <section class="section">
+      <h2 class="section-title">Club Stats</h2>
+      <p>View <a href={`/clubs/${club.clubSlug}/`}>{club.club}'s season history and stats</a>.</p>
+    </section>
+
+    <aside class="betting-cta" aria-label="Affiliate disclaimer">
+      <p class="disclaimer" style="margin:0;">
+        Prices are for adult replica shirts and may vary. Links on this page are affiliate links — we earn a small commission at no extra cost to you. Prices correct at time of publishing.
+      </p>
+    </aside>
+  </div>
+</Base>
