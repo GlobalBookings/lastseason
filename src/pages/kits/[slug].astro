@@ -19,6 +19,7 @@ for (const kit of club.kits) {
   kitsBySeason.get(kit.season)!.push(kit);
 }
 const seasons = [...kitsBySeason.keys()].sort((a, b) => b.localeCompare(a));
+const manufacturers = [...new Set(club.kits.map(k => k.manufacturer))];
 
 const breadcrumbSchema = JSON.stringify({
   "@context": "https://schema.org",
@@ -66,39 +67,75 @@ const typeLabel: Record<string, string> = { home: "Home", away: "Away", third: "
           <span class="hero-stat-label">Seasons</span>
         </div>
         <div class="hero-stat">
-          <span class="hero-stat-value">{[...new Set(club.kits.map(k => k.manufacturer))].length}</span>
+          <span class="hero-stat-value">{manufacturers.length}</span>
           <span class="hero-stat-label">Manufacturers</span>
         </div>
       </div>
     </section>
 
     <section class="section">
-      <h2 class="section-title">All Kits by Season</h2>
+      <h2 class="section-title">Full Kit History</h2>
+      <div class="table-wrap" role="region" aria-label="Kit history table" tabindex="0">
+        <table class="stats-table" aria-label="Kit history">
+          <thead>
+            <tr>
+              <th scope="col">Season</th>
+              <th scope="col">Type</th>
+              <th scope="col">Manufacturer</th>
+              <th scope="col">Sponsor</th>
+              <th scope="col">Colours</th>
+              <th scope="col">Buy</th>
+            </tr>
+          </thead>
+          <tbody>
+            {club.kits.map((kit) => (
+              <tr>
+                <td><a href={`/kits/${club.clubSlug}/${kit.season}-${kit.type}/`}>{kit.season}</a></td>
+                <td><span class={`kit-type-badge kit-type-${kit.type}`}>{typeLabel[kit.type]}</span></td>
+                <td>{kit.manufacturer}</td>
+                <td>{kit.sponsor || "—"}</td>
+                <td>
+                  <span class="colour-dots">
+                    <span class="colour-dot" style={`background:${kit.primaryColor}`}></span>
+                    <span class="colour-dot" style={`background:${kit.secondaryColor}`}></span>
+                    {kit.tertiaryColor && <span class="colour-dot" style={`background:${kit.tertiaryColor}`}></span>}
+                  </span>
+                </td>
+                <td>
+                  <a href={`/kits/${club.clubSlug}/${kit.season}-${kit.type}/`} class="kit-view-link">View &rarr;</a>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
 
-      {seasons.map((season) => {
-        const kits = kitsBySeason.get(season)!;
-        return (
-          <div class="kit-season-row" id={season}>
-            <h3 class="kit-season-heading">{season}</h3>
-            <div class="kit-cards-row">
-              {kits.map((kit) => (
-                <a href={`/kits/${club.clubSlug}/${season}-${kit.type}/`} class="kit-card">
-                  <div class="kit-shirt-preview" aria-hidden="true">
-                    <svg viewBox="0 0 100 120" class="kit-shirt-svg">
-                      <path d="M25,0 L0,20 L15,25 L15,120 L85,120 L85,25 L100,20 L75,0 Z"
-                        fill={kit.primaryColor} stroke={kit.secondaryColor} stroke-width="2"/>
-                      <path d="M35,0 L50,15 L65,0" fill="none" stroke={kit.secondaryColor} stroke-width="2"/>
-                    </svg>
-                  </div>
-                  <span class="kit-card-type">{typeLabel[kit.type] || kit.type}</span>
-                  <span class="kit-card-brand">{kit.manufacturer}</span>
-                  {kit.sponsor && <span class="kit-card-sponsor">{kit.sponsor}</span>}
-                </a>
-              ))}
+    <section class="section">
+      <h2 class="section-title">Manufacturer Timeline</h2>
+      <div class="kit-timeline">
+        {(() => {
+          const eras: { manufacturer: string; from: string; to: string }[] = [];
+          let current = { manufacturer: club.kits[club.kits.length - 1]?.manufacturer, from: club.kits[club.kits.length - 1]?.season, to: "" };
+          for (let i = club.kits.length - 1; i >= 0; i--) {
+            const kit = club.kits[i];
+            if (kit.type !== "home") continue;
+            if (kit.manufacturer !== current.manufacturer) {
+              current.to = club.kits[i + 1]?.season || kit.season;
+              eras.push({ ...current });
+              current = { manufacturer: kit.manufacturer, from: kit.season, to: "" };
+            }
+          }
+          current.to = club.kits[0]?.season || "";
+          eras.push({ ...current });
+          return eras.map((era) => (
+            <div class="timeline-block">
+              <span class="timeline-years">{era.from} — {era.to}</span>
+              <span class="timeline-brand">{era.manufacturer}</span>
             </div>
-          </div>
-        );
-      })}
+          ));
+        })()}
+      </div>
     </section>
 
     <section class="section">
@@ -109,67 +146,54 @@ const typeLabel: Record<string, string> = { home: "Home", away: "Away", third: "
 </Base>
 
 <style>
-  .kit-season-row {
-    margin-bottom: 1.75rem;
-    padding-bottom: 1.75rem;
-    border-bottom: 1px solid var(--border-light);
-  }
-  .kit-season-row:last-child { border-bottom: none; }
-  .kit-season-heading {
-    font-size: 1rem;
-    font-weight: 700;
-    margin-bottom: 0.75rem;
-    color: var(--text-secondary);
-  }
-  .kit-cards-row {
-    display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-  }
-  .kit-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 120px;
-    padding: 1rem 0.75rem;
-    background: var(--bg-alt);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    text-decoration: none;
-    color: var(--text);
-    transition: all 0.2s;
-    text-align: center;
-  }
-  .kit-card:hover {
-    border-color: var(--border);
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
-    text-decoration: none;
-  }
-  .kit-shirt-preview {
-    width: 60px;
-    height: 72px;
-    margin-bottom: 0.5rem;
-  }
-  .kit-shirt-svg { width: 100%; height: 100%; }
-  .kit-card-type {
-    font-size: 0.78rem;
+  .kit-type-badge {
+    display: inline-block;
+    font-size: 0.68rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    background: var(--bg-alt);
+    border: 1px solid var(--border-light);
   }
-  .kit-card-brand {
+  .kit-type-home { color: var(--cl-green); border-color: rgba(5, 150, 105, 0.2); background: rgba(5, 150, 105, 0.06); }
+  .kit-type-away { color: var(--el-blue); border-color: rgba(37, 99, 235, 0.2); background: rgba(37, 99, 235, 0.06); }
+  .kit-type-third { color: #9333ea; border-color: rgba(147, 51, 234, 0.2); background: rgba(147, 51, 234, 0.06); }
+  .colour-dots { display: flex; gap: 0.3rem; align-items: center; }
+  .colour-dot {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+  }
+  .kit-view-link {
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .kit-timeline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .timeline-block {
+    background: var(--bg-alt);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 0.65rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+  .timeline-years {
     font-size: 0.7rem;
     color: var(--text-muted);
-    margin-top: 0.15rem;
+    font-weight: 500;
   }
-  .kit-card-sponsor {
-    font-size: 0.62rem;
-    color: var(--text-muted);
-    opacity: 0.7;
-    margin-top: 0.1rem;
-  }
-  @media (max-width: 480px) {
-    .kit-card { width: calc(50% - 0.375rem); }
+  .timeline-brand {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text);
   }
 </style>
