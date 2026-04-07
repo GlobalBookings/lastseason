@@ -1,0 +1,101 @@
+---
+import Base from "../../layouts/Base.astro";
+import { plRelegations, plNeverRelegated } from "../../data/records/premier-league";
+
+const totalRelegations = plRelegations.reduce((sum, r) => sum + r.clubs.length, 0);
+const allRelegatedClubs = new Set(plRelegations.flatMap(r => r.clubs));
+
+const breadcrumbSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://lastseason.co.uk/" },
+    { "@type": "ListItem", "position": 2, "name": "Records", "item": "https://lastseason.co.uk/records/" },
+    { "@type": "ListItem", "position": 3, "name": "Relegation History" },
+  ],
+});
+
+const faqSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "Which clubs have never been relegated from the Premier League?",
+      "acceptedAnswer": { "@type": "Answer", "text": `${plNeverRelegated.join(", ")} have been in the Premier League since its formation in 1992 and have never been relegated.` }},
+    { "@type": "Question", "name": "How many clubs have been relegated from the Premier League?",
+      "acceptedAnswer": { "@type": "Answer", "text": `${allRelegatedClubs.size} different clubs have been relegated from the Premier League since 1992-93.` }},
+  ],
+});
+---
+
+<Base
+  title="Premier League Relegation History — Every Relegated Club by Season"
+  description="Complete Premier League relegation history from 1992 to present. Every club that has been relegated, season by season. Plus the clubs that have never gone down."
+  canonical="/records/relegation-history/"
+>
+  <script type="application/ld+json" set:html={breadcrumbSchema} />
+  <script type="application/ld+json" set:html={faqSchema} />
+
+  <div class="container">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a href="/">Home</a>
+      <span class="sep">/</span>
+      <a href="/records/">Records</a>
+      <span class="sep">/</span>
+      <span class="current">Relegation History</span>
+    </nav>
+
+    <section class="page-hero">
+      <h1>Premier League Relegation History</h1>
+      <p class="subtitle">Every club relegated from the Premier League since its formation in 1992.</p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="hero-stat-value">{totalRelegations}</span>
+          <span class="hero-stat-label">Total Relegations</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">{allRelegatedClubs.size}</span>
+          <span class="hero-stat-label">Clubs Relegated</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">{plNeverRelegated.length}</span>
+          <span class="hero-stat-label">Never Relegated</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Clubs That Have Never Been Relegated</h2>
+      <p style="margin-bottom:0.75rem;color:var(--text-secondary);font-size:0.92rem;">These six clubs have been ever-present in the Premier League since 1992:</p>
+      <div class="awards-grid">
+        {plNeverRelegated.map((club) => (
+          <div class="award-card">
+            <div class="award-winner">{club}</div>
+            <div class="award-title">Since 1992</div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Relegated Clubs by Season</h2>
+      <div class="table-wrap" role="region" aria-label="Relegation history table" tabindex="0">
+        <table class="stats-table" aria-label="Premier League relegation history">
+          <thead>
+            <tr>
+              <th scope="col">Season</th>
+              <th scope="col">Relegated Clubs</th>
+            </tr>
+          </thead>
+          <tbody>
+            {plRelegations.map((r) => (
+              <tr>
+                <td><a href={`/premier-league/${r.season}/`}>{r.season}</a></td>
+                <td>{r.clubs.join(", ")}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</Base>

@@ -75,7 +75,15 @@ const fullTitle = title.includes("Last Season") ? title : `${title} | Last Seaso
     {accentColor && <style set:html={`:root { --accent: ${accentColor}; --accent-light: ${accentColor}12; }`} />}
 
     <!-- Ezoic: add script tag here once account is active -->
-    <!-- GA4: add gtag.js here once measurement ID is available -->
+
+    <!-- Google Analytics 4 -->
+    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-C2K4PMZEDJ"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-C2K4PMZEDJ');
+    </script>
   </head>
   <body>
     <a href="#main-content" class="skip-link">Skip to content</a>
@@ -98,6 +106,7 @@ const fullTitle = title.includes("Last Season") ? title : `${title} | Last Seaso
             <a href="/scottish-premiership/">Scottish Prem</a>
             <a href="/mls/">MLS</a>
             <a href="/kits/" style="color:rgba(255,255,255,0.95);background:rgba(255,255,255,0.08);border-radius:6px;">Kits</a>
+            <a href="/records/" style="color:rgba(255,255,255,0.95);background:rgba(255,255,255,0.08);border-radius:6px;">Records</a>
           </nav>
 
           <button class="nav-toggle" aria-label="Open menu" aria-expanded="false" id="nav-toggle">
@@ -122,6 +131,7 @@ const fullTitle = title.includes("Last Season") ? title : `${title} | Last Seaso
         <a href="/mls/">MLS</a>
         <div class="nav-section-title">Browse</div>
         <a href="/kits/">Kits 2024-25</a>
+        <a href="/records/">Records & Stats</a>
         <a href="/clubs/">All Clubs</a>
         <a href="/players/">All Players</a>
       </div>
@@ -156,6 +166,7 @@ const fullTitle = title.includes("Last Season") ? title : `${title} | Last Seaso
             <div class="footer-heading">Site</div>
             <ul class="footer-link-list">
               <li><a href="/kits/">Kits 2024-25</a></li>
+              <li><a href="/records/">Records & Stats</a></li>
               <li><a href="/clubs/">All Clubs</a></li>
               <li><a href="/players/">All Players</a></li>
               <li><a href="/privacy/">Privacy Policy</a></li>

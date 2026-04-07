@@ -1,3 +1,50 @@
+# lastseason.co.uk — Robots.txt
+# Full crawlability for search engines and LLM/AI agents
+
 User-agent: *
 Allow: /
+Disallow:
+
+# Sitemaps
 Sitemap: https://lastseason.co.uk/sitemap-index.xml
+
+# Explicit allow for AI/LLM crawlers
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Anthropic-AI
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+# Crawl-delay suggestion for aggressive bots
+User-agent: AhrefsBot
+Crawl-delay: 2
+
+User-agent: SemrushBot
+Crawl-delay: 2
+
+User-agent: MJ12bot
+Crawl-delay: 5
+
+User-agent: DotBot
+Crawl-delay: 5

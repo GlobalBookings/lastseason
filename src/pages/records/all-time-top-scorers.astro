@@ -1,0 +1,128 @@
+---
+import Base from "../../layouts/Base.astro";
+import { plAllTimeScorers } from "../../data/records/premier-league";
+
+const breadcrumbSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://lastseason.co.uk/" },
+    { "@type": "ListItem", "position": 2, "name": "Records", "item": "https://lastseason.co.uk/records/" },
+    { "@type": "ListItem", "position": 3, "name": "All-Time Top Scorers" }
+  ]
+});
+
+const faqSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Who is the Premier League's all-time top scorer?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Alan Shearer is the Premier League's all-time top scorer with 260 goals in 441 appearances for Blackburn Rovers and Newcastle United between 1992 and 2006."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How many goals has Alan Shearer scored?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Alan Shearer scored 260 Premier League goals in 441 appearances, a record that has stood since his retirement in 2006."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How many goals does Harry Kane have?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Harry Kane scored 213 Premier League goals in 320 appearances for Tottenham Hotspur between 2012 and 2023, placing him second on the all-time list."
+      }
+    }
+  ]
+});
+---
+
+<Base
+  title="Premier League All-Time Top Scorers — Complete List"
+  description="The complete list of Premier League all-time top scorers. See who has scored the most goals in Premier League history, with appearances, goals-per-game ratios and clubs."
+  canonical="/records/all-time-top-scorers/"
+>
+  <script type="application/ld+json" set:html={breadcrumbSchema} />
+  <script type="application/ld+json" set:html={faqSchema} />
+
+  <div class="container">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a href="/">Home</a>
+      <span class="sep">/</span>
+      <a href="/records/">Records</a>
+      <span class="sep">/</span>
+      <span class="current">All-Time Top Scorers</span>
+    </nav>
+
+    <section class="page-hero">
+      <h1>Premier League All-Time Top Scorers</h1>
+      <p class="subtitle">The highest goalscorers in Premier League history, ranked by total goals since 1992.</p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="hero-stat-value">{plAllTimeScorers.length}</span>
+          <span class="hero-stat-label">Players Listed</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">{plAllTimeScorers[0].goals}</span>
+          <span class="hero-stat-label">Record Goals (Shearer)</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">{plAllTimeScorers.reduce((sum, p) => sum + p.goals, 0).toLocaleString()}</span>
+          <span class="hero-stat-label">Combined Goals</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">{(plAllTimeScorers[0].goals / plAllTimeScorers[0].apps).toFixed(2)}</span>
+          <span class="hero-stat-label">Shearer Goals/Game</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="scorers">
+      <h2 class="section-title">All-Time Top Scorers</h2>
+      <div class="table-wrap">
+        <table class="stats-table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Player</th>
+              <th scope="col">Goals</th>
+              <th scope="col">Apps</th>
+              <th scope="col">Goals/Game</th>
+              <th scope="col">Clubs</th>
+              <th scope="col">Years</th>
+            </tr>
+          </thead>
+          <tbody>
+            {plAllTimeScorers.map((p) => (
+              <tr>
+                <td>{p.pos}</td>
+                <td><a href={`/players/${p.slug}/`}>{p.name}</a></td>
+                <td><strong>{p.goals}</strong></td>
+                <td>{p.apps}</td>
+                <td>{(p.goals / p.apps).toFixed(2)}</td>
+                <td>{p.clubs}</td>
+                <td>{p.years}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">About This Record</h2>
+      <div class="narrative">
+        <p>Alan Shearer's record of 260 Premier League goals has stood since his retirement in 2006 and remains one of the most iconic milestones in English football. Scored across 441 appearances for Blackburn Rovers and Newcastle United, the record looked untouchable for over a decade.</p>
+        <p>Harry Kane emerged as the most likely challenger, reaching 213 goals for Tottenham Hotspur before his move to Bayern Munich in 2023. Behind them, Wayne Rooney's 208 goals across 491 appearances for Everton and Manchester United complete the top three — a trio of strikers whose careers define different eras of the Premier League.</p>
+        <p>The list also highlights players whose goal-per-game ratios stand out: Erling Haaland and Sergio Aguero both boast ratios above 0.65, while Thierry Henry's 175 goals in just 258 games (0.68 per game) remains among the most efficient records in the competition's history.</p>
+      </div>
+    </section>
+  </div>
+</Base>
