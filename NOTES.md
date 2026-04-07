@@ -242,3 +242,28 @@ Example for `/premier-league/2023-24/`:
 - 2025-04-05: Built full /kits/ section — hub page + 18 club kit pages with retailer price comparison
 - 2025-04-05: Added Kits link to desktop nav, mobile nav, and footer
 - 2025-04-05: 473 total pages now (up from 454)
+- 2025-04-05: Built full historical kit archive — 1,710 kit pages, 24 clubs, flat colour-block illustrations
+- 2025-04-05: Kit detail pages with eBay, Classic Football Shirts, Vintage Football Shirts buy links
+- 2025-04-07: GA4 tracking (G-C2K4PMZEDJ) added to ALL pages via Base.astro
+- 2025-04-07: Records section built — 6 pages targeting 100k+ monthly searches:
+  - /records/ — hub page
+  - /records/all-time-top-scorers/ — targets "premier league all time top scorers" (40k/mo)
+  - /records/winners/ — targets "premier league winners list" (30k/mo)
+  - /records/golden-boot/ — targets "premier league golden boot" (12k/mo)
+  - /records/relegation-history/ — targets "premier league relegation history" (8k/mo)
+  - /records/premier-league-records/ — targets "premier league records" (10k/mo)
+- 2025-04-07: robots.txt updated for LLM crawlability (GPTBot, ClaudeBot, PerplexityBot etc.)
+- 2025-04-07: Records link added to desktop nav, mobile nav, and footer
+- 2025-04-07: 2,170 total pages, 2,169 URLs in sitemap
+
+## Google Analytics
+- **GA4 Property ID:** G-C2K4PMZEDJ
+- **Implemented in:** `src/layouts/Base.astro` (appears on EVERY page automatically)
+- **IMPORTANT:** Do NOT remove the GA4 script from Base.astro. All current and future pages inherit it.
+
+## Google Indexing — Next Steps
+- [ ] Submit sitemap URL (https://lastseason.co.uk/sitemap-index.xml) in Google Search Console
+- [ ] Submit sitemap URL in Bing Webmaster Tools
+- [ ] Request indexing of key pages manually in GSC: /, /premier-league/2023-24/, /records/all-time-top-scorers/, /kits/
+- [ ] Monitor GSC for crawl errors and coverage issues
+- [ ] After 1 week: check which pages are indexed, request re-crawl of any missing
