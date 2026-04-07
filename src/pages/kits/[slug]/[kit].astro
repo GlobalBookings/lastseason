@@ -1,5 +1,6 @@
 ---
 import Base from "../../../layouts/Base.astro";
+import KitIllustration from "../../../components/KitIllustration.astro";
 import { allClubKitArchives } from "../../../data/kits/index";
 import { leagues } from "../../../data/leagues/index";
 
@@ -42,6 +43,7 @@ const cfsUrl = `https://www.classicfootballshirts.co.uk/search?q=${encodeURIComp
 const vfsUrl = `https://www.vintagefootballshirts.com/search?q=${encodeURIComponent(`${club.club} ${kit.season}`)}`;
 const ebayUrl = `https://www.ebay.co.uk/sch/i.html?_nkw=${encodeURIComponent(`${club.club} ${kit.season} ${kit.type} shirt football`)}&_sacat=0&LH_TitleDesc=0&rt=nc`;
 const ebayRetroUrl = `https://www.ebay.co.uk/sch/i.html?_nkw=${encodeURIComponent(`${club.club} ${kit.season} ${kit.type} shirt retro original`)}&_sacat=0&LH_TitleDesc=0`;
+const typeShort: Record<string, string> = { home: "Home", away: "Away", third: "Third", goalkeeper: "GK" };
 ---
 
 <Base
@@ -71,8 +73,59 @@ const ebayRetroUrl = `https://www.ebay.co.uk/sch/i.html?_nkw=${encodeURIComponen
       </p>
     </section>
 
-    <div class="kit-detail-grid">
-      <div class="kit-info-col">
+    <div class="kit-detail-layout">
+      <div class="kit-visual-panel">
+        <div class="kit-visual-card">
+          <KitIllustration
+            primary={kit.primaryColor}
+            secondary={kit.secondaryColor}
+            tertiary={kit.tertiaryColor}
+            type={kit.type}
+            size="lg"
+            manufacturer={kit.manufacturer}
+          />
+          <div class="kit-visual-label">
+            <span class="kit-visual-season">{kit.season}</span>
+            <span class="kit-visual-type">{label}</span>
+          </div>
+        </div>
+
+        <div class="kit-colour-bar">
+          <div class="kit-colour-chip" style={`background:${kit.primaryColor}`}>
+            <span>Primary</span>
+          </div>
+          <div class="kit-colour-chip" style={`background:${kit.secondaryColor}`}>
+            <span>Secondary</span>
+          </div>
+          {kit.tertiaryColor && (
+            <div class="kit-colour-chip" style={`background:${kit.tertiaryColor}`}>
+              <span>Accent</span>
+            </div>
+          )}
+        </div>
+
+        {otherKitsSameSeason.length > 0 && (
+          <div class="kit-other-season">
+            <span class="kit-other-label">Also from {kit.season}</span>
+            <div class="kit-other-row">
+              {otherKitsSameSeason.map((k) => (
+                <a href={`/kits/${club.clubSlug}/${k.season}-${k.type}/`} class="kit-other-item">
+                  <KitIllustration
+                    primary={k.primaryColor}
+                    secondary={k.secondaryColor}
+                    tertiary={k.tertiaryColor}
+                    type={k.type}
+                    size="sm"
+                  />
+                  <span class="kit-other-type">{typeShort[k.type]}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div class="kit-info-panel">
         <div class="section">
           <h2 class="section-title">Kit Details</h2>
           <div class="kit-specs">
@@ -102,73 +155,43 @@ const ebayRetroUrl = `https://www.ebay.co.uk/sch/i.html?_nkw=${encodeURIComponen
               <span class="kit-spec-label">League</span>
               <span class="kit-spec-value"><a href={`/${club.leagueSlug}/`}>{club.league}</a></span>
             </div>
-            <div class="kit-spec-row">
-              <span class="kit-spec-label">Colours</span>
-              <span class="kit-spec-value">
-                <span class="colour-dots">
-                  <span class="colour-dot" style={`background:${kit.primaryColor}`}></span>
-                  <span class="colour-dot" style={`background:${kit.secondaryColor}`}></span>
-                  {kit.tertiaryColor && <span class="colour-dot" style={`background:${kit.tertiaryColor}`}></span>}
-                </span>
-              </span>
-            </div>
           </div>
         </div>
 
-        {otherKitsSameSeason.length > 0 && (
-          <div class="section">
-            <h2 class="section-title">Also from {kit.season}</h2>
-            <div class="other-kits-list">
-              {otherKitsSameSeason.map((k) => (
-                <a href={`/kits/${club.clubSlug}/${k.season}-${k.type}/`} class="other-kit-link">
-                  <span class="colour-dots">
-                    <span class="colour-dot" style={`background:${k.primaryColor}`}></span>
-                    <span class="colour-dot" style={`background:${k.secondaryColor}`}></span>
-                  </span>
-                  <span>{typeLabel[k.type] || k.type} — {k.manufacturer}</span>
-                </a>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div class="kit-buy-col">
         <div class="section">
           <h2 class="section-title">Where to Buy</h2>
-          <p class="kit-buy-intro">Search for the {club.club} {kit.season} {kit.type} shirt at these retailers:</p>
           <div class="kit-buy-stack">
-            <a href={ebayUrl} rel="nofollow sponsored" target="_blank" class="kit-buy-button">
-              <div>
-                <span class="kit-buy-name">eBay</span>
-                <span class="kit-buy-desc">New & used shirts</span>
-              </div>
-              <span class="kit-buy-action">Search &rarr;</span>
-            </a>
-            <a href={ebayRetroUrl} rel="nofollow sponsored" target="_blank" class="kit-buy-button">
-              <div>
-                <span class="kit-buy-name">eBay — Original / Retro</span>
-                <span class="kit-buy-desc">Authentic vintage shirts</span>
-              </div>
-              <span class="kit-buy-action">Search &rarr;</span>
-            </a>
-            <a href={cfsUrl} rel="nofollow sponsored" target="_blank" class="kit-buy-button kit-buy-featured">
+            <a href={cfsUrl} rel="nofollow sponsored" target="_blank" class="kit-buy-btn kit-buy-featured">
               <div>
                 <span class="kit-buy-name">Classic Football Shirts</span>
                 <span class="kit-buy-desc">Authenticated vintage kits</span>
               </div>
-              <span class="kit-buy-action">Search &rarr;</span>
+              <span class="kit-buy-arrow">&rarr;</span>
             </a>
-            <a href={vfsUrl} rel="nofollow sponsored" target="_blank" class="kit-buy-button">
+            <a href={ebayUrl} rel="nofollow sponsored" target="_blank" class="kit-buy-btn">
+              <div>
+                <span class="kit-buy-name">eBay</span>
+                <span class="kit-buy-desc">New & used shirts</span>
+              </div>
+              <span class="kit-buy-arrow">&rarr;</span>
+            </a>
+            <a href={ebayRetroUrl} rel="nofollow sponsored" target="_blank" class="kit-buy-btn">
+              <div>
+                <span class="kit-buy-name">eBay &mdash; Retro Originals</span>
+                <span class="kit-buy-desc">Authentic vintage shirts</span>
+              </div>
+              <span class="kit-buy-arrow">&rarr;</span>
+            </a>
+            <a href={vfsUrl} rel="nofollow sponsored" target="_blank" class="kit-buy-btn">
               <div>
                 <span class="kit-buy-name">Vintage Football Shirts</span>
                 <span class="kit-buy-desc">Retro & classic kits</span>
               </div>
-              <span class="kit-buy-action">Search &rarr;</span>
+              <span class="kit-buy-arrow">&rarr;</span>
             </a>
           </div>
           <p class="kit-buy-disclaimer">
-            Links open external sites. Availability and prices vary. We may earn commission from qualifying purchases.
+            Illustration is a stylised representation of kit colours, not the actual design. Links open external sites. We may earn commission from qualifying purchases.
           </p>
         </div>
       </div>
@@ -187,12 +210,101 @@ const ebayRetroUrl = `https://www.ebay.co.uk/sch/i.html?_nkw=${encodeURIComponen
 </Base>
 
 <style>
-  .kit-detail-grid {
+  .kit-detail-layout {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 320px 1fr;
     gap: 2.5rem;
     margin-bottom: 2rem;
   }
+  .kit-visual-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+  .kit-visual-card {
+    background: var(--bg-alt);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 2rem 1.5rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+  .kit-visual-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+  }
+  .kit-visual-season {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+  }
+  .kit-visual-type {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .kit-colour-bar {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .kit-colour-chip {
+    flex: 1;
+    height: 36px;
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(0,0,0,0.08);
+  }
+  .kit-colour-chip span {
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    mix-blend-mode: normal;
+  }
+  .kit-other-season {
+    background: var(--bg-alt);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+  }
+  .kit-other-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    display: block;
+    margin-bottom: 0.65rem;
+  }
+  .kit-other-row { display: flex; gap: 0.75rem; }
+  .kit-other-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    text-decoration: none;
+    padding: 0.5rem;
+    border-radius: var(--radius);
+    transition: all 0.15s;
+  }
+  .kit-other-item:hover { background: rgba(0,0,0,0.03); text-decoration: none; }
+  .kit-other-type {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+  .kit-info-panel { display: flex; flex-direction: column; gap: 0; }
   .kit-specs {
     border: 1px solid var(--border-light);
     border-radius: var(--radius-lg);
@@ -209,43 +321,11 @@ const ebayRetroUrl = `https://www.ebay.co.uk/sch/i.html?_nkw=${encodeURIComponen
   .kit-spec-row:last-child { border-bottom: none; }
   .kit-spec-row:nth-child(even) { background: var(--bg-alt); }
   .kit-spec-label { color: var(--text-muted); font-weight: 500; }
-  .kit-spec-value { font-weight: 600; color: var(--text); text-align: right; }
+  .kit-spec-value { font-weight: 600; color: var(--text); }
   .kit-spec-value a { color: var(--text); }
   .kit-spec-value a:hover { color: var(--link); }
-  .colour-dots { display: flex; gap: 0.3rem; align-items: center; }
-  .colour-dot {
-    width: 18px; height: 18px;
-    border-radius: 50%;
-    border: 2px solid var(--border);
-    flex-shrink: 0;
-  }
-  .other-kits-list { display: flex; flex-direction: column; gap: 0.5rem; }
-  .other-kit-link {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.65rem 0.85rem;
-    background: var(--bg-alt);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius);
-    text-decoration: none;
-    color: var(--text);
-    font-size: 0.88rem;
-    font-weight: 500;
-    transition: all 0.15s;
-  }
-  .other-kit-link:hover {
-    border-color: var(--border);
-    box-shadow: var(--shadow-xs);
-    text-decoration: none;
-  }
-  .kit-buy-intro {
-    font-size: 0.88rem;
-    color: var(--text-secondary);
-    margin-bottom: 0.85rem;
-  }
   .kit-buy-stack { display: flex; flex-direction: column; gap: 0.5rem; }
-  .kit-buy-button {
+  .kit-buy-btn {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -257,7 +337,7 @@ const ebayRetroUrl = `https://www.ebay.co.uk/sch/i.html?_nkw=${encodeURIComponen
     transition: all 0.2s;
     color: var(--text);
   }
-  .kit-buy-button:hover {
+  .kit-buy-btn:hover {
     border-color: var(--accent);
     box-shadow: var(--shadow-md);
     text-decoration: none;
@@ -268,18 +348,20 @@ const ebayRetroUrl = `https://www.ebay.co.uk/sch/i.html?_nkw=${encodeURIComponen
     background: rgba(61, 25, 91, 0.03);
   }
   .kit-buy-name { font-weight: 700; font-size: 0.9rem; display: block; }
-  .kit-buy-desc { font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 0.1rem; }
-  .kit-buy-action { font-size: 0.8rem; color: var(--link); font-weight: 650; flex-shrink: 0; }
+  .kit-buy-desc { font-size: 0.72rem; color: var(--text-muted); display: block; margin-top: 0.1rem; }
+  .kit-buy-arrow { font-size: 1rem; color: var(--link); font-weight: 700; flex-shrink: 0; }
   .kit-buy-disclaimer {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     color: var(--text-muted);
     margin-top: 0.85rem;
     line-height: 1.5;
+    font-style: italic;
   }
   @media (max-width: 768px) {
-    .kit-detail-grid {
+    .kit-detail-layout {
       grid-template-columns: 1fr;
       gap: 1.5rem;
     }
+    .kit-visual-card { padding: 1.5rem 1rem 1rem; }
   }
 </style>

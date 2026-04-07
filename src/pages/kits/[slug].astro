@@ -1,5 +1,6 @@
 ---
 import Base from "../../layouts/Base.astro";
+import KitIllustration from "../../components/KitIllustration.astro";
 import { allClubKitArchives } from "../../data/kits/index";
 import { leagues } from "../../data/leagues/index";
 
@@ -74,41 +75,34 @@ const typeLabel: Record<string, string> = { home: "Home", away: "Away", third: "
     </section>
 
     <section class="section">
-      <h2 class="section-title">Full Kit History</h2>
-      <div class="table-wrap" role="region" aria-label="Kit history table" tabindex="0">
-        <table class="stats-table" aria-label="Kit history">
-          <thead>
-            <tr>
-              <th scope="col">Season</th>
-              <th scope="col">Type</th>
-              <th scope="col">Manufacturer</th>
-              <th scope="col">Sponsor</th>
-              <th scope="col">Colours</th>
-              <th scope="col">Buy</th>
-            </tr>
-          </thead>
-          <tbody>
-            {club.kits.map((kit) => (
-              <tr>
-                <td><a href={`/kits/${club.clubSlug}/${kit.season}-${kit.type}/`}>{kit.season}</a></td>
-                <td><span class={`kit-type-badge kit-type-${kit.type}`}>{typeLabel[kit.type]}</span></td>
-                <td>{kit.manufacturer}</td>
-                <td>{kit.sponsor || "—"}</td>
-                <td>
-                  <span class="colour-dots">
-                    <span class="colour-dot" style={`background:${kit.primaryColor}`}></span>
-                    <span class="colour-dot" style={`background:${kit.secondaryColor}`}></span>
-                    {kit.tertiaryColor && <span class="colour-dot" style={`background:${kit.tertiaryColor}`}></span>}
-                  </span>
-                </td>
-                <td>
-                  <a href={`/kits/${club.clubSlug}/${kit.season}-${kit.type}/`} class="kit-view-link">View &rarr;</a>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <h2 class="section-title">All Kits by Season</h2>
+      {seasons.map((season) => {
+        const kits = kitsBySeason.get(season)!;
+        return (
+          <div class="kit-season-row" id={season}>
+            <h3 class="kit-season-label">{season}</h3>
+            <div class="kit-season-grid">
+              {kits.map((kit) => (
+                <a href={`/kits/${club.clubSlug}/${season}-${kit.type}/`} class="kit-grid-card">
+                  <KitIllustration
+                    primary={kit.primaryColor}
+                    secondary={kit.secondaryColor}
+                    tertiary={kit.tertiaryColor}
+                    type={kit.type}
+                    size="sm"
+                    manufacturer={kit.manufacturer}
+                  />
+                  <div class="kit-grid-info">
+                    <span class={`kit-type-pill kit-type-${kit.type}`}>{typeLabel[kit.type]}</span>
+                    <span class="kit-grid-brand">{kit.manufacturer}</span>
+                    {kit.sponsor && <span class="kit-grid-sponsor">{kit.sponsor}</span>}
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        );
+      })}
     </section>
 
     <section class="section">
@@ -130,7 +124,7 @@ const typeLabel: Record<string, string> = { home: "Home", away: "Away", third: "
           eras.push({ ...current });
           return eras.map((era) => (
             <div class="timeline-block">
-              <span class="timeline-years">{era.from} — {era.to}</span>
+              <span class="timeline-years">{era.from} &mdash; {era.to}</span>
               <span class="timeline-brand">{era.manufacturer}</span>
             </div>
           ));
@@ -146,37 +140,75 @@ const typeLabel: Record<string, string> = { home: "Home", away: "Away", third: "
 </Base>
 
 <style>
-  .kit-type-badge {
+  .kit-season-row {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .kit-season-row:last-child { border-bottom: none; }
+  .kit-season-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.85rem;
+  }
+  .kit-season-grid {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .kit-grid-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.85rem 1.1rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.2s;
+    min-width: 240px;
+    flex: 1 1 240px;
+    max-width: 360px;
+  }
+  .kit-grid-card:hover {
+    border-color: var(--border);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+    text-decoration: none;
+  }
+  .kit-grid-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  .kit-type-pill {
     display: inline-block;
     font-size: 0.68rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    padding: 0.15rem 0.45rem;
+    padding: 0.15rem 0.5rem;
     border-radius: 4px;
-    background: var(--bg-alt);
-    border: 1px solid var(--border-light);
+    width: fit-content;
   }
-  .kit-type-home { color: var(--cl-green); border-color: rgba(5, 150, 105, 0.2); background: rgba(5, 150, 105, 0.06); }
-  .kit-type-away { color: var(--el-blue); border-color: rgba(37, 99, 235, 0.2); background: rgba(37, 99, 235, 0.06); }
-  .kit-type-third { color: #9333ea; border-color: rgba(147, 51, 234, 0.2); background: rgba(147, 51, 234, 0.06); }
-  .colour-dots { display: flex; gap: 0.3rem; align-items: center; }
-  .colour-dot {
-    width: 16px; height: 16px;
-    border-radius: 50%;
-    border: 2px solid var(--border);
-    flex-shrink: 0;
-  }
-  .kit-view-link {
-    font-size: 0.8rem;
+  .kit-type-home { color: #059669; background: rgba(5,150,105,0.08); }
+  .kit-type-away { color: #2563eb; background: rgba(37,99,235,0.08); }
+  .kit-type-third { color: #9333ea; background: rgba(147,51,234,0.08); }
+  .kit-type-goalkeeper { color: #d97706; background: rgba(217,119,6,0.08); }
+  .kit-grid-brand {
+    font-size: 0.88rem;
     font-weight: 600;
-    white-space: nowrap;
+    color: var(--text);
   }
-  .kit-timeline {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+  .kit-grid-sponsor {
+    font-size: 0.75rem;
+    color: var(--text-muted);
   }
+  .kit-timeline { display: flex; flex-wrap: wrap; gap: 0.5rem; }
   .timeline-block {
     background: var(--bg-alt);
     border: 1px solid var(--border-light);
@@ -186,14 +218,10 @@ const typeLabel: Record<string, string> = { home: "Home", away: "Away", third: "
     flex-direction: column;
     gap: 0.15rem;
   }
-  .timeline-years {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    font-weight: 500;
-  }
-  .timeline-brand {
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: var(--text);
+  .timeline-years { font-size: 0.7rem; color: var(--text-muted); font-weight: 500; }
+  .timeline-brand { font-size: 0.9rem; font-weight: 700; color: var(--text); }
+
+  @media (max-width: 480px) {
+    .kit-grid-card { min-width: 100%; max-width: 100%; }
   }
 </style>

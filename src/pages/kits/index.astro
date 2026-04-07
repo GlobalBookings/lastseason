@@ -1,5 +1,6 @@
 ---
 import Base from "../../layouts/Base.astro";
+import KitIllustration from "../../components/KitIllustration.astro";
 import { allClubKitArchives, getKitArchivesByLeague } from "../../data/kits/index";
 import { leagues } from "../../data/leagues/index";
 
@@ -42,22 +43,39 @@ const totalClubs = allClubKitArchives.length;
           <div class="league-section-header">
             <h2><a href={`/${league.slug}/`}>{league.name}</a></h2>
           </div>
-          <div class="card-grid">
+          <div class="kit-hub-grid">
             {clubs.map((club) => {
               const kitCount = club.kits.length;
-              const decades = new Set(club.kits.map(k => k.season.slice(0, 3) + "0s"));
+              const latestHome = club.kits.find(k => k.type === "home");
+              const latestAway = club.kits.find(k => k.type === "away");
               const yearsRange = club.kits.length > 0
                 ? `${club.kits[club.kits.length - 1].season} — ${club.kits[0].season}`
                 : "";
               return (
-                <a href={`/kits/${club.clubSlug}/`} class="card card-accent" style={`border-top-color: ${league.accentColor}`}>
-                  <div class="kit-color-preview">
-                    <span class="kit-swatch" style={`background: ${club.kits[0]?.primaryColor || '#ccc'}`}></span>
-                    <span class="kit-swatch" style={`background: ${club.kits[0]?.secondaryColor || '#ccc'}`}></span>
+                <a href={`/kits/${club.clubSlug}/`} class="kit-hub-card">
+                  <div class="kit-hub-previews">
+                    {latestHome && (
+                      <KitIllustration
+                        primary={latestHome.primaryColor}
+                        secondary={latestHome.secondaryColor}
+                        tertiary={latestHome.tertiaryColor}
+                        size="sm"
+                      />
+                    )}
+                    {latestAway && (
+                      <KitIllustration
+                        primary={latestAway.primaryColor}
+                        secondary={latestAway.secondaryColor}
+                        tertiary={latestAway.tertiaryColor}
+                        size="sm"
+                      />
+                    )}
                   </div>
-                  <h3>{club.club}</h3>
-                  <p class="meta"><strong>{kitCount} kits</strong> archived</p>
-                  <p class="meta">{yearsRange}</p>
+                  <div class="kit-hub-info">
+                    <h3>{club.club}</h3>
+                    <p class="meta"><strong>{kitCount} kits</strong> archived</p>
+                    <p class="meta">{yearsRange}</p>
+                  </div>
                 </a>
               );
             })}
@@ -67,3 +85,48 @@ const totalClubs = allClubKitArchives.length;
     })}
   </div>
 </Base>
+
+<style>
+  .kit-hub-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 0.875rem;
+  }
+  .kit-hub-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.2s;
+  }
+  .kit-hub-card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: rgba(0,0,0,0.12);
+    transform: translateY(-2px);
+    text-decoration: none;
+  }
+  .kit-hub-previews {
+    display: flex;
+    gap: 0.25rem;
+    flex-shrink: 0;
+  }
+  .kit-hub-info h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+  }
+  .kit-hub-info .meta {
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    margin-bottom: 0.15rem;
+  }
+  .kit-hub-info .meta strong { color: var(--text); }
+  @media (max-width: 480px) {
+    .kit-hub-grid { grid-template-columns: 1fr; }
+  }
+</style>
