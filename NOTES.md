@@ -255,6 +255,24 @@ Example for `/premier-league/2023-24/`:
 - 2025-04-07: robots.txt updated for LLM crawlability (GPTBot, ClaudeBot, PerplexityBot etc.)
 - 2025-04-07: Records link added to desktop nav, mobile nav, and footer
 - 2025-04-07: 2,170 total pages, 2,169 URLs in sitemap
+- 2025-04-07: New football favicon (SVG soccerball with pentagon/hexagon pattern)
+- 2025-04-07: Homepage refresh — hero CTAs, quick-link pills, headline cards
+- 2025-04-07: Club profiles — 97 clubs across all 8 leagues with owner, stadium, capacity, manager, wage bill, revenue, kit manufacturer, FAQPage + SportsTeam schema
+- 2025-04-07: Player profiles — 90 players with nationality, position, DOB, height, market value, preferred foot, Person + FAQPage schema
+- 2025-04-07: FAQ section — 6 pages, 48 questions targeting "People Also Ask" queries:
+  - /faq/ — hub page
+  - /faq/premier-league/ — 11 questions about PL format, rules, history
+  - /faq/transfers-and-money/ — 10 questions about fees, salaries, FFP
+  - /faq/champions-league/ — 8 questions about UCL format, history, records
+  - /faq/world-football/ — 9 questions about leagues, cups, international football
+  - /faq/rules-and-format/ — 10 questions about offside, VAR, substitutions
+- 2025-04-07: FAQ link added to mobile nav and footer
+- 2025-04-07: 2,176 total pages, 2,175 URLs in sitemap
+
+## Key Data Files
+- `src/data/clubs/profiles.ts` — 97 club profiles (owner, stadium, finances, etc.)
+- `src/data/players/profiles.ts` — 90 player profiles (nationality, position, value, etc.)
+- `src/data/records/premier-league.ts` — All-time scorers, winners, golden boots, relegations, records
 
 ## Google Analytics
 - **GA4 Property ID:** G-C2K4PMZEDJ
