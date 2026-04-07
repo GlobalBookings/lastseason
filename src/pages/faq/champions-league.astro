@@ -1,0 +1,174 @@
+---
+import Base from "../../layouts/Base.astro";
+
+const faqs = [
+  {
+    q: "How does the Champions League work?",
+    a: "The UEFA Champions League is European club football's premier competition. From 2024-25, it uses a new 'Swiss model' league phase where 36 teams each play eight matches against different opponents. The top eight qualify automatically for the round of 16, teams finishing 9th–24th play a knockout play-off round, and teams 25th–36th are eliminated. The competition then follows a traditional knockout format through to the final. Previously, the group stage had 32 teams in eight groups of four."
+  },
+  {
+    q: "Who has won the most Champions League titles?",
+    a: "Real Madrid hold the record with 15 Champions League/European Cup titles, including six since 2014 alone. AC Milan are second with 7 titles, followed by Bayern Munich and Liverpool with 6 each. Barcelona have won 5. Real Madrid's dominance of the modern era — with titles in 2014, 2016, 2017, 2018, 2022 and 2024 — is unprecedented in the competition's history."
+  },
+  {
+    q: "What is the Champions League anthem?",
+    a: "The Champions League anthem is 'Champions League' by Tony Britten, composed in 1992 and based on George Frideric Handel's 'Zadok the Priest'. It is performed by the Royal Philharmonic Orchestra and sung in three languages — English, French and German (the official UEFA languages). The iconic opening line 'Les grandes équipes' is one of the most recognisable sounds in world sport and is played before every Champions League match."
+  },
+  {
+    q: "How many teams qualify for the Champions League from each country?",
+    a: "The number of Champions League spots per country depends on UEFA's coefficient ranking. England, Spain, Germany and Italy each receive four automatic places. France gets three. Other countries receive between one and three places, with some requiring qualification rounds. From 2024-25, the expanded 36-team format also grants additional places based on coefficient and historical performance. The reigning Champions League and Europa League winners also qualify automatically."
+  },
+  {
+    q: "How much is the Champions League prize money?",
+    a: "Champions League prize money is substantial. For 2024-25, the total prize pool is approximately €2.467 billion. Each club receives a minimum of around €18.6 million just for participating in the league phase. Winning the competition is worth well over €100 million in total when you combine participation fees, performance bonuses, coefficient payments and TV market pool distributions. The exact amount varies depending on the domestic TV market."
+  },
+  {
+    q: "What is the Europa League?",
+    a: "The UEFA Europa League is European football's second-tier club competition, below the Champions League. It features clubs that finish just below Champions League qualification spots in their domestic leagues, plus domestic cup winners and clubs that drop out of Champions League qualifying. The competition follows a similar format to the Champions League with a league phase and knockout rounds. Winning the Europa League earns automatic qualification for the next season's Champions League."
+  },
+  {
+    q: "Who are the Champions League all-time top scorers?",
+    a: "Cristiano Ronaldo is the Champions League's all-time top scorer with 140 goals, scored for Manchester United, Real Madrid and Juventus. Lionel Messi is second with 129 goals for Barcelona, PSG and Inter Miami (in qualifying). Robert Lewandowski (94 goals), Karim Benzema (90) and Raúl (71) complete the top five. Ronaldo also holds the record for most goals in a single campaign with 17 in 2013-14."
+  },
+  {
+    q: "What is the Europa Conference League?",
+    a: "The UEFA Europa Conference League is European football's third-tier club competition, introduced in 2021-22. It sits below both the Champions League and Europa League and was created to give clubs from smaller football nations more meaningful European football. Teams qualify through domestic league finishing positions or by dropping out of Europa League qualifying. The first winners were AS Roma in 2022, followed by West Ham United in 2023 and Olympiacos in 2024."
+  }
+];
+
+const breadcrumbSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://lastseason.co.uk/" },
+    { "@type": "ListItem", "position": 2, "name": "FAQ", "item": "https://lastseason.co.uk/faq/" },
+    { "@type": "ListItem", "position": 3, "name": "Champions League FAQ" }
+  ]
+});
+
+const faqSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqs.map(f => ({
+    "@type": "Question",
+    "name": f.q,
+    "acceptedAnswer": { "@type": "Answer", "text": f.a }
+  }))
+});
+---
+
+<Base
+  title="Champions League FAQ — Format, History & Records"
+  description="How the Champions League works, who has won the most titles, qualification rules, prize money, the anthem, Europa League and all-time top scorers — all explained."
+  canonical="/faq/champions-league/"
+>
+  <script type="application/ld+json" set:html={breadcrumbSchema} />
+  <script type="application/ld+json" set:html={faqSchema} />
+
+  <div class="container">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a href="/">Home</a>
+      <span class="sep">/</span>
+      <a href="/faq/">FAQ</a>
+      <span class="sep">/</span>
+      <span class="current">Champions League</span>
+    </nav>
+
+    <section class="page-hero">
+      <h1>Champions League FAQ</h1>
+      <p class="subtitle">Everything you need to know about UEFA's premier club competition — format, history, records and prize money.</p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="hero-stat-value">15</span>
+          <span class="hero-stat-label">Real Madrid Titles</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">140</span>
+          <span class="hero-stat-label">Ronaldo Goals (Record)</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">36</span>
+          <span class="hero-stat-label">Teams (New Format)</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">€2.5bn</span>
+          <span class="hero-stat-label">Prize Pool</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Frequently Asked Questions</h2>
+      {faqs.map((faq) => (
+        <div class="faq-item">
+          <h3>{faq.q}</h3>
+          <p>{faq.a}</p>
+        </div>
+      ))}
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Champions League Title Winners</h2>
+      <div class="table-wrap">
+        <table class="stats-table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Club</th>
+              <th scope="col">Titles</th>
+              <th scope="col">Country</th>
+              <th scope="col">Most Recent</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>Real Madrid</td><td><strong>15</strong></td><td>Spain</td><td>2024</td></tr>
+            <tr><td>2</td><td>AC Milan</td><td><strong>7</strong></td><td>Italy</td><td>2007</td></tr>
+            <tr><td>3</td><td>Bayern Munich</td><td><strong>6</strong></td><td>Germany</td><td>2020</td></tr>
+            <tr><td>=</td><td>Liverpool</td><td><strong>6</strong></td><td>England</td><td>2019</td></tr>
+            <tr><td>5</td><td>Barcelona</td><td><strong>5</strong></td><td>Spain</td><td>2015</td></tr>
+            <tr><td>6</td><td>Ajax</td><td><strong>4</strong></td><td>Netherlands</td><td>1995</td></tr>
+            <tr><td>=</td><td>Inter Milan</td><td><strong>4</strong></td><td>Italy</td><td>2010</td></tr>
+            <tr><td>8</td><td>Manchester United</td><td><strong>3</strong></td><td>England</td><td>2008</td></tr>
+            <tr><td>=</td><td>Nottingham Forest</td><td><strong>2</strong></td><td>England</td><td>1980</td></tr>
+            <tr><td>=</td><td>Juventus</td><td><strong>2</strong></td><td>Italy</td><td>1996</td></tr>
+            <tr><td>=</td><td>Benfica</td><td><strong>2</strong></td><td>Portugal</td><td>1962</td></tr>
+            <tr><td>=</td><td>Porto</td><td><strong>2</strong></td><td>Portugal</td><td>2004</td></tr>
+            <tr><td>=</td><td>Chelsea</td><td><strong>2</strong></td><td>England</td><td>2021</td></tr>
+            <tr><td>=</td><td>Manchester City</td><td><strong>1</strong></td><td>England</td><td>2023</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Related Reading</h2>
+      <div class="narrative">
+        <p>For more on the Premier League clubs that compete in Europe, head to our <a href="/premier-league/">Premier League page</a> for full season archives. See who topped the table and qualified for European competition across every season since 1992.</p>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .faq-item {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .faq-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  .faq-item h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--heading);
+  }
+  .faq-item p {
+    color: var(--text-muted);
+    line-height: 1.7;
+    font-size: 0.97rem;
+  }
+</style>

@@ -1,6 +1,7 @@
 ---
 import Base from "../../layouts/Base.astro";
 import { getAllLoadedSeasons } from "../../utils/data";
+import { playerProfiles } from "../../data/players/profiles";
 
 export function getStaticPaths() {
   const allSeasons = getAllLoadedSeasons();
@@ -12,14 +13,9 @@ export function getStaticPaths() {
         playerMap.set(scorer.playerSlug, { name: scorer.name, slug: scorer.playerSlug, appearances: [] });
       }
       playerMap.get(scorer.playerSlug)!.appearances.push({
-        season: season.season,
-        league: season.league,
-        leagueSlug: season.leagueSlug,
-        club: scorer.club,
-        clubSlug: scorer.clubSlug,
-        goals: scorer.goals,
-        assists: scorer.assists,
-        type: "scorer",
+        season: season.season, league: season.league, leagueSlug: season.leagueSlug,
+        club: scorer.club, clubSlug: scorer.clubSlug,
+        goals: scorer.goals, assists: scorer.assists, type: "scorer",
       });
     }
     for (const assister of season.assisters) {
@@ -27,32 +23,17 @@ export function getStaticPaths() {
         playerMap.set(assister.playerSlug, { name: assister.name, slug: assister.playerSlug, appearances: [] });
       }
       const existing = playerMap.get(assister.playerSlug)!.appearances;
-      const alreadyAdded = existing.find(
-        (a: any) => a.season === season.season && a.leagueSlug === season.leagueSlug
-      );
-      if (!alreadyAdded) {
-        existing.push({
-          season: season.season, league: season.league, leagueSlug: season.leagueSlug,
-          club: assister.club, clubSlug: assister.clubSlug,
-          goals: 0, assists: assister.assists, type: "assister",
-        });
-      }
+      const match = existing.find((a: any) => a.season === season.season && a.leagueSlug === season.leagueSlug);
+      if (match) { match.assists = Math.max(match.assists || 0, assister.assists); }
+      else { existing.push({ season: season.season, league: season.league, leagueSlug: season.leagueSlug, club: assister.club, clubSlug: assister.clubSlug, goals: 0, assists: assister.assists, type: "assister" }); }
     }
     for (const cs of season.cleanSheets) {
       if (!playerMap.has(cs.playerSlug)) {
         playerMap.set(cs.playerSlug, { name: cs.name, slug: cs.playerSlug, appearances: [] });
       }
       const existing = playerMap.get(cs.playerSlug)!.appearances;
-      const alreadyAdded = existing.find(
-        (a: any) => a.season === season.season && a.leagueSlug === season.leagueSlug
-      );
-      if (!alreadyAdded) {
-        existing.push({
-          season: season.season, league: season.league, leagueSlug: season.leagueSlug,
-          club: cs.club, clubSlug: cs.clubSlug,
-          goals: 0, assists: 0, cleanSheets: cs.cleanSheets, type: "goalkeeper",
-        });
-      }
+      const match = existing.find((a: any) => a.season === season.season && a.leagueSlug === season.leagueSlug);
+      if (!match) { existing.push({ season: season.season, league: season.league, leagueSlug: season.leagueSlug, club: cs.club, clubSlug: cs.clubSlug, goals: 0, assists: 0, cleanSheets: cs.cleanSheets, type: "goalkeeper" }); }
     }
   }
 
@@ -63,9 +44,46 @@ export function getStaticPaths() {
 }
 
 const { player } = Astro.props;
-const sortedAppearances = player.appearances.sort((a: any, b: any) => b.season.localeCompare(a.season));
+const profile = playerProfiles.find((p) => p.slug === player.slug);
+const sorted = player.appearances.sort((a: any, b: any) => b.season.localeCompare(a.season));
 const totalGoals = player.appearances.reduce((sum: number, a: any) => sum + (a.goals || 0), 0);
 const totalAssists = player.appearances.reduce((sum: number, a: any) => sum + (a.assists || 0), 0);
+const clubs = [...new Set(player.appearances.map((a: any) => a.club))];
+const hasProfile = !!profile;
+
+function getAge(dob: string): number {
+  const b = new Date(dob); const t = new Date();
+  let age = t.getFullYear() - b.getFullYear();
+  if (t.getMonth() < b.getMonth() || (t.getMonth() === b.getMonth() && t.getDate() < b.getDate())) age--;
+  return age;
+}
+
+const pNat = profile?.nationality ?? "";
+const pPos = profile?.position ?? "";
+const pDob = profile?.dateOfBirth ?? "";
+const pDobDisplay = pDob ? new Date(pDob).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) : "";
+const pAge = pDob ? getAge(pDob) : 0;
+const pHeight = profile?.height ?? "";
+const pClub = profile?.currentClub ?? "";
+const pClubSlug = profile?.currentClubSlug ?? "";
+const pLeague = profile?.currentLeague ?? "";
+const pValue = profile?.marketValue ?? "";
+const pFoot = profile?.preferredFoot ?? "";
+const pShirt = profile?.shirtNumber ?? 0;
+const isRetired = pClub === "Retired";
+
+const subtitleParts: string[] = [];
+if (pNat) subtitleParts.push(`${pNat} ${pPos}`);
+if (pClub && !isRetired) subtitleParts.push(pClub);
+if (isRetired) subtitleParts.push("Retired");
+
+const desc = hasProfile
+  ? `${player.name} — ${pNat} ${pPos}${!isRetired ? ` at ${pClub}` : ""}. Career stats, season history, goals and assists.`
+  : `${player.name} season-by-season stats including goals, assists and career history.`;
+
+const pageTitle = hasProfile
+  ? `${player.name} — ${pNat} ${pPos} — Career Stats & History`
+  : `${player.name} — Career Stats & Season History`;
 
 const breadcrumbSchema = JSON.stringify({
   "@context": "https://schema.org",
@@ -76,43 +94,60 @@ const breadcrumbSchema = JSON.stringify({
     { "@type": "ListItem", "position": 3, "name": player.name },
   ],
 });
+
+const personSchema = hasProfile ? JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": player.name,
+  "nationality": pNat,
+  "birthDate": pDob,
+  "height": pHeight,
+  "jobTitle": "Professional Footballer",
+  ...(!isRetired ? { "memberOf": { "@type": "SportsTeam", "name": pClub } } : {}),
+}) : "";
+
+const faqItems: any[] = [];
+if (hasProfile) {
+  if (totalGoals > 0) faqItems.push({ "@type": "Question", "name": `How many goals has ${player.name} scored?`, "acceptedAnswer": { "@type": "Answer", "text": `${player.name} has scored ${totalGoals} goals across ${player.appearances.length} seasons tracked.` }});
+  faqItems.push({ "@type": "Question", "name": `What nationality is ${player.name}?`, "acceptedAnswer": { "@type": "Answer", "text": `${player.name} is ${pNat}.` }});
+  faqItems.push({ "@type": "Question", "name": `How old is ${player.name}?`, "acceptedAnswer": { "@type": "Answer", "text": `${player.name} was born on ${pDobDisplay}${!isRetired ? `, making him ${pAge} years old` : ""}.` }});
+  if (!isRetired) faqItems.push({ "@type": "Question", "name": `What club does ${player.name} play for?`, "acceptedAnswer": { "@type": "Answer", "text": `${player.name} currently plays for ${pClub} in the ${pLeague}.` }});
+}
+const faqSchema = faqItems.length > 0 ? JSON.stringify({ "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": faqItems }) : "";
 ---
 
-<Base
-  title={`${player.name} — Career Stats & Season History`}
-  description={`${player.name} season-by-season stats including goals, assists and career history at Last Season.`}
-  canonical={`/players/${player.slug}/`}
->
+<Base title={pageTitle} description={desc} canonical={`/players/${player.slug}/`}>
   <script type="application/ld+json" set:html={breadcrumbSchema} />
+  <Fragment set:html={personSchema ? `<script type="application/ld+json">${personSchema}</script>` : ""} />
+  <Fragment set:html={faqSchema ? `<script type="application/ld+json">${faqSchema}</script>` : ""} />
 
   <div class="container">
     <nav class="breadcrumbs" aria-label="Breadcrumb">
-      <a href="/">Home</a>
-      <span class="sep">/</span>
-      <a href="/players/">Players</a>
-      <span class="sep">/</span>
-      <span class="current">{player.name}</span>
+      <a href="/">Home</a><span class="sep">/</span><a href="/players/">Players</a><span class="sep">/</span><span class="current">{player.name}</span>
     </nav>
 
     <section class="page-hero">
       <h1>{player.name}</h1>
+      <p class="subtitle">{subtitleParts.join(" · ")}</p>
       <div class="hero-stats">
-        {totalGoals > 0 && (
-          <div class="hero-stat">
-            <span class="hero-stat-value">{totalGoals}</span>
-            <span class="hero-stat-label">Goals</span>
-          </div>
-        )}
-        {totalAssists > 0 && (
-          <div class="hero-stat">
-            <span class="hero-stat-value">{totalAssists}</span>
-            <span class="hero-stat-label">Assists</span>
-          </div>
-        )}
-        <div class="hero-stat">
-          <span class="hero-stat-value">{player.appearances.length}</span>
-          <span class="hero-stat-label">Seasons Tracked</span>
-        </div>
+        <div class="hero-stat"><span class="hero-stat-value">{totalGoals}</span><span class="hero-stat-label">Goals</span></div>
+        <div class="hero-stat"><span class="hero-stat-value">{totalAssists}</span><span class="hero-stat-label">Assists</span></div>
+        <div class="hero-stat"><span class="hero-stat-value">{player.appearances.length}</span><span class="hero-stat-label">Seasons</span></div>
+        <div class="hero-stat"><span class="hero-stat-value">{clubs.length}</span><span class="hero-stat-label">Clubs</span></div>
+      </div>
+    </section>
+
+    <section class="section" style={hasProfile ? "" : "display:none"}>
+      <h2 class="section-title">Player Profile</h2>
+      <div class="profile-grid">
+        <div class="profile-card"><h3>Nationality</h3><div class="profile-value">{pNat}</div></div>
+        <div class="profile-card"><h3>Position</h3><div class="profile-value">{pPos}</div></div>
+        <div class="profile-card"><h3>Date of Birth</h3><div class="profile-value">{pDobDisplay}</div><div class="profile-meta">Age: {pAge}</div></div>
+        <div class="profile-card"><h3>Height</h3><div class="profile-value">{pHeight}</div></div>
+        <div class="profile-card"><h3>Current Club</h3><div class="profile-value">{isRetired ? "Retired" : pClub}</div><div class="profile-meta">{isRetired ? "" : pLeague}</div></div>
+        <div class="profile-card"><h3>Market Value</h3><div class="profile-value">{pValue}</div><div class="profile-meta">Estimated</div></div>
+        <div class="profile-card"><h3>Preferred Foot</h3><div class="profile-value">{pFoot}</div></div>
+        <div class="profile-card"><h3>Shirt Number</h3><div class="profile-value">{pShirt > 0 ? `#${pShirt}` : "-"}</div></div>
       </div>
     </section>
 
@@ -130,7 +165,7 @@ const breadcrumbSchema = JSON.stringify({
             </tr>
           </thead>
           <tbody>
-            {sortedAppearances.map((a: any) => (
+            {sorted.map((a: any) => (
               <tr>
                 <td><a href={`/${a.leagueSlug}/${a.season}/`}>{a.season}</a></td>
                 <td><a href={`/${a.leagueSlug}/`}>{a.league}</a></td>
@@ -140,8 +175,37 @@ const breadcrumbSchema = JSON.stringify({
               </tr>
             ))}
           </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3"><strong>Total</strong></td>
+              <td class="num"><strong>{totalGoals || "-"}</strong></td>
+              <td class="num"><strong>{totalAssists || "-"}</strong></td>
+            </tr>
+          </tfoot>
         </table>
       </div>
     </section>
   </div>
 </Base>
+
+<style>
+  .profile-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  .profile-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.25rem;
+  }
+  .profile-card h3 {
+    font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--text-secondary); margin-bottom: 0.35rem;
+  }
+  .profile-value { font-size: 1.05rem; font-weight: 700; color: var(--text); }
+  .profile-meta { font-size: 0.82rem; color: var(--text-secondary); margin-top: 0.15rem; }
+  @media (max-width: 640px) { .profile-grid { grid-template-columns: 1fr 1fr; } }
+</style>

@@ -1,0 +1,150 @@
+---
+import Base from "../../layouts/Base.astro";
+
+const faqs = [
+  {
+    q: "What is the offside rule in football?",
+    a: "A player is offside if they are nearer to the opponent's goal line than both the ball and the second-last defender at the moment the ball is played to them by a teammate. Being in an offside position is not an offence in itself — the player must be actively involved in play (interfering with play, interfering with an opponent, or gaining an advantage). The rule does not apply if the player receives the ball directly from a goal kick, throw-in or corner kick."
+  },
+  {
+    q: "How does VAR work in football?",
+    a: "VAR (Video Assistant Referee) operates from a central video operations room where officials review incidents using multiple camera angles. VAR can intervene in four types of decision: goals, penalty incidents, direct red cards and mistaken identity. When a potential error is identified, the VAR communicates with the on-field referee, who can either accept the recommendation or go to the pitchside monitor to review the footage themselves. The guiding principle is 'minimum interference, maximum benefit' — VAR only overturns clear and obvious errors."
+  },
+  {
+    q: "How many substitutes are allowed in football?",
+    a: "In most professional competitions, teams are allowed to make five substitutions per match, using a maximum of three 'windows' (plus half-time) to make those changes. This was introduced as a temporary measure during the COVID-19 pandemic and later made permanent by the International Football Association Board (IFAB) in 2023. Previously, teams were limited to three substitutions. An additional substitution is permitted in extra time during knockout matches."
+  },
+  {
+    q: "What is extra time in football?",
+    a: "Extra time is an additional 30-minute period (two halves of 15 minutes) played when a knockout match ends in a draw after 90 minutes. It is used in cup competitions and European knockout rounds where a winner must be decided. If the scores remain level after extra time, the match is decided by a penalty shootout. Not all competitions use extra time — some go straight to penalties after 90 minutes. The away goals rule, which previously eliminated extra time in some scenarios, was abolished by UEFA in 2021."
+  },
+  {
+    q: "What is a penalty shootout?",
+    a: "A penalty shootout is used to decide a winner when a knockout match remains level after 90 minutes (and extra time, where applicable). Each team takes five penalties, alternating turns. If the scores are still level after five penalties each, the shootout continues into sudden death — where each team takes one penalty at a time until one team scores and the other misses. Penalties are taken from the penalty spot, 12 yards (11 metres) from the goal line."
+  },
+  {
+    q: "What do yellow cards and red cards mean?",
+    a: "A yellow card is a formal caution given by the referee for offences such as reckless fouls, persistent infringement, time-wasting, dissent or unsporting behaviour. Two yellow cards in the same match result in a red card and the player is sent off. A straight red card is shown for serious foul play, violent conduct, spitting, denying a clear goal-scoring opportunity by a handball or foul, or using offensive language. A player who is sent off cannot be replaced — their team must play with one fewer player."
+  },
+  {
+    q: "How long is a football match?",
+    a: "A standard football match lasts 90 minutes, split into two halves of 45 minutes each, with a half-time interval of 15 minutes. The referee adds stoppage time (also called injury time or added time) at the end of each half to compensate for delays caused by substitutions, injuries, VAR reviews and time-wasting. In recent seasons, particularly since the 2022 World Cup, added time has increased significantly, with some matches exceeding 100 minutes of total play."
+  },
+  {
+    q: "What is injury time (stoppage time)?",
+    a: "Injury time (officially called 'added time' or 'stoppage time') is additional playing time added by the referee at the end of each half. It compensates for time lost to substitutions, injuries, goal celebrations, VAR checks and deliberate time-wasting. The fourth official displays a minimum number of minutes to be added, but the referee can extend this. Since 2022, FIFA has encouraged referees to add more accurate stoppage time, leading to significantly longer additions than in previous years."
+  },
+  {
+    q: "What is the away goals rule?",
+    a: "The away goals rule was a tiebreaking method used in two-legged knockout ties. If the aggregate score was level after both matches, the team that scored more goals away from home advanced. For example, if Team A won 2-1 at home and lost 1-0 away (aggregate 2-2), Team B would advance having scored one away goal to Team A's zero. UEFA abolished the rule in 2021, meaning all level ties now go to extra time and potentially penalties in the second leg. The English Football League still uses a version of the rule in some competitions."
+  },
+  {
+    q: "What is a clean sheet in football?",
+    a: "A clean sheet means a team (and specifically the goalkeeper) did not concede any goals during a match. It is one of the key defensive statistics tracked in football. The term originates from early football reporting where the team sheet would remain 'clean' (no goals against marked). Petr Čech holds the Premier League record with 202 clean sheets. Golden Glove awards are given each season to the goalkeeper with the most clean sheets."
+  }
+];
+
+const breadcrumbSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://lastseason.co.uk/" },
+    { "@type": "ListItem", "position": 2, "name": "FAQ", "item": "https://lastseason.co.uk/faq/" },
+    { "@type": "ListItem", "position": 3, "name": "Football Rules FAQ" }
+  ]
+});
+
+const faqSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqs.map(f => ({
+    "@type": "Question",
+    "name": f.q,
+    "acceptedAnswer": { "@type": "Answer", "text": f.a }
+  }))
+});
+---
+
+<Base
+  title="Football Rules FAQ — Offside, VAR, Substitutions & More"
+  description="Football rules explained simply. Offside, VAR, substitutions, extra time, penalties, yellow and red cards, injury time and more — clear answers for fans and newcomers."
+  canonical="/faq/rules-and-format/"
+>
+  <script type="application/ld+json" set:html={breadcrumbSchema} />
+  <script type="application/ld+json" set:html={faqSchema} />
+
+  <div class="container">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a href="/">Home</a>
+      <span class="sep">/</span>
+      <a href="/faq/">FAQ</a>
+      <span class="sep">/</span>
+      <span class="current">Rules &amp; Format</span>
+    </nav>
+
+    <section class="page-hero">
+      <h1>Football Rules FAQ</h1>
+      <p class="subtitle">Every football rule explained in plain English — from offside and VAR to penalty shootouts and stoppage time.</p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="hero-stat-value">90 min</span>
+          <span class="hero-stat-label">Standard Match</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">5</span>
+          <span class="hero-stat-label">Subs Allowed</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">12 yds</span>
+          <span class="hero-stat-label">Penalty Distance</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">202</span>
+          <span class="hero-stat-label">Čech Clean Sheets</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Frequently Asked Questions</h2>
+      {faqs.map((faq) => (
+        <div class="faq-item">
+          <h3>{faq.q}</h3>
+          <p>{faq.a}</p>
+        </div>
+      ))}
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">More Football Resources</h2>
+      <div class="narrative">
+        <p>Understanding the rules is just the start. Explore full season data, league tables and top scorers across Europe's biggest leagues on our <a href="/premier-league/">Premier League</a>, <a href="/la-liga/">La Liga</a>, <a href="/bundesliga/">Bundesliga</a>, <a href="/serie-a/">Serie A</a> and <a href="/ligue-1/">Ligue 1</a> pages.</p>
+        <p>For more about how competitions are structured, see our <a href="/faq/premier-league/">Premier League FAQ</a> and <a href="/faq/champions-league/">Champions League FAQ</a>.</p>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .faq-item {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .faq-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  .faq-item h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--heading);
+  }
+  .faq-item p {
+    color: var(--text-muted);
+    line-height: 1.7;
+    font-size: 0.97rem;
+  }
+</style>

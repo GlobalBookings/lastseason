@@ -1,0 +1,149 @@
+---
+import Base from "../../layouts/Base.astro";
+
+const faqs = [
+  {
+    q: "What is the most expensive football transfer ever?",
+    a: "The most expensive transfer in football history is Neymar's move from Barcelona to Paris Saint-Germain in August 2017 for €222 million (around £198 million). The fee was more than double the previous record and remains unmatched. Other notable high-fee transfers include Kylian Mbappé to PSG from Monaco (€180m) and Philippe Coutinho from Liverpool to Barcelona (€160m)."
+  },
+  {
+    q: "How much do footballers earn?",
+    a: "Footballer salaries vary massively depending on the league and club. In the Premier League, top players can earn £300,000–£400,000 per week, while first-team regulars at mid-table clubs may earn £50,000–£80,000. In the Championship, average wages are significantly lower at around £10,000–£25,000 per week. Outside the top divisions, many players earn modest salaries comparable to other professions."
+  },
+  {
+    q: "What is Financial Fair Play (FFP)?",
+    a: "Financial Fair Play is a set of regulations introduced by UEFA in 2011 designed to prevent clubs from spending more than they earn. Clubs competing in European competitions must demonstrate that their football-related expenditure does not significantly exceed their football-related income over a rolling three-year period. Penalties for breaches can include fines, squad restrictions, or even exclusion from European competition. In 2022, UEFA updated FFP into a new 'Financial Sustainability' framework with a squad cost ratio cap of 70%."
+  },
+  {
+    q: "How do transfer fees work?",
+    a: "When a player is under contract, their current club must agree to sell and the buying club must pay a transfer fee. This fee is negotiated between the two clubs and can be paid as a lump sum or in instalments over several years. Fees often include add-ons — conditional payments triggered by appearances, goals or trophies. The player must also agree personal terms (salary, contract length) with the buying club and pass a medical examination."
+  },
+  {
+    q: "What is a free agent in football?",
+    a: "A free agent is a player whose contract with their club has expired, allowing them to sign for any club without a transfer fee being paid. High-profile free transfers include Kylian Mbappé joining Real Madrid from PSG in 2024, Andrea Pirlo moving to Juventus from AC Milan in 2011, and Robert Lewandowski signing for Barcelona from Bayern Munich in 2022. Players can also become free agents if their contract is terminated by mutual consent."
+  },
+  {
+    q: "What is a loan in football?",
+    a: "A loan is a temporary transfer where a player joins another club for a set period (usually six months or one season) while remaining under contract at their parent club. The loan club typically pays the player's wages and may also pay a loan fee. At the end of the loan, the player returns to their parent club unless a permanent deal is agreed. Loans are commonly used to give young players first-team experience or to move squad players who are not in the manager's plans."
+  },
+  {
+    q: "Who is the highest paid footballer?",
+    a: "Cristiano Ronaldo became the highest-paid footballer in history when he joined Al Nassr in Saudi Arabia in January 2023 on a deal reportedly worth over £175 million per year. In European football, Kylian Mbappé's contract at Real Madrid and Erling Haaland's deal at Manchester City make them among the highest earners, both on reported wages of around £350,000–£400,000 per week before bonuses and commercial income."
+  },
+  {
+    q: "What is a release clause?",
+    a: "A release clause is a provision in a player's contract that allows them to leave if another club meets a specified fee. The buying club pays this fee directly and the selling club is contractually obliged to accept it. Release clauses are mandatory in Spanish football (La Liga) but optional in England and most other leagues. Famous examples include Neymar's €222 million clause triggered by PSG in 2017 and Antoine Griezmann's €120 million clause paid by Barcelona in 2019."
+  },
+  {
+    q: "What is the transfer window?",
+    a: "The transfer window is a set period during which clubs are permitted to register new players. In most European leagues there are two windows: the summer window (typically June to August/September) and the January window (the full month of January). Outside these windows, clubs cannot sign players from other clubs, though they can sign free agents in some circumstances. The exact dates vary slightly by country and are set by each national football association."
+  },
+  {
+    q: "Is there a Premier League salary cap?",
+    a: "The Premier League does not have a traditional salary cap like American sports leagues. However, clubs must comply with the league's Profit and Sustainability Rules (PSR), which limit losses to £105 million over a rolling three-year period. In 2024, the Premier League also introduced an Anchoring system as part of new cost controls, which ties the top spending to a multiple of the lowest-revenue club. UEFA's Financial Sustainability rules also apply to clubs in European competition."
+  }
+];
+
+const breadcrumbSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://lastseason.co.uk/" },
+    { "@type": "ListItem", "position": 2, "name": "FAQ", "item": "https://lastseason.co.uk/faq/" },
+    { "@type": "ListItem", "position": 3, "name": "Transfers & Money FAQ" }
+  ]
+});
+
+const faqSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqs.map(f => ({
+    "@type": "Question",
+    "name": f.q,
+    "acceptedAnswer": { "@type": "Answer", "text": f.a }
+  }))
+});
+---
+
+<Base
+  title="Football Transfers & Money FAQ — Salaries, Fees & Financial Fair Play"
+  description="Everything you need to know about football transfers, player salaries, Financial Fair Play, release clauses, loan deals and the transfer window — all explained clearly."
+  canonical="/faq/transfers-and-money/"
+>
+  <script type="application/ld+json" set:html={breadcrumbSchema} />
+  <script type="application/ld+json" set:html={faqSchema} />
+
+  <div class="container">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a href="/">Home</a>
+      <span class="sep">/</span>
+      <a href="/faq/">FAQ</a>
+      <span class="sep">/</span>
+      <span class="current">Transfers &amp; Money</span>
+    </nav>
+
+    <section class="page-hero">
+      <h1>Football Transfers &amp; Money FAQ</h1>
+      <p class="subtitle">How transfer fees work, what footballers earn, Financial Fair Play rules and everything about the business side of football.</p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="hero-stat-value">£198m</span>
+          <span class="hero-stat-label">Record Fee (Neymar)</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">£175m/yr</span>
+          <span class="hero-stat-label">Top Salary (Ronaldo)</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">70%</span>
+          <span class="hero-stat-label">UEFA Squad Cost Cap</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">2</span>
+          <span class="hero-stat-label">Windows per Season</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Frequently Asked Questions</h2>
+      {faqs.map((faq) => (
+        <div class="faq-item">
+          <h3>{faq.q}</h3>
+          <p>{faq.a}</p>
+        </div>
+      ))}
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Related Reading</h2>
+      <div class="narrative">
+        <p>For more on the Premier League's financial landscape, see how clubs have performed historically in our <a href="/records/">Records section</a>. You can also explore individual club pages to see squad values and spending patterns across different eras of the competition.</p>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .faq-item {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .faq-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  .faq-item h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--heading);
+  }
+  .faq-item p {
+    color: var(--text-muted);
+    line-height: 1.7;
+    font-size: 0.97rem;
+  }
+</style>

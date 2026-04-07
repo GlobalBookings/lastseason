@@ -1,6 +1,7 @@
 ---
 import Base from "../../layouts/Base.astro";
 import { getAllLoadedSeasons } from "../../utils/data";
+import { clubProfiles } from "../../data/clubs/profiles";
 
 export function getStaticPaths() {
   const allSeasons = getAllLoadedSeasons();
@@ -17,6 +18,7 @@ export function getStaticPaths() {
         leagueSlug: season.leagueSlug,
         position: row.pos,
         points: row.pts,
+        w: row.w, d: row.d, l: row.l, gf: row.gf, ga: row.ga,
       });
     }
   }
@@ -28,9 +30,36 @@ export function getStaticPaths() {
 }
 
 const { club } = Astro.props;
+const profile = clubProfiles.find((p) => p.slug === club.slug);
 const sortedSeasons = club.seasons.sort((a: any, b: any) => b.season.localeCompare(a.season));
 const bestFinish = Math.min(...club.seasons.map((s: any) => s.position));
 const suffix = bestFinish === 1 ? "st" : bestFinish === 2 ? "nd" : bestFinish === 3 ? "rd" : "th";
+const totalWins = club.seasons.reduce((sum: number, s: any) => sum + (s.w || 0), 0);
+const totalGoals = club.seasons.reduce((sum: number, s: any) => sum + (s.gf || 0), 0);
+const titles = club.seasons.filter((s: any) => s.position === 1).length;
+
+const hasProfile = !!profile;
+const pStadium = profile?.stadium ?? "";
+const pCapacity = profile ? profile.capacity.toLocaleString() : "";
+const pOwner = profile?.owner ?? "";
+const pOwnerNat = profile?.ownerNationality ?? "";
+const pManager = profile?.manager ?? "";
+const pNickname = profile?.nickname ?? "";
+const pCity = profile?.city ?? "";
+const pCountry = profile?.country ?? "";
+const pFounded = profile?.founded ?? 0;
+const pKit = profile?.kitManufacturer ?? "";
+const pSponsor = profile?.mainSponsor ?? "";
+const pWage = profile?.wageBill ?? "";
+const pRevenue = profile?.revenue ?? "";
+const pWebsite = profile?.website ?? "";
+const pWebsiteDisplay = pWebsite.replace(/^https?:\/\//, "");
+const pLeague = profile?.league ?? "";
+const pLeagueSlug = profile?.leagueSlug ?? "";
+
+const desc = hasProfile
+  ? `${club.name} — ${pNickname}. Stadium: ${pStadium} (${pCapacity}). Owner: ${pOwner}. Season history, stats and records.`
+  : `${club.name} season-by-season stats, league positions and history at Last Season.`;
 
 const breadcrumbSchema = JSON.stringify({
   "@context": "https://schema.org",
@@ -41,36 +70,81 @@ const breadcrumbSchema = JSON.stringify({
     { "@type": "ListItem", "position": 3, "name": club.name },
   ],
 });
+
+const orgSchema = hasProfile ? JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "SportsTeam",
+  "name": club.name,
+  "alternateName": pNickname,
+  "sport": "Football",
+  "url": pWebsite,
+  "location": { "@type": "StadiumOrArena", "name": pStadium, "maximumAttendeeCapacity": profile!.capacity },
+  "foundingDate": String(pFounded),
+  "memberOf": { "@type": "SportsOrganization", "name": pLeague },
+}) : "";
+
+const faqSchema = hasProfile ? JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": `Who owns ${club.name}?`, "acceptedAnswer": { "@type": "Answer", "text": `${club.name} is owned by ${pOwner} (${pOwnerNat}).` }},
+    { "@type": "Question", "name": `What stadium do ${club.name} play at?`, "acceptedAnswer": { "@type": "Answer", "text": `${club.name} play at ${pStadium}, capacity ${pCapacity}.` }},
+    { "@type": "Question", "name": `When were ${club.name} founded?`, "acceptedAnswer": { "@type": "Answer", "text": `${club.name} were founded in ${pFounded}.` }},
+    { "@type": "Question", "name": `Who is the manager of ${club.name}?`, "acceptedAnswer": { "@type": "Answer", "text": `The current manager of ${club.name} is ${pManager}.` }},
+  ],
+}) : "";
+
+const subtitleText = hasProfile ? `${pNickname} · ${pCity}, ${pCountry} · Est. ${pFounded}` : "";
+const pageTitle = hasProfile ? `${club.name} — ${pNickname} — Season History, Stats & Club Profile` : `${club.name} — Season History & Stats`;
 ---
 
-<Base
-  title={`${club.name} — Season History & Stats`}
-  description={`${club.name} season-by-season stats, league positions and history across all tracked leagues at Last Season.`}
-  canonical={`/clubs/${club.slug}/`}
->
+<Base title={pageTitle} description={desc} canonical={`/clubs/${club.slug}/`}>
   <script type="application/ld+json" set:html={breadcrumbSchema} />
+  <Fragment set:html={orgSchema ? `<script type="application/ld+json">${orgSchema}</script>` : ""} />
+  <Fragment set:html={faqSchema ? `<script type="application/ld+json">${faqSchema}</script>` : ""} />
 
   <div class="container">
     <nav class="breadcrumbs" aria-label="Breadcrumb">
-      <a href="/">Home</a>
-      <span class="sep">/</span>
-      <a href="/clubs/">Clubs</a>
-      <span class="sep">/</span>
-      <span class="current">{club.name}</span>
+      <a href="/">Home</a><span class="sep">/</span><a href="/clubs/">Clubs</a><span class="sep">/</span><span class="current">{club.name}</span>
     </nav>
 
     <section class="page-hero">
       <h1>{club.name}</h1>
+      <p class="subtitle">{subtitleText}</p>
       <div class="hero-stats">
-        <div class="hero-stat">
-          <span class="hero-stat-value">{bestFinish}{suffix}</span>
-          <span class="hero-stat-label">Best Finish</span>
-        </div>
-        <div class="hero-stat">
-          <span class="hero-stat-value">{club.seasons.length}</span>
-          <span class="hero-stat-label">Seasons Tracked</span>
-        </div>
+        <div class="hero-stat"><span class="hero-stat-value">{bestFinish}{suffix}</span><span class="hero-stat-label">Best Finish</span></div>
+        <div class="hero-stat"><span class="hero-stat-value">{club.seasons.length}</span><span class="hero-stat-label">Seasons</span></div>
+        <div class="hero-stat"><span class="hero-stat-value">{titles}</span><span class="hero-stat-label">Titles</span></div>
+        <div class="hero-stat"><span class="hero-stat-value">{totalGoals}</span><span class="hero-stat-label">Goals</span></div>
+        <div class="hero-stat"><span class="hero-stat-value">{totalWins}</span><span class="hero-stat-label">Wins</span></div>
       </div>
+    </section>
+
+    <section class="section" style={hasProfile ? "" : "display:none"}>
+      <h2 class="section-title">Club Profile</h2>
+      <div class="profile-grid">
+        <div class="profile-card"><h3>Stadium</h3><div class="profile-value">{pStadium}</div><div class="profile-meta">Capacity: {pCapacity}</div></div>
+        <div class="profile-card"><h3>Owner</h3><div class="profile-value">{pOwner}</div><div class="profile-meta">{pOwnerNat}</div></div>
+        <div class="profile-card"><h3>Manager</h3><div class="profile-value">{pManager}</div></div>
+        <div class="profile-card"><h3>Kit</h3><div class="profile-value">{pKit}</div><div class="profile-meta">Sponsor: {pSponsor}</div></div>
+        <div class="profile-card"><h3>Wage Bill</h3><div class="profile-value">{pWage}</div><div class="profile-meta">Annual estimate</div></div>
+        <div class="profile-card"><h3>Revenue</h3><div class="profile-value">{pRevenue}</div><div class="profile-meta">Annual estimate</div></div>
+      </div>
+      <table class="stats-table facts-table" aria-label="Club facts">
+        <tbody>
+          <tr><td>Full Name</td><td><strong>{club.name}</strong></td></tr>
+          <tr><td>Nickname</td><td>{pNickname}</td></tr>
+          <tr><td>Founded</td><td>{pFounded}</td></tr>
+          <tr><td>City</td><td>{pCity}, {pCountry}</td></tr>
+          <tr><td>League</td><td><a href={`/${pLeagueSlug}/`}>{pLeague}</a></td></tr>
+          <tr><td>Stadium</td><td>{pStadium} ({pCapacity})</td></tr>
+          <tr><td>Owner</td><td>{pOwner} ({pOwnerNat})</td></tr>
+          <tr><td>Manager</td><td>{pManager}</td></tr>
+          <tr><td>Kit</td><td>{pKit}</td></tr>
+          <tr><td>Shirt Sponsor</td><td>{pSponsor}</td></tr>
+          <tr><td>Website</td><td><a href={pWebsite} target="_blank" rel="noopener">{pWebsiteDisplay}</a></td></tr>
+        </tbody>
+      </table>
     </section>
 
     <section class="section">
@@ -81,16 +155,26 @@ const breadcrumbSchema = JSON.stringify({
             <tr>
               <th scope="col">Season</th>
               <th scope="col">League</th>
-              <th class="num" scope="col">Position</th>
-              <th class="num" scope="col">Points</th>
+              <th class="num" scope="col">Pos</th>
+              <th class="num" scope="col">W</th>
+              <th class="num" scope="col">D</th>
+              <th class="num" scope="col">L</th>
+              <th class="num" scope="col">GF</th>
+              <th class="num" scope="col">GA</th>
+              <th class="num" scope="col">Pts</th>
             </tr>
           </thead>
           <tbody>
             {sortedSeasons.map((s: any) => (
-              <tr>
+              <tr class={s.position === 1 ? "zone-cl" : s.position >= 18 ? "zone-rel" : ""}>
                 <td><a href={`/${s.leagueSlug}/${s.season}/`}>{s.season}</a></td>
                 <td><a href={`/${s.leagueSlug}/`}>{s.league}</a></td>
-                <td class="num">{s.position}</td>
+                <td class="num"><strong>{s.position}</strong></td>
+                <td class="num">{s.w ?? "-"}</td>
+                <td class="num">{s.d ?? "-"}</td>
+                <td class="num">{s.l ?? "-"}</td>
+                <td class="num">{s.gf ?? "-"}</td>
+                <td class="num">{s.ga ?? "-"}</td>
                 <td class="num"><strong>{s.points}</strong></td>
               </tr>
             ))}
@@ -100,3 +184,31 @@ const breadcrumbSchema = JSON.stringify({
     </section>
   </div>
 </Base>
+
+<style>
+  .profile-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  .profile-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.25rem;
+  }
+  .profile-card h3 {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+    margin-bottom: 0.35rem;
+  }
+  .profile-value { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+  .profile-meta { font-size: 0.82rem; color: var(--text-secondary); margin-top: 0.15rem; }
+  .facts-table { margin-top: 1rem; }
+  .facts-table td:first-child { font-weight: 600; color: var(--text-secondary); white-space: nowrap; width: 140px; }
+  @media (max-width: 640px) { .profile-grid { grid-template-columns: 1fr 1fr; } }
+</style>

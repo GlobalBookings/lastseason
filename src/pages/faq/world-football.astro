@@ -1,0 +1,146 @@
+---
+import Base from "../../layouts/Base.astro";
+
+const faqs = [
+  {
+    q: "How many football leagues are there in England?",
+    a: "England has over 140 football leagues across more than 20 levels of the football pyramid. The top four tiers are fully professional: the Premier League (20 teams), the Championship (24 teams), League One (24 teams) and League Two (24 teams). Below that, the National League system covers semi-professional and amateur football. In total, more than 7,000 clubs compete in the English football league system."
+  },
+  {
+    q: "What is the football pyramid?",
+    a: "The football pyramid is the hierarchical structure of English football leagues connected by promotion and relegation. At the top sits the Premier League, followed by the EFL Championship, League One and League Two. Below these professional tiers, the National League (level 5) leads into the National League North and South (level 6), then regional leagues at levels 7 and below. Clubs can theoretically rise from the lowest amateur level to the Premier League through successive promotions."
+  },
+  {
+    q: "How does promotion and relegation work?",
+    a: "Promotion and relegation is the system by which teams move between divisions based on their league performance. At the end of each season, the bottom teams in a division are relegated (moved down) and the top teams from the division below are promoted (moved up). In the Premier League, three teams are relegated each year. In the EFL, two teams earn automatic promotion and a third is decided by play-offs. This system creates sporting jeopardy at both ends of the table throughout the season."
+  },
+  {
+    q: "What is the FA Cup?",
+    a: "The FA Cup (Football Association Challenge Cup) is the oldest football competition in the world, first played in 1871-72. It is a knockout tournament open to all eligible clubs in England — from Premier League giants to small amateur sides. Every round is a single match (replays were removed from the fifth round onwards in 2024-25), with the final held at Wembley Stadium in May. The FA Cup is famous for 'giant killings' where lower-league clubs defeat top-flight opposition."
+  },
+  {
+    q: "What is the League Cup?",
+    a: "The League Cup (officially the Carabao Cup for sponsorship reasons) is an annual knockout competition open to the 92 clubs in the English Football League (EFL) and the Premier League. Founded in 1960, it runs alongside the league season with the final held at Wembley in February or March. The League Cup is considered less prestigious than the FA Cup, but winning it guarantees a place in European competition. Liverpool hold the record with 10 League Cup wins."
+  },
+  {
+    q: "Who has won the most World Cups?",
+    a: "Brazil have won the FIFA World Cup a record five times (1958, 1962, 1970, 1994, 2002). Germany and Italy have each won four. Argentina have won three (1978, 1986, 2022), with Lionel Messi leading them to their most recent triumph in Qatar. France (1998, 2018) and Uruguay (1930, 1950) have two titles each. England's sole World Cup victory came in 1966, when they beat West Germany 4-2 in the final at Wembley."
+  },
+  {
+    q: "How does the World Cup work?",
+    a: "The FIFA World Cup is held every four years. National teams qualify through a series of regional qualifying matches over the two years preceding the tournament. The 2026 World Cup in the USA, Mexico and Canada will expand to 48 teams (up from 32). The tournament features a group stage followed by knockout rounds through to the final. The host nation(s) qualify automatically. Each continental confederation (UEFA, CONMEBOL, etc.) is allocated a set number of qualifying spots."
+  },
+  {
+    q: "What is the Ballon d'Or?",
+    a: "The Ballon d'Or is football's most prestigious individual award, given annually by French magazine France Football to the best male footballer in the world. Lionel Messi holds the record with eight Ballon d'Or wins (2009, 2010, 2011, 2012, 2015, 2019, 2021, 2023). Cristiano Ronaldo has won five. The award considers individual and team performances, particularly in the calendar year. A women's Ballon d'Or has been awarded since 2018."
+  },
+  {
+    q: "What is the Community Shield?",
+    a: "The FA Community Shield is an annual match played at the start of the English football season between the reigning Premier League champions and the FA Cup winners. If the same club wins both, the runners-up in the league take the second spot. Held at Wembley Stadium (traditionally on the first weekend of August), it is considered a curtain-raiser rather than a major trophy. Manchester United have won the Community Shield a record 21 times."
+  }
+];
+
+const breadcrumbSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://lastseason.co.uk/" },
+    { "@type": "ListItem", "position": 2, "name": "FAQ", "item": "https://lastseason.co.uk/faq/" },
+    { "@type": "ListItem", "position": 3, "name": "World Football FAQ" }
+  ]
+});
+
+const faqSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqs.map(f => ({
+    "@type": "Question",
+    "name": f.q,
+    "acceptedAnswer": { "@type": "Answer", "text": f.a }
+  }))
+});
+---
+
+<Base
+  title="World Football FAQ — Leagues, Cups & International Football"
+  description="The English football pyramid, FA Cup, League Cup, World Cup, Ballon d'Or and promotion and relegation — answers to the most searched world football questions."
+  canonical="/faq/world-football/"
+>
+  <script type="application/ld+json" set:html={breadcrumbSchema} />
+  <script type="application/ld+json" set:html={faqSchema} />
+
+  <div class="container">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a href="/">Home</a>
+      <span class="sep">/</span>
+      <a href="/faq/">FAQ</a>
+      <span class="sep">/</span>
+      <span class="current">World Football</span>
+    </nav>
+
+    <section class="page-hero">
+      <h1>World Football FAQ</h1>
+      <p class="subtitle">Leagues, cups and international football explained — from the English pyramid to the World Cup and Ballon d'Or.</p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="hero-stat-value">140+</span>
+          <span class="hero-stat-label">English Leagues</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">5</span>
+          <span class="hero-stat-label">Brazil World Cups</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">8</span>
+          <span class="hero-stat-label">Messi Ballon d'Ors</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">1871</span>
+          <span class="hero-stat-label">First FA Cup</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Frequently Asked Questions</h2>
+      {faqs.map((faq) => (
+        <div class="faq-item">
+          <h3>{faq.q}</h3>
+          <p>{faq.a}</p>
+        </div>
+      ))}
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Explore League Archives</h2>
+      <div class="narrative">
+        <p>We archive full season data for leagues across Europe. Browse the <a href="/premier-league/">Premier League</a>, <a href="/championship/">Championship</a>, <a href="/la-liga/">La Liga</a>, <a href="/bundesliga/">Bundesliga</a>, <a href="/serie-a/">Serie A</a>, <a href="/ligue-1/">Ligue 1</a>, <a href="/scottish-premiership/">Scottish Premiership</a> and <a href="/mls/">MLS</a> — with final tables, top scorers and season reviews.</p>
+        <p>For historical records and milestones, head to our <a href="/records/">Records &amp; Stats</a> section covering top scorers, title winners, Golden Boot history and relegation records.</p>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .faq-item {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .faq-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  .faq-item h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--heading);
+  }
+  .faq-item p {
+    color: var(--text-muted);
+    line-height: 1.7;
+    font-size: 0.97rem;
+  }
+</style>
