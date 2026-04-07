@@ -3,22 +3,27 @@ import Base from "../layouts/Base.astro";
 import SeasonCard from "../components/SeasonCard.astro";
 import { leagues } from "../data/leagues/index";
 import { getSeasonData, getAllLoadedSeasons } from "../utils/data";
+import { plAllTimeScorers, plWinners, plGoldenBoots, plTitleCounts } from "../data/records/premier-league";
 
 const allSeasons = getAllLoadedSeasons();
 const totalSeasons = allSeasons.length;
 const totalClubs = new Set(allSeasons.flatMap(s => s.standings.map(r => r.clubSlug))).size;
 const totalGoals = allSeasons.reduce((sum, s) => sum + s.totalGoals, 0);
+const totalPlayers = new Set(allSeasons.flatMap(s => s.scorers.map(sc => sc.playerSlug))).size;
+
+const latestWinner = plWinners[0];
+const latestGoldenBoot = plGoldenBoots[0];
 ---
 
 <Base
-  title="Every Season. Every Stat. — Football History Archived"
-  description="Last season's football stats archived. Final tables, top scorers, season reviews for the Premier League, La Liga, Bundesliga, Serie A and more."
+  title="Last Season — Every Season. Every Stat. Football History Archived."
+  description="Historical football stats archived. Final tables, top scorers, season reviews, club records, kits and more across the Premier League, La Liga, Bundesliga, Serie A, Ligue 1 and MLS."
   canonical="/"
 >
   <section class="home-hero" style="background-image: url('/img/hero-floodlights.jpg');">
     <div class="container">
       <h1>Every season.<br />Every stat.</h1>
-      <p class="subtitle">Historical football data archived. Final tables, top scorers and full season reviews across Europe's top leagues.</p>
+      <p class="subtitle">The definitive archive of football history. Final tables, top scorers, records and full season reviews across Europe's top leagues.</p>
       <div class="hero-stats">
         <div class="hero-stat">
           <span class="hero-stat-value">{leagues.length}</span>
@@ -34,52 +39,198 @@ const totalGoals = allSeasons.reduce((sum, s) => sum + s.totalGoals, 0);
         </div>
         <div class="hero-stat">
           <span class="hero-stat-value">{(totalGoals / 1000).toFixed(0)}k+</span>
-          <span class="hero-stat-label">Goals tracked</span>
+          <span class="hero-stat-label">Goals</span>
         </div>
+      </div>
+      <div class="hero-cta">
+        <a href="/premier-league/" class="btn btn-primary">Browse Premier League</a>
+        <a href="/records/" class="btn btn-outline">Records & Stats</a>
       </div>
     </div>
   </section>
 
-  <div class="container home-leagues">
-    {leagues.map((league) => {
-      const latestSeason = league.seasons[0];
-      const data = getSeasonData(league.slug, latestSeason);
-      return (
-        <section class="league-section">
-          <div class="league-section-header">
-            <h2><a href={`/${league.slug}/`}>{league.name}</a></h2>
-            <a href={`/${league.slug}/`} class="view-all">All seasons &rarr;</a>
-          </div>
-          {data ? (
-            <div class="card-grid">
-              <SeasonCard
-                leagueSlug={league.slug}
-                season={data.season}
-                champion={data.champion}
-                topScorer={data.topScorer}
-                topScorerGoals={data.topScorerGoals}
-                totalGoals={data.totalGoals}
-                accentColor={league.accentColor}
-              />
-              {league.seasons.slice(1, 3).map((s) => {
-                const sd = getSeasonData(league.slug, s);
-                return sd ? (
-                  <SeasonCard
-                    leagueSlug={league.slug}
-                    season={sd.season}
-                    champion={sd.champion}
-                    topScorer={sd.topScorer}
-                    topScorerGoals={sd.topScorerGoals}
-                    accentColor={league.accentColor}
-                  />
-                ) : null;
-              })}
+  <div class="container">
+    <section class="quick-links-bar">
+      <a href="/records/all-time-top-scorers/" class="quick-link">
+        <span class="quick-link-icon">&#9917;</span>
+        <span class="quick-link-text">All-Time Top Scorers</span>
+      </a>
+      <a href="/records/winners/" class="quick-link">
+        <span class="quick-link-icon">&#127942;</span>
+        <span class="quick-link-text">PL Winners List</span>
+      </a>
+      <a href="/records/golden-boot/" class="quick-link">
+        <span class="quick-link-icon">&#128095;</span>
+        <span class="quick-link-text">Golden Boot</span>
+      </a>
+      <a href="/kits/" class="quick-link">
+        <span class="quick-link-icon">&#128085;</span>
+        <span class="quick-link-text">Kit Archive</span>
+      </a>
+      <a href="/records/relegation-history/" class="quick-link">
+        <span class="quick-link-icon">&#128315;</span>
+        <span class="quick-link-text">Relegation History</span>
+      </a>
+      <a href="/clubs/" class="quick-link">
+        <span class="quick-link-icon">&#127969;</span>
+        <span class="quick-link-text">All Clubs</span>
+      </a>
+    </section>
+
+    <section class="latest-section">
+      <h2 class="section-title">Latest Headlines</h2>
+      <div class="headline-grid">
+        <a href="/premier-league/2023-24/" class="headline-card headline-card--feature">
+          <span class="headline-label">Latest Season</span>
+          <span class="headline-title">Premier League 2023-24</span>
+          <span class="headline-sub">{latestWinner.winner} won their {plTitleCounts.find(t => t.club === latestWinner.winner)?.titles}th title with {latestWinner.points} points</span>
+        </a>
+        <a href="/records/all-time-top-scorers/" class="headline-card">
+          <span class="headline-label">All-Time Record</span>
+          <span class="headline-title">Alan Shearer: 260 Goals</span>
+          <span class="headline-sub">Still the Premier League's all-time top scorer</span>
+        </a>
+        <a href="/records/golden-boot/" class="headline-card">
+          <span class="headline-label">2024-25 Golden Boot</span>
+          <span class="headline-title">{latestGoldenBoot.player}</span>
+          <span class="headline-sub">{latestGoldenBoot.goals} goals for {latestGoldenBoot.club}</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="home-leagues">
+      {leagues.map((league) => {
+        const latestSeason = league.seasons[0];
+        const data = getSeasonData(league.slug, latestSeason);
+        return (
+          <section class="league-section">
+            <div class="league-section-header">
+              <h2><a href={`/${league.slug}/`}>{league.name}</a></h2>
+              <a href={`/${league.slug}/`} class="view-all">All seasons &rarr;</a>
             </div>
-          ) : (
-            <p class="meta">Season data coming soon.</p>
-          )}
-        </section>
-      );
-    })}
+            {data ? (
+              <div class="card-grid">
+                <SeasonCard
+                  leagueSlug={league.slug}
+                  season={data.season}
+                  champion={data.champion}
+                  topScorer={data.topScorer}
+                  topScorerGoals={data.topScorerGoals}
+                  totalGoals={data.totalGoals}
+                  accentColor={league.accentColor}
+                />
+                {league.seasons.slice(1, 3).map((s) => {
+                  const sd = getSeasonData(league.slug, s);
+                  return sd ? (
+                    <SeasonCard
+                      leagueSlug={league.slug}
+                      season={sd.season}
+                      champion={sd.champion}
+                      topScorer={sd.topScorer}
+                      topScorerGoals={sd.topScorerGoals}
+                      accentColor={league.accentColor}
+                    />
+                  ) : null;
+                })}
+              </div>
+            ) : (
+              <p class="meta">Season data coming soon.</p>
+            )}
+          </section>
+        );
+      })}
+    </div>
   </div>
 </Base>
+
+<style>
+  .hero-cta {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.65rem 1.5rem;
+    font-size: 0.92rem;
+    font-weight: 600;
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-primary {
+    background: #fff;
+    color: var(--bg-dark);
+  }
+  .btn-primary:hover { background: rgba(255,255,255,0.9); transform: translateY(-1px); text-decoration: none; }
+  .btn-outline {
+    background: transparent;
+    color: #fff;
+    border: 1.5px solid rgba(255,255,255,0.5);
+  }
+  .btn-outline:hover { border-color: #fff; background: rgba(255,255,255,0.08); text-decoration: none; }
+
+  .quick-links-bar {
+    display: flex;
+    gap: 0.5rem;
+    padding: 1.25rem 0 0.5rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .quick-links-bar::-webkit-scrollbar { display: none; }
+  .quick-link {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.85rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 0.82rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .quick-link:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); text-decoration: none; }
+  .quick-link-icon { font-size: 1rem; }
+
+  .latest-section { padding: 1.5rem 0 0.5rem; }
+  .headline-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.875rem;
+  }
+  .headline-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 1.25rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.2s;
+  }
+  .headline-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); border-color: rgba(0,0,0,0.12); text-decoration: none; }
+  .headline-card--feature { border-left: 3px solid var(--accent, #3d195b); }
+  .headline-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent, #3d195b);
+  }
+  .headline-title { font-size: 1.05rem; font-weight: 700; line-height: 1.3; }
+  .headline-sub { font-size: 0.82rem; color: var(--text-secondary); }
+
+  @media (max-width: 768px) {
+    .headline-grid { grid-template-columns: 1fr; }
+  }
+</style>
