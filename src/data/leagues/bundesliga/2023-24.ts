@@ -64,11 +64,11 @@ const data: SeasonData = {
   ],
   relegated: ["Cologne", "Darmstadt 98"],
   promoted: ["St. Pauli", "Holstein Kiel"],
-  narrative: `Bayer Leverkusen wrote one of the greatest chapters in Bundesliga history in 2023-24, completing an unprecedented unbeaten league season under Xabi Alonso to claim their first-ever Bundesliga title. Their remarkable record of 28 wins and 6 draws — zero defeats — yielded 90 points and ended Bayern Munich's eleven-year stranglehold on the championship.
+  narrative: `Bayer Leverkusen wrote one of the greatest chapters in Bundesliga history in 2023-24, completing an unprecedented unbeaten league season under Xabi Alonso to claim their first-ever Bundesliga title. Their remarkable record of 28 wins and 6 draws  -  zero defeats  -  yielded 90 points and ended Bayern Munich's eleven-year stranglehold on the championship.
 
 Leverkusen's success was built on relentless consistency and late drama. Time and again they rescued results in stoppage time, earning the nickname "Neverkusen" being replaced by something far more glorious. Florian Wirtz, just 20 years old, was the creative heartbeat with 11 goals and 11 assists, winning Player of the Season. Victor Boniface and Alejandro Grimaldo provided crucial contributions in attack.
 
-Harry Kane's debut season at Bayern Munich was individually spectacular — his 36 league goals shattered the record for a debut Bundesliga season and earned him the Torjägerkanone with ease. Yet even Kane's brilliance couldn't prevent Bayern from slipping to a shocking third-place finish on 72 points, their worst league position in over a decade.
+Harry Kane's debut season at Bayern Munich was individually spectacular  -  his 36 league goals shattered the record for a debut Bundesliga season and earned him the Torjägerkanone with ease. Yet even Kane's brilliance couldn't prevent Bayern from slipping to a shocking third-place finish on 72 points, their worst league position in over a decade.
 
 VfB Stuttgart were the surprise package of the season, finishing second on 73 points in a remarkable revival under Sebastian Hoeneß. Serhou Guirassy's 28 goals and Deniz Undav's all-round excellence powered a side that had narrowly avoided relegation the previous season into the Champions League. It was one of the most dramatic turnarounds in Bundesliga history.
 
@@ -76,7 +76,7 @@ RB Leipzig secured fourth on 65 points, with Loïs Openda's 24 goals proving vit
 
 At the bottom, Darmstadt 98 were cut adrift on just 17 points, while Cologne's 27 points weren't enough to avoid the drop. Heidenheim, in their debut Bundesliga season, defied expectations by finishing a comfortable eighth on 42 points.
 
-A season that will be remembered for Leverkusen's perfection, Kane's record-breaking debut, and Stuttgart's extraordinary resurgence — 2023-24 was a campaign that reshaped the landscape of German football.`,
+A season that will be remembered for Leverkusen's perfection, Kane's record-breaking debut, and Stuttgart's extraordinary resurgence  -  2023-24 was a campaign that reshaped the landscape of German football.`,
   notableMoments: [
     "Bayer Leverkusen completed the first-ever unbeaten Bundesliga season (28W 6D 0L)",
     "Xabi Alonso's side ended Bayern Munich's eleven-year title streak",

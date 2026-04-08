@@ -66,9 +66,9 @@ const data: SeasonData = {
   ],
   relegated: ["Burnley", "Watford", "Norwich City"],
   promoted: ["Fulham", "AFC Bournemouth", "Nottingham Forest"],
-  narrative: `The 2021-22 Premier League season produced one of the greatest title races in the competition's history, with Manchester City pipping Liverpool by a single point on a dramatic final day. City finished on 93 points, just one ahead of Jurgen Klopp's relentless Liverpool side on 92 — the third-highest points total ever recorded by a runner-up.
+  narrative: `The 2021-22 Premier League season produced one of the greatest title races in the competition's history, with Manchester City pipping Liverpool by a single point on a dramatic final day. City finished on 93 points, just one ahead of Jurgen Klopp's relentless Liverpool side on 92  -  the third-highest points total ever recorded by a runner-up.
 
-The final day drama at the Etihad Stadium will live long in the memory. City found themselves 2-0 down to Aston Villa at half-time, with Liverpool leading Wolverhampton Wanderers at Anfield and the title seemingly slipping away. But three goals in five extraordinary second-half minutes — from Ilkay Gundogan twice and Rodri — turned the match and the title race on its head. City won 3-2 and were confirmed as champions for the fourth time in five seasons.
+The final day drama at the Etihad Stadium will live long in the memory. City found themselves 2-0 down to Aston Villa at half-time, with Liverpool leading Wolverhampton Wanderers at Anfield and the title seemingly slipping away. But three goals in five extraordinary second-half minutes  -  from Ilkay Gundogan twice and Rodri  -  turned the match and the title race on its head. City won 3-2 and were confirmed as champions for the fourth time in five seasons.
 
 Mohamed Salah and Son Heung-min shared the Golden Boot with 23 goals apiece, the first time two players had finished level at the top since 1998-99. Salah also contributed 13 assists for Liverpool, making him one of the most complete attacking players in the world. Son's goals were particularly remarkable given Tottenham's largely defensive approach under Antonio Conte, who guided them to a fourth-place finish and Champions League qualification.
 
@@ -76,9 +76,9 @@ Kevin De Bruyne was named Player of the Season after another sublime campaign or
 
 Chelsea finished third with 74 points under Thomas Tuchel, though their season was disrupted significantly by the sanctions imposed on owner Roman Abramovich following Russia's invasion of Ukraine. Despite the off-field turmoil, Chelsea remained competitive and reached the FA Cup final. Arsenal, under Mikel Arteta, were in the running for fourth place until a late-season collapse saw them slip to fifth.
 
-The goalkeeping awards told their own story — Alisson and Ederson shared the Golden Glove with an astonishing 20 clean sheets each, underlining the defensive excellence at both title-chasing clubs. Liverpool conceded just 26 goals all season, the same as City.
+The goalkeeping awards told their own story  -  Alisson and Ederson shared the Golden Glove with an astonishing 20 clean sheets each, underlining the defensive excellence at both title-chasing clubs. Liverpool conceded just 26 goals all season, the same as City.
 
-At the bottom, Burnley's six-year Premier League stay came to an end as they were relegated with 35 points. Watford returned to the Championship immediately after promotion with just 23 points, while Norwich City suffered the same fate for the second time in three seasons, finishing bottom with only 22 points and 23 goals scored — the lowest tally in over a decade.
+At the bottom, Burnley's six-year Premier League stay came to an end as they were relegated with 35 points. Watford returned to the Championship immediately after promotion with just 23 points, while Norwich City suffered the same fate for the second time in three seasons, finishing bottom with only 22 points and 23 goals scored  -  the lowest tally in over a decade.
 
 Brentford impressed in their debut Premier League campaign, finishing a comfortable thirteenth, while Newcastle United's Saudi-backed takeover began to bear fruit in the second half of the season as Eddie Howe transformed their fortunes. The 2021-22 season set the stage for a new era of competition at the top of English football.`,
   notableMoments: [

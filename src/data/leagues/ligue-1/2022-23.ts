@@ -66,7 +66,7 @@ const data: SeasonData = {
   ],
   relegated: ["Angers", "Troyes", "Ajaccio"],
   promoted: ["Le Havre", "Metz"],
-  narrative: `PSG retained the Ligue 1 title in 2022-23 but were pushed all the way by an outstanding Lens side. The final margin was a single point — 85 to 84 — making it one of the closest title races in French football history. Franck Haise's Lens produced a remarkable campaign that captured the imagination of the nation, running the Parisian giants closer than anyone had managed in years.
+  narrative: `PSG retained the Ligue 1 title in 2022-23 but were pushed all the way by an outstanding Lens side. The final margin was a single point  -  85 to 84  -  making it one of the closest title races in French football history. Franck Haise's Lens produced a remarkable campaign that captured the imagination of the nation, running the Parisian giants closer than anyone had managed in years.
 
 Kylian Mbappe was once again the standout performer, scoring 29 goals to claim the golden boot in devastating fashion. The Frenchman's pace, power and finishing were simply unmatched in the division. He was joined in a formidable front line by Lionel Messi and Neymar in what proved to be the final season of PSG's superstar trio. Messi contributed 16 goals and a league-leading 10 assists, while Neymar added 11 goals and 9 assists before his departure to Saudi Arabia.
 

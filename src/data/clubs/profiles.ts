@@ -510,7 +510,7 @@ export const clubProfiles: ClubProfile[] = [
     mainSponsor: "King Power",
     website: "https://www.lcfc.com",
     description:
-      "Leicester City are a Midlands club famous for their miraculous 2015-16 Premier League title, playing at the King Power Stadium — one of football's greatest ever underdog stories.",
+      "Leicester City are a Midlands club famous for their miraculous 2015-16 Premier League title, playing at the King Power Stadium  -  one of football's greatest ever underdog stories.",
   },
   {
     name: "Southampton",

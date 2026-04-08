@@ -9,7 +9,7 @@ const totalClubs = allClubKitArchives.length;
 ---
 
 <Base
-  title="Football Kit Archive — Every Club, Every Season"
+  title="Football Kit Archive  -  Every Club, Every Season"
   description="Browse the complete football kit archive. Home, away and third kits for clubs across the Premier League, La Liga, Bundesliga, Serie A and more. Find where to buy vintage and retro shirts."
   canonical="/kits/"
 >
@@ -49,7 +49,7 @@ const totalClubs = allClubKitArchives.length;
               const latestHome = club.kits.find(k => k.type === "home");
               const latestAway = club.kits.find(k => k.type === "away");
               const yearsRange = club.kits.length > 0
-                ? `${club.kits[club.kits.length - 1].season} — ${club.kits[0].season}`
+                ? `${club.kits[club.kits.length - 1].season}  -  ${club.kits[0].season}`
                 : "";
               return (
                 <a href={`/kits/${club.clubSlug}/`} class="kit-hub-card">

@@ -66,13 +66,13 @@ const data: SeasonData = {
   ],
   relegated: ["AFC Bournemouth", "Watford", "Norwich City"],
   promoted: ["Leeds United", "West Bromwich Albion", "Fulham"],
-  narrative: `The 2019-20 Premier League season will forever be remembered as the year Liverpool ended their 30-year wait for a league title — and the year the world changed. The COVID-19 pandemic forced the season into a three-month hiatus from March to June, but when football returned, it was Jurgen Klopp's extraordinary Liverpool side who were confirmed as champions with seven matches still to play.
+  narrative: `The 2019-20 Premier League season will forever be remembered as the year Liverpool ended their 30-year wait for a league title  -  and the year the world changed. The COVID-19 pandemic forced the season into a three-month hiatus from March to June, but when football returned, it was Jurgen Klopp's extraordinary Liverpool side who were confirmed as champions with seven matches still to play.
 
 Liverpool's dominance was staggering. They won 32 of their 38 matches and amassed 99 points, the third-highest total in Premier League history and just one short of Manchester City's record 100. Their only league defeat came at Watford in February, ending a run of 44 unbeaten matches. The front three of Mohamed Salah, Sadio Mane and Roberto Firmino continued to terrorise defences, contributing 37 league goals between them, while the full-back pairing of Trent Alexander-Arnold and Andrew Robertson provided a combined 25 assists from defence.
 
-Jordan Henderson, Liverpool's captain, was named Player of the Season — a fitting tribute to the midfielder whose leadership and energy drove the team throughout the campaign. Alexander-Arnold earned the Young Player of the Season award after another record-breaking season from right-back, with 13 assists underlining his revolutionary impact on the position.
+Jordan Henderson, Liverpool's captain, was named Player of the Season  -  a fitting tribute to the midfielder whose leadership and energy drove the team throughout the campaign. Alexander-Arnold earned the Young Player of the Season award after another record-breaking season from right-back, with 13 assists underlining his revolutionary impact on the position.
 
-Manchester City, despite finishing 18 points behind Liverpool, still scored 102 goals — the most in the league — thanks to the brilliance of Kevin De Bruyne. The Belgian maestro equaled Thierry Henry's long-standing record of 20 assists in a single season, cementing his status as one of the greatest creators the Premier League has ever seen.
+Manchester City, despite finishing 18 points behind Liverpool, still scored 102 goals  -  the most in the league  -  thanks to the brilliance of Kevin De Bruyne. The Belgian maestro equaled Thierry Henry's long-standing record of 20 assists in a single season, cementing his status as one of the greatest creators the Premier League has ever seen.
 
 Jamie Vardy became the oldest player to win the Golden Boot at the age of 33, netting 23 goals for Leicester City with characteristic speed and clinical finishing. His achievement was a testament to remarkable longevity. Pierre-Emerick Aubameyang and Danny Ings finished close behind with 22 goals each, with Ings's tally being particularly impressive for a Southampton side that flirted with relegation.
 
@@ -82,7 +82,7 @@ Sheffield United were the surprise story of the campaign, finishing ninth in the
 
 At the bottom, AFC Bournemouth's five-year spell in the Premier League came to an end. Watford and Norwich City also went down, with Norwich finishing bottom on just 21 points. The pandemic-affected conclusion to the season meant the final matches were played behind closed doors, robbing Liverpool of the chance to celebrate their historic triumph with their fans at Anfield.
 
-Ederson claimed the Golden Glove with 16 clean sheets, while Nick Pope of Burnley ran him close with 15 — an outstanding achievement for a side that finished tenth.`,
+Ederson claimed the Golden Glove with 16 clean sheets, while Nick Pope of Burnley ran him close with 15  -  an outstanding achievement for a side that finished tenth.`,
   notableMoments: [
     "Liverpool won their first league title in 30 years, finishing on 99 points",
     "The season was suspended for three months due to the COVID-19 pandemic",

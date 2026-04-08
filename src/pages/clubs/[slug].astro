@@ -58,7 +58,7 @@ const pLeague = profile?.league ?? "";
 const pLeagueSlug = profile?.leagueSlug ?? "";
 
 const desc = hasProfile
-  ? `${club.name} — ${pNickname}. Stadium: ${pStadium} (${pCapacity}). Owner: ${pOwner}. Season history, stats and records.`
+  ? `${club.name}  -  ${pNickname}. Stadium: ${pStadium} (${pCapacity}). Owner: ${pOwner}. Season history, stats and records.`
   : `${club.name} season-by-season stats, league positions and history at Last Season.`;
 
 const breadcrumbSchema = JSON.stringify({
@@ -95,7 +95,7 @@ const faqSchema = hasProfile ? JSON.stringify({
 }) : "";
 
 const subtitleText = hasProfile ? `${pNickname} · ${pCity}, ${pCountry} · Est. ${pFounded}` : "";
-const pageTitle = hasProfile ? `${club.name} — ${pNickname} — Season History, Stats & Club Profile` : `${club.name} — Season History & Stats`;
+const pageTitle = hasProfile ? `${club.name}  -  ${pNickname}  -  Season History, Stats & Club Profile` : `${club.name}  -  Season History & Stats`;
 ---
 
 <Base title={pageTitle} description={desc} canonical={`/clubs/${club.slug}/`}>

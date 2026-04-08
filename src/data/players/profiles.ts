@@ -395,7 +395,7 @@ export const playerProfiles: PlayerProfile[] = [
     marketValue: "-",
     preferredFoot: "Right",
     shirtNumber: 0,
-    description: "Manchester City legend who scored 184 Premier League goals including the most iconic goal in league history — the 93:20 winner that clinched the 2011-12 title. Five-time Premier League champion.",
+    description: "Manchester City legend who scored 184 Premier League goals including the most iconic goal in league history  -  the 93:20 winner that clinched the 2011-12 title. Five-time Premier League champion.",
   },
   {
     name: "Frank Lampard",

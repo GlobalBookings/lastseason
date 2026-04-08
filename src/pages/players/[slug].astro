@@ -78,12 +78,12 @@ if (pClub && !isRetired) subtitleParts.push(pClub);
 if (isRetired) subtitleParts.push("Retired");
 
 const desc = hasProfile
-  ? `${player.name} — ${pNat} ${pPos}${!isRetired ? ` at ${pClub}` : ""}. Career stats, season history, goals and assists.`
+  ? `${player.name}  -  ${pNat} ${pPos}${!isRetired ? ` at ${pClub}` : ""}. Career stats, season history, goals and assists.`
   : `${player.name} season-by-season stats including goals, assists and career history.`;
 
 const pageTitle = hasProfile
-  ? `${player.name} — ${pNat} ${pPos} — Career Stats & History`
-  : `${player.name} — Career Stats & Season History`;
+  ? `${player.name}  -  ${pNat} ${pPos}  -  Career Stats & History`
+  : `${player.name}  -  Career Stats & Season History`;
 
 const breadcrumbSchema = JSON.stringify({
   "@context": "https://schema.org",

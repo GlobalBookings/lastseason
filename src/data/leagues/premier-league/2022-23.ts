@@ -66,7 +66,7 @@ const data: SeasonData = {
   ],
   relegated: ["Leicester City", "Leeds United", "Southampton"],
   promoted: ["Burnley", "Sheffield United", "Luton Town"],
-  narrative: `Manchester City made history in 2022-23 by completing an extraordinary treble, winning the Premier League, FA Cup and UEFA Champions League in the same season — a feat never before achieved by an English club. Pep Guardiola's side clinched the league title with 89 points, holding off a determined Arsenal challenge that had briefly looked like it might end City's dominance.
+  narrative: `Manchester City made history in 2022-23 by completing an extraordinary treble, winning the Premier League, FA Cup and UEFA Champions League in the same season  -  a feat never before achieved by an English club. Pep Guardiola's side clinched the league title with 89 points, holding off a determined Arsenal challenge that had briefly looked like it might end City's dominance.
 
 The story of the season was undoubtedly Erling Haaland. The Norwegian striker, signed from Borussia Dortmund the previous summer, shattered the Premier League single-season scoring record with an astonishing 36 goals in just 35 appearances. He surpassed the long-standing record of 34 goals shared by Alan Shearer and Andy Cole, and his relentless finishing made him virtually unplayable throughout the campaign. Haaland also contributed eight assists, rightfully earning the Player of the Season award.
 
@@ -78,9 +78,9 @@ Liverpool endured an inconsistent season, finishing fifth with 67 points as Jurg
 
 Harry Kane scored 30 league goals in what proved to be his final season at Tottenham Hotspur before moving to Bayern Munich, while Chelsea suffered a turbulent campaign despite enormous spending, finishing a disappointing twelfth under a succession of managerial changes.
 
-At the bottom end, the relegation of Leicester City was a shocking fall from grace for the 2016 champions, who dropped just seven years after their fairytale title. Leeds United and Southampton also went down, with Southampton finishing bottom on just 25 points. The three promoted sides for the following season — Burnley, Sheffield United and Luton Town — each brought contrasting stories to the top flight.
+At the bottom end, the relegation of Leicester City was a shocking fall from grace for the 2016 champions, who dropped just seven years after their fairytale title. Leeds United and Southampton also went down, with Southampton finishing bottom on just 25 points. The three promoted sides for the following season  -  Burnley, Sheffield United and Luton Town  -  each brought contrasting stories to the top flight.
 
-The 2022-23 season will be remembered above all for City's treble and Haaland's breathtaking debut campaign — a season that redefined what was possible in English football.`,
+The 2022-23 season will be remembered above all for City's treble and Haaland's breathtaking debut campaign  -  a season that redefined what was possible in English football.`,
   notableMoments: [
     "Manchester City completed an historic treble, winning the Premier League, FA Cup and Champions League",
     "Erling Haaland broke the Premier League single-season scoring record with 36 goals",

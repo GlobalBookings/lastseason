@@ -64,21 +64,21 @@ const data: SeasonData = {
   ],
   relegated: ["Schalke 04", "Hertha Berlin"],
   promoted: ["Heidenheim", "Darmstadt 98"],
-  narrative: `The 2022-23 Bundesliga season delivered perhaps the most dramatic final day in the competition's history, as Bayern Munich claimed their eleventh consecutive title by the narrowest of margins — goal difference — after finishing level on 71 points with Borussia Dortmund.
+  narrative: `The 2022-23 Bundesliga season delivered perhaps the most dramatic final day in the competition's history, as Bayern Munich claimed their eleventh consecutive title by the narrowest of margins  -  goal difference  -  after finishing level on 71 points with Borussia Dortmund.
 
 Going into the final matchday, the title race was on a knife-edge. Dortmund, who had led the table for much of the season, needed to match or better Bayern's result to be crowned champions. At Signal Iduna Park, Dortmund fell behind to Mainz 05 early on, sending shockwaves through the ground. Although they rallied to win, Bayern's comfortable victory over Cologne meant the title stayed in Munich, decided by a superior goal difference of 52 compared to Dortmund's 38.
 
-The heartbreak for Dortmund was palpable. They had mounted a genuine title challenge built on consistency and team spirit, but a wobble in the closing weeks — combined with Bayern's relentless finishing power — proved decisive. It was a painful echo of past near-misses for the Yellow Wall faithful.
+The heartbreak for Dortmund was palpable. They had mounted a genuine title challenge built on consistency and team spirit, but a wobble in the closing weeks  -  combined with Bayern's relentless finishing power  -  proved decisive. It was a painful echo of past near-misses for the Yellow Wall faithful.
 
 Bayern's season was not without turbulence. Thomas Tuchel replaced Julian Nagelsmann as manager mid-season in a controversial move, yet steadied the ship to deliver the title. Jamal Musiala emerged as the breakout star with 12 goals and dazzling performances that earned him Player of the Season, while Leroy Sané contributed 10 goals and 8 assists in a dynamic attacking display.
 
 Union Berlin's remarkable rise continued as they finished fourth to qualify for the Champions League for the first time in their history. Freiburg, under Christian Streich, took fifth for a Europa League spot, while Niclas Füllkrug's 16 goals for newly promoted Werder Bremen earned him the Torjägerkanone and a place in the Germany squad.
 
-At the bottom, Schalke 04 went straight back down after just one season following their 2022 promotion, while Hertha Berlin's long-feared relegation finally became reality on just 22 points. Stuttgart narrowly survived via the relegation playoff — a far cry from the heights they would reach just twelve months later.
+At the bottom, Schalke 04 went straight back down after just one season following their 2022 promotion, while Hertha Berlin's long-feared relegation finally became reality on just 22 points. Stuttgart narrowly survived via the relegation playoff  -  a far cry from the heights they would reach just twelve months later.
 
 A season defined by its extraordinary climax, 2022-23 proved once again that the Bundesliga title race could produce drama to rival any league in Europe.`,
   notableMoments: [
-    "Bayern Munich won the title on goal difference over Dortmund on the final day — both teams on 71 points",
+    "Bayern Munich won the title on goal difference over Dortmund on the final day  -  both teams on 71 points",
     "Borussia Dortmund's title dream shattered despite winning their final match",
     "Union Berlin qualified for the Champions League for the first time in their history",
     "Niclas Füllkrug won the Torjägerkanone with 16 goals in his first Bundesliga season with Bremen",

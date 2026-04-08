@@ -47,7 +47,7 @@ const typeShort: Record<string, string> = { home: "Home", away: "Away", third: "
 ---
 
 <Base
-  title={`${club.club} ${kit.season} ${label} — ${kit.manufacturer}`}
+  title={`${club.club} ${kit.season} ${label}  -  ${kit.manufacturer}`}
   description={`${club.club} ${kit.season} ${label.toLowerCase()} made by ${kit.manufacturer}${kit.sponsor ? `, sponsored by ${kit.sponsor}` : ""}. Find where to buy this shirt on eBay, Classic Football Shirts and other retailers.`}
   canonical={`/kits/${club.clubSlug}/${kit.season}-${kit.type}/`}
   accentColor={league?.accentColor}
