@@ -1,5 +1,6 @@
 ---
 import Base from "../../layouts/Base.astro";
+import { hasPublishedPlayerPage } from "../../utils/data";
 import { plAllTimeScorers } from "../../data/records/premier-league";
 
 const breadcrumbSchema = JSON.stringify({
@@ -104,7 +105,7 @@ const faqSchema = JSON.stringify({
             {plAllTimeScorers.map((p) => (
               <tr>
                 <td>{p.pos}</td>
-                <td><a href={`/players/${p.slug}/`}>{p.name}</a></td>
+                <td>{hasPublishedPlayerPage(p.slug) ? <a href={`/players/${p.slug}/`}>{p.name}</a> : p.name}</td>
                 <td><strong>{p.goals}</strong></td>
                 <td>{p.apps}</td>
                 <td>{(p.goals / p.apps).toFixed(2)}</td>

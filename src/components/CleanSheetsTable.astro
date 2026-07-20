@@ -3,12 +3,13 @@ import type { CleanSheet } from "../types";
 
 interface Props {
   cleanSheets: CleanSheet[];
+  linkEntities?: boolean;
 }
 
-const { cleanSheets } = Astro.props;
+const { cleanSheets, linkEntities = true } = Astro.props;
 ---
 
-<section class="section" id="clean-sheets">
+{cleanSheets.length > 0 && <section class="section" id="clean-sheets">
   <h2 class="section-title">Clean Sheet Leaders</h2>
   <div class="table-wrap" role="region" aria-label="Clean sheet leaders table" tabindex="0">
     <table class="stats-table" aria-label="Clean sheet leaders">
@@ -24,12 +25,12 @@ const { cleanSheets } = Astro.props;
         {cleanSheets.map((cs, i) => (
           <tr>
             <td class="num">{i + 1}</td>
-            <td><a href={`/players/${cs.playerSlug}/`}>{cs.name}</a></td>
-            <td><a href={`/clubs/${cs.clubSlug}/`}>{cs.club}</a></td>
+            <td>{linkEntities ? <a href={`/players/${cs.playerSlug}/`}>{cs.name}</a> : cs.name}</td>
+            <td>{linkEntities ? <a href={`/clubs/${cs.clubSlug}/`}>{cs.club}</a> : cs.club}</td>
             <td class="num"><strong>{cs.cleanSheets}</strong></td>
           </tr>
         ))}
       </tbody>
     </table>
   </div>
-</section>
+</section>}

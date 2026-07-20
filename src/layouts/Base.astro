@@ -38,6 +38,7 @@ const fullTitle = title.includes("Last Season") ? title : `${title} | Last Seaso
     <link rel="canonical" href={fullCanonical} />
     <meta name="robots" content={robots} />
     <meta name="theme-color" content="#0f1923" />
+    <meta name="google-site-verification" content="WJgP_4XApvaOWdCekx382oPqemu5z1QdFD8OASEnNJE" />
 
     <link rel="alternate" hreflang="en-GB" href={fullCanonical} />
     <link rel="alternate" hreflang="x-default" href={fullCanonical} />
@@ -117,6 +118,7 @@ const fullTitle = title.includes("Last Season") ? title : `${title} | Last Seaso
             <a href="/ligue-1/">Ligue 1</a>
             <a href="/scottish-premiership/">Scottish Prem</a>
             <a href="/tools/" class="nav-feature">Tools</a>
+            <a href="/compare/" class="nav-feature">Compare</a>
             <a href="/records/" class="nav-feature">Records</a>
             <a href="/search/" class="nav-search" aria-label="Search Last Season">Search</a>
           </nav>
@@ -143,11 +145,13 @@ const fullTitle = title.includes("Last Season") ? title : `${title} | Last Seaso
         <a href="/mls/">MLS</a>
         <div class="nav-section-title">Browse</div>
         <a href="/kits/">Kit Colour Archive</a>
+        <a href="/football-shirts/">Buy Football Shirts</a>
         <a href="/records/">Records & Stats</a>
         <a href="/faq/">Football FAQ</a>
         <a href="/clubs/">All Clubs</a>
         <a href="/players/">All Players</a>
         <a href="/tools/">Interactive Tools</a>
+        <a href="/compare/">Season Comparisons</a>
         <a href="/search/">Search</a>
       </div>
     </header>
@@ -181,6 +185,8 @@ const fullTitle = title.includes("Last Season") ? title : `${title} | Last Seaso
             <div class="footer-heading">Site</div>
             <ul class="footer-link-list">
               <li><a href="/tools/">Interactive Tools</a></li>
+              <li><a href="/compare/">Season Comparisons</a></li>
+              <li><a href="/football-shirts/">Football Shirt Buying Guide</a></li>
               <li><a href="/search/">Search</a></li>
               <li><a href="/kits/">Kit Colour Archive</a></li>
               <li><a href="/records/">Records & Stats</a></li>
@@ -267,6 +273,16 @@ const fullTitle = title.includes("Last Season") ? title : `${title} | Last Seaso
         button.addEventListener("click", () => {
           try { localStorage.removeItem(analyticsKey); } catch {}
           if (privacyChoice) privacyChoice.hidden = false;
+        });
+      });
+
+      document.addEventListener("click", (event) => {
+        const link = event.target instanceof Element ? event.target.closest("a[data-retailer]") : null;
+        if (!link || typeof window.gtag !== "function") return;
+        window.gtag("event", "retailer_click", {
+          retailer: link.getAttribute("data-retailer"),
+          commerce_context: link.getAttribute("data-commerce-context"),
+          affiliate_link: link.getAttribute("data-affiliate") === "true",
         });
       });
     </script>

@@ -38,6 +38,12 @@ export function getStaticPaths() {
     }
   }
 
+  for (const profile of playerProfiles) {
+    if (!playerMap.has(profile.slug)) {
+      playerMap.set(profile.slug, { name: profile.name, slug: profile.slug, appearances: [] });
+    }
+  }
+
   return Array.from(playerMap.values()).map((player) => ({
     params: { slug: player.slug },
     props: { player },

@@ -1,0 +1,89 @@
+---
+import Base from "../layouts/Base.astro";
+import { buildRetailLink } from "../utils/affiliate";
+
+const clubs = ["Arsenal", "Liverpool", "Manchester United", "Chelsea", "Manchester City", "Barcelona", "Real Madrid", "Bayern Munich", "Inter Milan", "Juventus"];
+const clubLinks = clubs.map((club) => {
+  const query = `${club} football shirt retro classic`;
+  const direct = `https://www.ebay.co.uk/sch/i.html?_nkw=${encodeURIComponent(query)}&_sacat=0&LH_TitleDesc=0`;
+  return { club, link: buildRetailLink(direct, import.meta.env.PUBLIC_EBAY_AFFILIATE_LINK_TEMPLATE, query, `shirt-guide-${club.toLowerCase().replaceAll(" ", "-")}`) };
+});
+const cfsDirect = "https://www.classicfootballshirts.co.uk/";
+const vfsDirect = "https://www.vintagefootballshirts.com/";
+const cfsLink = buildRetailLink(cfsDirect, import.meta.env.PUBLIC_CFS_AFFILIATE_LINK_TEMPLATE, "classic football shirts", "shirt-guide-cfs");
+const vfsLink = buildRetailLink(vfsDirect, import.meta.env.PUBLIC_VFS_AFFILIATE_LINK_TEMPLATE, "vintage football shirts", "shirt-guide-vfs");
+const hasAffiliateLinks = [cfsLink, vfsLink, ...clubLinks.map(({ link }) => link)].some((link) => link.isAffiliate);
+
+const schema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: "Where to buy classic and retro football shirts",
+  description: "A practical guide to buying current, classic and retro football shirts safely, including condition, sizing and authenticity checks.",
+  mainEntityOfPage: "https://lastseason.co.uk/football-shirts/",
+  author: { "@type": "Organization", name: "Last Season" },
+  publisher: { "@type": "Organization", name: "Last Season" },
+});
+---
+
+<Base
+  title="Where to Buy Classic & Retro Football Shirts"
+  description="A practical guide to buying classic and retro football shirts: retailer options, authenticity checks, sizing, condition and searches for popular clubs."
+  canonical="/football-shirts/"
+  schema={schema}
+>
+  <div class="container">
+    <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span class="sep">/</span><span class="current">Football shirts</span></nav>
+    <section class="page-hero">
+      <h1>Where to buy classic and retro football shirts</h1>
+      <p class="subtitle">Find the shirt you remember, then check it carefully before you buy.</p>
+    </section>
+
+    <aside class="commerce-disclosure">
+      {hasAffiliateLinks
+        ? "Disclosure: some retailer links on this page are affiliate links. Last Season may receive a commission at no extra cost to you."
+        : "Retailer links on this page are ordinary outbound links. Last Season currently receives no commission from them."}
+    </aside>
+
+    <article class="prose section buying-guide">
+      <h2>Start with the exact season</h2>
+      <p>A club name and the word “retro” usually produce a very broad search. Add the season, manufacturer and home, away or third to narrow it down. Sponsor names are especially useful when a design was reused across more than one campaign. The <a href="/kits/">Last Season kit colour archive</a> can help identify the era, but its illustrations are colour studies rather than authenticated reproductions.</p>
+
+      <h2>Choose the right type of seller</h2>
+      <div class="retailer-grid">
+        <a href={cfsLink.url} rel={`${cfsLink.isAffiliate ? "sponsored " : ""}nofollow noopener`} target="_blank" data-retailer="classic-football-shirts" data-commerce-context="shirt-guide-cfs" data-affiliate={String(cfsLink.isAffiliate)}><strong>Classic Football Shirts</strong><span>Specialist catalogue of current and vintage shirts</span></a>
+        <a href={vfsLink.url} rel={`${vfsLink.isAffiliate ? "sponsored " : ""}nofollow noopener`} target="_blank" data-retailer="vintage-football-shirts" data-commerce-context="shirt-guide-vfs" data-affiliate={String(vfsLink.isAffiliate)}><strong>Vintage Football Shirts</strong><span>Specialist retro and classic shirt retailer</span></a>
+      </div>
+      <p>Specialist retailers are useful when you want structured grading and a curated catalogue. Marketplaces can offer more choice and lower prices, but the buyer must assess the individual seller, photographs and description.</p>
+
+      <h2>Popular club shirt searches</h2>
+      <div class="club-searches">
+        {clubLinks.map(({ club, link }) => (
+          <a href={link.url} rel={`${link.isAffiliate ? "sponsored " : ""}nofollow noopener`} target="_blank" data-retailer="ebay" data-commerce-context={`shirt-guide-${club.toLowerCase().replaceAll(" ", "-")}`} data-affiliate={String(link.isAffiliate)}>{club} shirts <span>&rarr;</span></a>
+        ))}
+      </div>
+
+      <h2>Five checks before buying</h2>
+      <ol>
+        <li><strong>Ask for label photographs.</strong> Product codes, wash labels and manufacturer details are more useful than one front-facing image.</li>
+        <li><strong>Compare measurements.</strong> Vintage sizing varies. Use the seller's pit-to-pit and length measurements instead of relying only on the size on the tag.</li>
+        <li><strong>Inspect the sponsor and printing.</strong> Cracking, lifting, replacement lettering and heat damage materially affect condition and value.</li>
+        <li><strong>Read the condition description.</strong> Check for pulls, bobbling, stains, repairs and missing labels, and keep copies of the listing photographs.</li>
+        <li><strong>Use protected payment.</strong> Review seller history and use the marketplace or retailer's supported checkout and returns process.</li>
+      </ol>
+
+      <h2>Original, remake or inspired design?</h2>
+      <p>An original period shirt, an officially licensed remake and an unofficial reproduction are different products. A trustworthy listing should make that distinction clear. If the price appears unusually low for a rare shirt, treat that as a reason to ask more questions rather than proof of a bargain.</p>
+      <p>Last Season does not authenticate shirts and cannot verify a third-party listing. Retailer availability, prices and policies can change, so confirm the details on the seller's site before purchasing.</p>
+    </article>
+  </div>
+</Base>
+
+<style>
+  .commerce-disclosure { margin: 0 0 1.5rem; padding: .85rem 1rem; border: 1px solid var(--border); border-radius: 10px; background: var(--accent-light); font-size: .9rem; }
+  .buying-guide { max-width: 900px; }
+  .retailer-grid, .club-searches { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: .75rem; margin: 1rem 0 1.5rem; }
+  .retailer-grid a, .club-searches a { display: flex; justify-content: space-between; gap: .75rem; padding: 1rem; border: 1px solid var(--border); border-radius: 10px; text-decoration: none; background: var(--surface); color: var(--text); }
+  .retailer-grid a { flex-direction: column; }
+  .retailer-grid span { color: var(--text-muted); font-size: .88rem; }
+  .retailer-grid a:hover, .club-searches a:hover { border-color: var(--accent); }
+</style>

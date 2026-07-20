@@ -1,5 +1,6 @@
 ---
 import Base from "../../layouts/Base.astro";
+import { hasPublishedPlayerPage } from "../../utils/data";
 import { plGoldenBoots } from "../../data/records/premier-league";
 
 const mostWins = new Map<string, number>();
@@ -106,7 +107,7 @@ const seasonToSlug = (s: string) => s.toLowerCase();
             {plGoldenBoots.map((row) => (
               <tr>
                 <td><a href={`/premier-league/${seasonToSlug(row.season)}/`}>{row.season}</a></td>
-                <td><a href={`/players/${row.slug}/`}>{row.player}</a></td>
+                <td>{hasPublishedPlayerPage(row.slug) ? <a href={`/players/${row.slug}/`}>{row.player}</a> : row.player}</td>
                 <td>{row.club}</td>
                 <td><strong>{row.goals}</strong></td>
               </tr>

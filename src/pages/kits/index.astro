@@ -38,6 +38,11 @@ const totalClubs = allClubKitArchives.length;
 
   <div class="container home-leagues">
     <DataNotice status="illustrative" />
+    <section class="section tool-cta">
+      <h2>Looking for a real shirt?</h2>
+      <p>Read our practical guide to buying current, classic and retro football shirts, including condition and authenticity checks.</p>
+      <a class="button" href="/football-shirts/">Football shirt buying guide</a>
+    </section>
     {leagues.map((league) => {
       const clubs = getKitArchivesByLeague(league.slug);
       if (!clubs || clubs.length === 0) return null;

@@ -1,0 +1,84 @@
+---
+import Base from "../../layouts/Base.astro";
+import { curatedComparisons, type CuratedComparison } from "../../data/comparisons";
+import { getSeasonData } from "../../utils/data";
+
+export function getStaticPaths() {
+  return curatedComparisons.map((comparison) => ({ params: { slug: comparison.slug }, props: { comparison } }));
+}
+
+const { comparison } = Astro.props as { comparison: CuratedComparison };
+const leftSeason = getSeasonData(comparison.left.leagueSlug, comparison.left.season);
+const rightSeason = getSeasonData(comparison.right.leagueSlug, comparison.right.season);
+if (!leftSeason || !rightSeason) throw new Error(`Missing season data for comparison ${comparison.slug}`);
+const left = leftSeason.standings.find((row) => row.clubSlug === comparison.left.clubSlug);
+const right = rightSeason.standings.find((row) => row.clubSlug === comparison.right.clubSlug);
+if (!left || !right) throw new Error(`Missing club data for comparison ${comparison.slug}`);
+
+const metrics = [
+  { label: "Position", left: left.pos, right: right.pos },
+  { label: "Points", left: left.pts, right: right.pts },
+  { label: "Points per game", left: (left.pts / left.p).toFixed(2), right: (right.pts / right.p).toFixed(2) },
+  { label: "Wins", left: left.w, right: right.w },
+  { label: "Win rate", left: `${((left.w / left.p) * 100).toFixed(1)}%`, right: `${((right.w / right.p) * 100).toFixed(1)}%` },
+  { label: "Draws", left: left.d, right: right.d },
+  { label: "Losses", left: left.l, right: right.l },
+  { label: "Goals for", left: left.gf, right: right.gf },
+  { label: "Goals per game", left: (left.gf / left.p).toFixed(2), right: (right.gf / right.p).toFixed(2) },
+  { label: "Goals against", left: left.ga, right: right.ga },
+  { label: "Goal difference", left: left.gd, right: right.gd },
+];
+
+const schema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: comparison.title,
+  description: comparison.description,
+  mainEntityOfPage: `https://lastseason.co.uk/compare/${comparison.slug}/`,
+  author: { "@type": "Organization", name: "Last Season" },
+  publisher: { "@type": "Organization", name: "Last Season" },
+});
+---
+
+<Base title={comparison.title} description={comparison.description} canonical={`/compare/${comparison.slug}/`} schema={schema}>
+  <div class="container">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a href="/">Home</a><span class="sep">/</span><a href="/compare/">Comparisons</a><span class="sep">/</span><span class="current">{comparison.title}</span>
+    </nav>
+    <section class="page-hero comparison-hero">
+      <p class="eyebrow">Season comparison</p>
+      <h1>{comparison.title}</h1>
+      <p class="subtitle">{comparison.intro}</p>
+    </section>
+
+    <section class="section" aria-labelledby="comparison-table-title">
+      <h2 class="section-title" id="comparison-table-title">Final league records</h2>
+      <div class="comparison-table-wrap">
+        <table class="comparison-table">
+          <thead><tr><th>Metric</th><th>{comparison.left.label}</th><th>{comparison.right.label}</th></tr></thead>
+          <tbody>{metrics.map((metric) => <tr><th scope="row">{metric.label}</th><td>{metric.left}</td><td>{metric.right}</td></tr>)}</tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section source-links">
+      <h2 class="section-title">Explore the full seasons</h2>
+      <a class="button" href={`/${comparison.left.leagueSlug}/${comparison.left.season}/`}>{comparison.left.label} season</a>
+      <a class="button button--secondary" href={`/${comparison.right.leagueSlug}/${comparison.right.season}/`}>{comparison.right.label} season</a>
+      <a class="button button--secondary" href="/tools/season-compare/">Build another comparison</a>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .comparison-hero { max-width: 850px; }
+  .eyebrow { color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+  .comparison-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; }
+  .comparison-table { width: 100%; border-collapse: collapse; min-width: 560px; }
+  .comparison-table th, .comparison-table td { padding: .85rem 1rem; border-bottom: 1px solid var(--border); text-align: right; }
+  .comparison-table th:first-child { text-align: left; }
+  .comparison-table thead th { background: var(--accent-light); color: var(--text); }
+  .comparison-table tbody tr:last-child th, .comparison-table tbody tr:last-child td { border-bottom: 0; }
+  .source-links { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; }
+  .source-links h2 { width: 100%; }
+</style>

@@ -1,0 +1,60 @@
+import type { SeasonData } from "../../../types";
+
+const data: SeasonData = {
+  league: "Serie A",
+  leagueSlug: "serie-a",
+  season: "2025-26",
+  seasonDisplay: "2025-26",
+  champion: "Inter Milan",
+  championSlug: "inter-milan",
+  topScorer: "Lautaro Martinez",
+  topScorerGoals: 17,
+  totalGoals: 922,
+  standings: [
+    { pos: 1, club: "Inter Milan", clubSlug: "inter-milan", p: 38, w: 27, d: 6, l: 5, gf: 89, ga: 35, gd: 54, pts: 87, zone: "cl" },
+    { pos: 2, club: "Napoli", clubSlug: "napoli", p: 38, w: 23, d: 7, l: 8, gf: 58, ga: 36, gd: 22, pts: 76, zone: "cl" },
+    { pos: 3, club: "Roma", clubSlug: "roma", p: 38, w: 23, d: 4, l: 11, gf: 59, ga: 31, gd: 28, pts: 73, zone: "cl" },
+    { pos: 4, club: "Como", clubSlug: "como", p: 38, w: 20, d: 11, l: 7, gf: 65, ga: 29, gd: 36, pts: 71, zone: "cl" },
+    { pos: 5, club: "AC Milan", clubSlug: "ac-milan", p: 38, w: 20, d: 10, l: 8, gf: 53, ga: 35, gd: 18, pts: 70, zone: "el" },
+    { pos: 6, club: "Juventus", clubSlug: "juventus", p: 38, w: 19, d: 12, l: 7, gf: 61, ga: 34, gd: 27, pts: 69, zone: "el" },
+    { pos: 7, club: "Atalanta", clubSlug: "atalanta", p: 38, w: 15, d: 14, l: 9, gf: 51, ga: 36, gd: 15, pts: 59, zone: "ecl" },
+    { pos: 8, club: "Bologna", clubSlug: "bologna", p: 38, w: 16, d: 8, l: 14, gf: 49, ga: 46, gd: 3, pts: 56 },
+    { pos: 9, club: "Lazio", clubSlug: "lazio", p: 38, w: 14, d: 12, l: 12, gf: 41, ga: 40, gd: 1, pts: 54 },
+    { pos: 10, club: "Udinese", clubSlug: "udinese", p: 38, w: 14, d: 8, l: 16, gf: 45, ga: 48, gd: -3, pts: 50 },
+    { pos: 11, club: "Sassuolo", clubSlug: "sassuolo", p: 38, w: 14, d: 7, l: 17, gf: 46, ga: 50, gd: -4, pts: 49 },
+    { pos: 12, club: "Torino", clubSlug: "torino", p: 38, w: 12, d: 9, l: 17, gf: 44, ga: 63, gd: -19, pts: 45 },
+    { pos: 13, club: "Parma", clubSlug: "parma", p: 38, w: 11, d: 12, l: 15, gf: 28, ga: 46, gd: -18, pts: 45 },
+    { pos: 14, club: "Cagliari", clubSlug: "cagliari", p: 38, w: 11, d: 10, l: 17, gf: 40, ga: 53, gd: -13, pts: 43 },
+    { pos: 15, club: "Fiorentina", clubSlug: "fiorentina", p: 38, w: 9, d: 15, l: 14, gf: 41, ga: 50, gd: -9, pts: 42 },
+    { pos: 16, club: "Genoa", clubSlug: "genoa", p: 38, w: 10, d: 11, l: 17, gf: 41, ga: 51, gd: -10, pts: 41 },
+    { pos: 17, club: "Lecce", clubSlug: "lecce", p: 38, w: 10, d: 8, l: 20, gf: 28, ga: 50, gd: -22, pts: 38 },
+    { pos: 18, club: "Cremonese", clubSlug: "cremonese", p: 38, w: 8, d: 10, l: 20, gf: 32, ga: 57, gd: -25, pts: 34, zone: "relegation" },
+    { pos: 19, club: "Hellas Verona", clubSlug: "hellas-verona", p: 38, w: 3, d: 12, l: 23, gf: 25, ga: 61, gd: -36, pts: 21, zone: "relegation" },
+    { pos: 20, club: "Pisa", clubSlug: "pisa", p: 38, w: 2, d: 12, l: 24, gf: 26, ga: 71, gd: -45, pts: 18, zone: "relegation" },
+  ],
+  scorers: [{ name: "Lautaro Martinez", playerSlug: "lautaro-martinez", club: "Inter Milan", clubSlug: "inter-milan", goals: 17 }],
+  assisters: [],
+  cleanSheets: [],
+  awards: [{ title: "Capocannoniere", winner: "Lautaro Martinez", playerSlug: "lautaro-martinez" }],
+  relegated: ["Cremonese", "Hellas Verona", "Pisa"],
+  promoted: [],
+  narrative: `Inter Milan won their 21st Italian championship, finishing 11 points clear of Napoli and scoring a league-high 89 goals. Roma returned to the Champions League in third, while Como's record 71-point campaign earned a historic fourth-place finish.
+
+Lautaro Martinez was Serie A's leading scorer with 17 goals. AC Milan and Juventus took the Europa League places, Atalanta qualified for the Conference League, and Cremonese, Hellas Verona and Pisa were relegated.`,
+  notableMoments: [
+    "Inter Milan won a 21st Serie A title",
+    "Inter scored 89 goals, the league's highest total",
+    "Como set club records with 20 wins, 71 points and 65 goals",
+    "Lautaro Martinez finished top of the scoring chart with 17 goals",
+    "Cremonese, Hellas Verona and Pisa were relegated",
+  ],
+  sources: [
+    { name: "Lega Serie A — 2025-26 season in numbers", url: "https://en.legaseriea.it/serie-a/news/serie-a-enilive-2025-26-in-numbers" },
+    { name: "Lega Serie A — final European places", url: "https://www.legaseriea.it/serie-a/news/milan-juventus-roma-como-cremonese-lecce" },
+    { name: "L'Equipe — final Serie A table", url: "https://www.lequipe.fr/Football/championnat-d-italie/page-classement-equipes/general" },
+  ],
+  metaTitle: "Serie A 2025-26 | Final Table, Champions & Top Scorer",
+  metaDescription: "Serie A 2025-26 final table and season review: Inter champions, Como's historic top-four finish, relegation and Lautaro Martinez's 17 goals.",
+};
+
+export default data;

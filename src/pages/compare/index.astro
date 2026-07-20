@@ -1,0 +1,49 @@
+---
+import Base from "../../layouts/Base.astro";
+import { curatedComparisons } from "../../data/comparisons";
+
+const schema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  name: "Football season comparisons",
+  url: "https://lastseason.co.uk/compare/",
+  description: "Indexable comparisons of notable title-winning football teams and seasons.",
+});
+---
+
+<Base
+  title="Football Season Comparisons | Champions & Great Teams"
+  description="Compare famous title-winning football teams and seasons using final-table points, wins, goals, defence and per-game performance."
+  canonical="/compare/"
+  schema={schema}
+>
+  <div class="container">
+    <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span class="sep">/</span><span class="current">Comparisons</span></nav>
+    <section class="page-hero">
+      <h1>Football season comparisons</h1>
+      <p class="subtitle">Great champions, put side by side with final-table data.</p>
+    </section>
+    <section class="section comparison-index">
+      {curatedComparisons.map((comparison) => (
+        <article class="comparison-card">
+          <h2><a href={`/compare/${comparison.slug}/`}>{comparison.title}</a></h2>
+          <p>{comparison.description}</p>
+          <a class="button button--secondary" href={`/compare/${comparison.slug}/`}>View comparison</a>
+        </article>
+      ))}
+    </section>
+    <section class="section tool-cta">
+      <h2>Choose any two seasons</h2>
+      <p>Use the interactive season tool for a custom league-wide comparison.</p>
+      <a class="button" href="/tools/season-compare/">Open season comparison tool</a>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .comparison-index { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+  .comparison-card { border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; background: var(--surface); }
+  .comparison-card h2 { margin-top: 0; font-size: 1.2rem; }
+  .comparison-card h2 a { color: inherit; }
+  .tool-cta { text-align: center; padding: 2rem; border-radius: 12px; background: var(--accent-light); }
+</style>

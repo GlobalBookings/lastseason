@@ -1,21 +1,23 @@
 ---
 import type { Award } from "../types";
+import { hasPublishedPlayerPage } from "../utils/data";
 
 interface Props {
   awards: Award[];
+  linkEntities?: boolean;
 }
 
-const { awards } = Astro.props;
+const { awards, linkEntities = true } = Astro.props;
 ---
 
-<div class="section">
+{awards.length > 0 && <div class="section">
   <h2 class="section-title">Season Awards</h2>
   <div class="awards-grid">
     {awards.map((award) => (
       <div class="award-card">
         <div class="award-title">{award.title}</div>
         <div class="award-winner">
-          {award.playerSlug ? (
+          {award.playerSlug && linkEntities && hasPublishedPlayerPage(award.playerSlug) ? (
             <a href={`/players/${award.playerSlug}/`}>{award.winner}</a>
           ) : (
             award.winner
@@ -24,4 +26,4 @@ const { awards } = Astro.props;
       </div>
     ))}
   </div>
-</div>
+</div>}

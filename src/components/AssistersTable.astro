@@ -3,12 +3,13 @@ import type { Assister } from "../types";
 
 interface Props {
   assisters: Assister[];
+  linkEntities?: boolean;
 }
 
-const { assisters } = Astro.props;
+const { assisters, linkEntities = true } = Astro.props;
 ---
 
-<section class="section" id="assists">
+{assisters.length > 0 && <section class="section" id="assists">
   <h2 class="section-title">Top Assisters</h2>
   <div class="table-wrap" role="region" aria-label="Top assisters table" tabindex="0">
     <table class="stats-table" aria-label="Top assisters">
@@ -24,12 +25,12 @@ const { assisters } = Astro.props;
         {assisters.map((a, i) => (
           <tr>
             <td class="num">{i + 1}</td>
-            <td><a href={`/players/${a.playerSlug}/`}>{a.name}</a></td>
-            <td><a href={`/clubs/${a.clubSlug}/`}>{a.club}</a></td>
+            <td>{linkEntities ? <a href={`/players/${a.playerSlug}/`}>{a.name}</a> : a.name}</td>
+            <td>{linkEntities ? <a href={`/clubs/${a.clubSlug}/`}>{a.club}</a> : a.club}</td>
             <td class="num"><strong>{a.assists}</strong></td>
           </tr>
         ))}
       </tbody>
     </table>
   </div>
-</section>
+</section>}

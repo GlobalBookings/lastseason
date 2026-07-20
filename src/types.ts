@@ -52,6 +52,11 @@ export interface Award {
   playerSlug?: string;
 }
 
+export interface SeasonSource {
+  name: string;
+  url: string;
+}
+
 export interface SeasonData {
   league: string;
   leagueSlug: string;
@@ -71,6 +76,7 @@ export interface SeasonData {
   promoted: string[];
   narrative: string;
   notableMoments: string[];
+  sources?: SeasonSource[];
   metaTitle: string;
   metaDescription: string;
 }

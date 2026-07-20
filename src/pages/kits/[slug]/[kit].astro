@@ -5,6 +5,8 @@ import DataNotice from "../../../components/DataNotice.astro";
 import { allClubKitArchives } from "../../../data/kits/index";
 import type { ClubKitArchive, HistoricKit } from "../../../data/kits/index";
 import { leagues } from "../../../data/leagues/index";
+import { buildRetailLink } from "../../../utils/affiliate";
+import { hasPublishedClubPage } from "../../../utils/data";
 
 export function getStaticPaths() {
   const paths: { params: { slug: string; kit: string }; props: { club: ClubKitArchive; kit: HistoricKit } }[] = [];
@@ -21,6 +23,7 @@ export function getStaticPaths() {
 
 const { club, kit } = Astro.props as { club: ClubKitArchive; kit: HistoricKit };
 const league = leagues.find((l) => l.slug === club.leagueSlug);
+const hasClubPage = hasPublishedClubPage(club.clubSlug);
 const typeLabel: Record<string, string> = { home: "Home Kit", away: "Away Kit", third: "Third Kit", goalkeeper: "Goalkeeper Kit" };
 const label = typeLabel[kit.type] || kit.type;
 
@@ -45,6 +48,13 @@ const cfsUrl = `https://www.classicfootballshirts.co.uk/search?q=${encodeURIComp
 const vfsUrl = `https://www.vintagefootballshirts.com/search?q=${encodeURIComponent(`${club.club} ${kit.season}`)}`;
 const ebayUrl = `https://www.ebay.co.uk/sch/i.html?_nkw=${encodeURIComponent(`${club.club} ${kit.season} ${kit.type} shirt football`)}&_sacat=0&LH_TitleDesc=0&rt=nc`;
 const ebayRetroUrl = `https://www.ebay.co.uk/sch/i.html?_nkw=${encodeURIComponent(`${club.club} ${kit.season} ${kit.type} shirt retro original`)}&_sacat=0&LH_TitleDesc=0`;
+const retailQuery = `${club.club} ${kit.season} ${kit.type} football shirt`;
+const retailContext = `${club.clubSlug}-${kit.season}-${kit.type}`;
+const cfsLink = buildRetailLink(cfsUrl, import.meta.env.PUBLIC_CFS_AFFILIATE_LINK_TEMPLATE, retailQuery, retailContext);
+const vfsLink = buildRetailLink(vfsUrl, import.meta.env.PUBLIC_VFS_AFFILIATE_LINK_TEMPLATE, retailQuery, retailContext);
+const ebayLink = buildRetailLink(ebayUrl, import.meta.env.PUBLIC_EBAY_AFFILIATE_LINK_TEMPLATE, retailQuery, retailContext);
+const ebayRetroLink = buildRetailLink(ebayRetroUrl, import.meta.env.PUBLIC_EBAY_AFFILIATE_LINK_TEMPLATE, `${retailQuery} retro original`, `${retailContext}-retro`);
+const hasAffiliateLinks = [cfsLink, vfsLink, ebayLink, ebayRetroLink].some((link) => link.isAffiliate);
 const typeShort: Record<string, string> = { home: "Home", away: "Away", third: "Third", goalkeeper: "GK" };
 ---
 
@@ -136,7 +146,7 @@ const typeShort: Record<string, string> = { home: "Home", away: "Away", third: "
           <div class="kit-specs">
             <div class="kit-spec-row">
               <span class="kit-spec-label">Club</span>
-              <span class="kit-spec-value"><a href={`/clubs/${club.clubSlug}/`}>{club.club}</a></span>
+              <span class="kit-spec-value">{hasClubPage ? <a href={`/clubs/${club.clubSlug}/`}>{club.club}</a> : club.club}</span>
             </div>
             <div class="kit-spec-row">
               <span class="kit-spec-label">Season</span>
@@ -166,28 +176,28 @@ const typeShort: Record<string, string> = { home: "Home", away: "Away", third: "
         <div class="section">
           <h2 class="section-title">Where to Buy</h2>
           <div class="kit-buy-stack">
-            <a href={cfsUrl} rel="nofollow noopener" target="_blank" class="kit-buy-btn kit-buy-featured">
+            <a href={cfsLink.url} rel={`${cfsLink.isAffiliate ? "sponsored " : ""}nofollow noopener`} target="_blank" class="kit-buy-btn kit-buy-featured" data-retailer="classic-football-shirts" data-commerce-context={retailContext} data-affiliate={String(cfsLink.isAffiliate)}>
               <div>
                 <span class="kit-buy-name">Classic Football Shirts</span>
                 <span class="kit-buy-desc">Authenticated vintage kits</span>
               </div>
               <span class="kit-buy-arrow">&rarr;</span>
             </a>
-            <a href={ebayUrl} rel="nofollow noopener" target="_blank" class="kit-buy-btn">
+            <a href={ebayLink.url} rel={`${ebayLink.isAffiliate ? "sponsored " : ""}nofollow noopener`} target="_blank" class="kit-buy-btn" data-retailer="ebay" data-commerce-context={retailContext} data-affiliate={String(ebayLink.isAffiliate)}>
               <div>
                 <span class="kit-buy-name">eBay</span>
                 <span class="kit-buy-desc">New & used shirts</span>
               </div>
               <span class="kit-buy-arrow">&rarr;</span>
             </a>
-            <a href={ebayRetroUrl} rel="nofollow noopener" target="_blank" class="kit-buy-btn">
+            <a href={ebayRetroLink.url} rel={`${ebayRetroLink.isAffiliate ? "sponsored " : ""}nofollow noopener`} target="_blank" class="kit-buy-btn" data-retailer="ebay-retro" data-commerce-context={`${retailContext}-retro`} data-affiliate={String(ebayRetroLink.isAffiliate)}>
               <div>
                 <span class="kit-buy-name">eBay &mdash; Retro Originals</span>
                 <span class="kit-buy-desc">Authentic vintage shirts</span>
               </div>
               <span class="kit-buy-arrow">&rarr;</span>
             </a>
-            <a href={vfsUrl} rel="nofollow noopener" target="_blank" class="kit-buy-btn">
+            <a href={vfsLink.url} rel={`${vfsLink.isAffiliate ? "sponsored " : ""}nofollow noopener`} target="_blank" class="kit-buy-btn" data-retailer="vintage-football-shirts" data-commerce-context={retailContext} data-affiliate={String(vfsLink.isAffiliate)}>
               <div>
                 <span class="kit-buy-name">Vintage Football Shirts</span>
                 <span class="kit-buy-desc">Retro & classic kits</span>
@@ -196,7 +206,9 @@ const typeShort: Record<string, string> = { home: "Home", away: "Away", third: "
             </a>
           </div>
           <p class="kit-buy-disclaimer">
-            Illustration is a generated representation of colours, not the actual design. Links run retailer searches; Last Season currently receives no commission from them.
+            Illustration is a generated representation of colours, not the actual design. {hasAffiliateLinks
+              ? "Some retailer links are affiliate links. If you buy after clicking, Last Season may receive a commission at no extra cost to you."
+              : "Links run retailer searches; Last Season currently receives no commission from them."}
           </p>
         </div>
       </div>

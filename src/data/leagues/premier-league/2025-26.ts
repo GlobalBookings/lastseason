@@ -1,0 +1,60 @@
+import type { SeasonData } from "../../../types";
+
+const data: SeasonData = {
+  league: "Premier League",
+  leagueSlug: "premier-league",
+  season: "2025-26",
+  seasonDisplay: "2025-26",
+  champion: "Arsenal",
+  championSlug: "arsenal",
+  topScorer: "Erling Haaland",
+  topScorerGoals: 27,
+  totalGoals: 1045,
+  standings: [
+    { pos: 1, club: "Arsenal", clubSlug: "arsenal", p: 38, w: 26, d: 7, l: 5, gf: 71, ga: 27, gd: 44, pts: 85, zone: "cl" },
+    { pos: 2, club: "Manchester City", clubSlug: "manchester-city", p: 38, w: 23, d: 9, l: 6, gf: 77, ga: 35, gd: 42, pts: 78, zone: "cl" },
+    { pos: 3, club: "Manchester United", clubSlug: "manchester-united", p: 38, w: 20, d: 11, l: 7, gf: 69, ga: 50, gd: 19, pts: 71, zone: "cl" },
+    { pos: 4, club: "Aston Villa", clubSlug: "aston-villa", p: 38, w: 19, d: 8, l: 11, gf: 56, ga: 49, gd: 7, pts: 65, zone: "cl" },
+    { pos: 5, club: "Liverpool", clubSlug: "liverpool", p: 38, w: 17, d: 9, l: 12, gf: 63, ga: 53, gd: 10, pts: 60, zone: "cl" },
+    { pos: 6, club: "AFC Bournemouth", clubSlug: "bournemouth", p: 38, w: 13, d: 18, l: 7, gf: 58, ga: 54, gd: 4, pts: 57, zone: "el" },
+    { pos: 7, club: "Sunderland", clubSlug: "sunderland", p: 38, w: 14, d: 12, l: 12, gf: 42, ga: 48, gd: -6, pts: 54 },
+    { pos: 8, club: "Brighton & Hove Albion", clubSlug: "brighton", p: 38, w: 14, d: 11, l: 13, gf: 52, ga: 46, gd: 6, pts: 53 },
+    { pos: 9, club: "Brentford", clubSlug: "brentford", p: 38, w: 14, d: 11, l: 13, gf: 55, ga: 52, gd: 3, pts: 53 },
+    { pos: 10, club: "Chelsea", clubSlug: "chelsea", p: 38, w: 14, d: 10, l: 14, gf: 58, ga: 52, gd: 6, pts: 52 },
+    { pos: 11, club: "Fulham", clubSlug: "fulham", p: 38, w: 15, d: 7, l: 16, gf: 47, ga: 51, gd: -4, pts: 52 },
+    { pos: 12, club: "Newcastle United", clubSlug: "newcastle-united", p: 38, w: 14, d: 7, l: 17, gf: 53, ga: 55, gd: -2, pts: 49 },
+    { pos: 13, club: "Everton", clubSlug: "everton", p: 38, w: 13, d: 10, l: 15, gf: 47, ga: 50, gd: -3, pts: 49 },
+    { pos: 14, club: "Leeds United", clubSlug: "leeds-united", p: 38, w: 11, d: 14, l: 13, gf: 49, ga: 56, gd: -7, pts: 47 },
+    { pos: 15, club: "Crystal Palace", clubSlug: "crystal-palace", p: 38, w: 11, d: 12, l: 15, gf: 41, ga: 51, gd: -10, pts: 45 },
+    { pos: 16, club: "Nottingham Forest", clubSlug: "nottingham-forest", p: 38, w: 11, d: 11, l: 16, gf: 48, ga: 51, gd: -3, pts: 44 },
+    { pos: 17, club: "Tottenham Hotspur", clubSlug: "tottenham-hotspur", p: 38, w: 10, d: 11, l: 17, gf: 48, ga: 57, gd: -9, pts: 41 },
+    { pos: 18, club: "West Ham United", clubSlug: "west-ham-united", p: 38, w: 10, d: 9, l: 19, gf: 46, ga: 65, gd: -19, pts: 39, zone: "relegation" },
+    { pos: 19, club: "Burnley", clubSlug: "burnley", p: 38, w: 4, d: 10, l: 24, gf: 38, ga: 75, gd: -37, pts: 22, zone: "relegation" },
+    { pos: 20, club: "Wolverhampton Wanderers", clubSlug: "wolves", p: 38, w: 3, d: 11, l: 24, gf: 27, ga: 68, gd: -41, pts: 20, zone: "relegation" },
+  ],
+  scorers: [{ name: "Erling Haaland", playerSlug: "erling-haaland", club: "Manchester City", clubSlug: "manchester-city", goals: 27 }],
+  assisters: [],
+  cleanSheets: [],
+  awards: [{ title: "Golden Boot", winner: "Erling Haaland", playerSlug: "erling-haaland" }],
+  relegated: ["West Ham United", "Burnley", "Wolverhampton Wanderers"],
+  promoted: ["Coventry City", "Ipswich Town", "Hull City"],
+  narrative: `Arsenal ended a 22-year wait for the Premier League title, finishing seven points clear of Manchester City. Mikel Arteta's side secured the championship before the final day and completed the season with 85 points, the division's best defence and a fourth Premier League crown.
+
+Manchester United returned to the Champions League places in third, with Aston Villa and Liverpool completing the top five. At the bottom, Tottenham stayed up by two points as West Ham United, Burnley and Wolverhampton Wanderers were relegated. Erling Haaland won his third Golden Boot after scoring 27 league goals for Manchester City.`,
+  notableMoments: [
+    "Arsenal won their first Premier League title since the unbeaten 2003-04 season",
+    "The champions finished on 85 points, seven clear of Manchester City",
+    "Manchester United, Aston Villa and Liverpool completed the Champions League places",
+    "Erling Haaland won the Golden Boot with 27 goals",
+    "West Ham, Burnley and Wolves were relegated",
+  ],
+  sources: [
+    { name: "Premier League — final 2025-26 table", url: "https://www.premierleague.com/en/tables/premier-league/2025-26" },
+    { name: "Premier League — everything decided in 2025-26", url: "https://www.premierleague.com/en/news/4668605/everything-thats-been-decided-in-202526-premier-league" },
+    { name: "Premier League — 2025-26 Golden Boot", url: "https://www.premierleague.com/en/news/4591856" },
+  ],
+  metaTitle: "Premier League 2025-26 | Final Table, Champions & Top Scorer",
+  metaDescription: "Premier League 2025-26 final table and season review: Arsenal champions, all 20 clubs, points, goals, relegation and Erling Haaland's Golden Boot.",
+};
+
+export default data;

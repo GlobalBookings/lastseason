@@ -6,6 +6,7 @@ import { transform } from "esbuild";
 const root = resolve(import.meta.dirname, "..");
 const includeAll = process.argv.includes("--all");
 const summaryOnly = process.argv.includes("--summary");
+const seasonFilter = process.argv.find((arg) => arg.startsWith("--season="))?.split("=")[1];
 const allFiles = execFileSync("find", ["src/data/leagues", "-mindepth", "2", "-maxdepth", "2", "-name", "*.ts"], { cwd: root, encoding: "utf8" }).trim().split("\n").filter(Boolean);
 
 const indexSource = await readFile(resolve(root, "src/data/leagues/index.ts"), "utf8");
@@ -13,12 +14,15 @@ const { code: indexCode } = await transform(indexSource, { loader: "ts", format:
 const { leagues } = await import(`data:text/javascript;base64,${Buffer.from(indexCode).toString("base64")}`);
 const configuredKeys = new Set(leagues.flatMap((league) => league.seasons.map((season) => `${league.slug}/${season}`)));
 
-const files = includeAll
+const candidateFiles = seasonFilter || includeAll
   ? allFiles
   : allFiles.filter((file) => {
       const [leagueSlug, filename] = file.split(sep).slice(-2);
       return !configuredKeys.has(`${leagueSlug}/${filename.replace(/\.ts$/, "")}`);
     });
+const files = seasonFilter
+  ? candidateFiles.filter((file) => file.endsWith(`/${seasonFilter}.ts`))
+  : candidateFiles;
 
 const results = [];
 

@@ -4,9 +4,10 @@ import type { Standing } from "../types";
 interface Props {
   standings: Standing[];
   leagueSlug: string;
+  linkClubs?: boolean;
 }
 
-const { standings } = Astro.props;
+const { standings, linkClubs = true } = Astro.props;
 const hasPromotion = standings.some(s => s.zone === "promotion");
 ---
 
@@ -30,7 +31,7 @@ const hasPromotion = standings.some(s => s.zone === "promotion");
       {standings.map((row) => (
         <tr class={row.zone ? `zone-${row.zone}` : ""}>
           <td class="num">{row.pos}</td>
-          <td><a href={`/clubs/${row.clubSlug}/`}>{row.club}</a></td>
+          <td>{linkClubs ? <a href={`/clubs/${row.clubSlug}/`}>{row.club}</a> : row.club}</td>
           <td class="num">{row.p}</td>
           <td class="num">{row.w}</td>
           <td class="num">{row.d}</td>

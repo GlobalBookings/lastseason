@@ -4,13 +4,14 @@ import type { Scorer } from "../types";
 interface Props {
   scorers: Scorer[];
   title?: string;
+  linkEntities?: boolean;
 }
 
-const { scorers, title = "Top Scorers" } = Astro.props;
+const { scorers, title = "Top Scorers", linkEntities = true } = Astro.props;
 const showAssists = scorers.some((scorer) => scorer.assists !== undefined);
 ---
 
-<section class="section" id="scorers">
+{scorers.length > 0 && <section class="section" id="scorers">
   <h2 class="section-title">{title}</h2>
   <div class="table-wrap" role="region" aria-label="Top scorers table" tabindex="0">
     <table class="stats-table" aria-label={title}>
@@ -27,8 +28,8 @@ const showAssists = scorers.some((scorer) => scorer.assists !== undefined);
         {scorers.map((s, i) => (
           <tr>
             <td class="num">{i + 1}</td>
-            <td><a href={`/players/${s.playerSlug}/`}>{s.name}</a></td>
-            <td><a href={`/clubs/${s.clubSlug}/`}>{s.club}</a></td>
+            <td>{linkEntities ? <a href={`/players/${s.playerSlug}/`}>{s.name}</a> : s.name}</td>
+            <td>{linkEntities ? <a href={`/clubs/${s.clubSlug}/`}>{s.club}</a> : s.club}</td>
             <td class="num"><strong>{s.goals}</strong></td>
             {showAssists && <td class="num">{s.assists ?? "—"}</td>}
           </tr>
@@ -36,4 +37,4 @@ const showAssists = scorers.some((scorer) => scorer.assists !== undefined);
       </tbody>
     </table>
   </div>
-</section>
+</section>}

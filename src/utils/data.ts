@@ -65,6 +65,20 @@ export function getAllLoadedSeasons(options: { includeUnverified?: boolean } = {
   }));
 }
 
+export function hasPublishedClubPage(slug: string): boolean {
+  return getAllLoadedSeasons().some((season) =>
+    season.standings.some((row) => row.clubSlug === slug)
+  );
+}
+
+export function hasPublishedPlayerPage(slug: string): boolean {
+  return getAllLoadedSeasons().some((season) =>
+    season.scorers.some((player) => player.playerSlug === slug)
+    || season.assisters.some((player) => player.playerSlug === slug)
+    || season.cleanSheets.some((player) => player.playerSlug === slug)
+  );
+}
+
 export interface DataValidationIssue {
   key: string;
   message: string;
