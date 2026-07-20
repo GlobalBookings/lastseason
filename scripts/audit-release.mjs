@@ -5,6 +5,9 @@ const root = process.cwd();
 const dist = join(root, "dist");
 const site = "https://lastseason.co.uk";
 const required = [
+  "/",
+  "/scores/",
+  "/premier-league/",
   "/premier-league/2025-26/",
   "/championship/2025-26/",
   "/bundesliga/2025-26/",

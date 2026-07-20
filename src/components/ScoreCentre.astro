@@ -1,0 +1,156 @@
+---
+interface Props {
+  compact?: boolean;
+  heading?: string;
+}
+
+const { compact = false, heading = "Latest results & fixtures" } = Astro.props;
+const scoreLeagues = [
+  ["premier-league", "Premier League"],
+  ["championship", "Championship"],
+  ["la-liga", "La Liga"],
+  ["bundesliga", "Bundesliga"],
+  ["serie-a", "Serie A"],
+  ["ligue-1", "Ligue 1"],
+];
+---
+
+<section class:list={["score-centre", { "score-centre--compact": compact }]} data-score-centre aria-labelledby="score-centre-heading">
+  <div class="score-centre__head">
+    <div>
+      <span class="eyebrow"><span class="status-dot"></span> Match centre</span>
+      <h2 id="score-centre-heading">{heading}</h2>
+    </div>
+    {compact && <a href="/scores/" class="score-centre__all">Open match centre <span aria-hidden="true">→</span></a>}
+  </div>
+
+  <div class="score-tabs" role="tablist" aria-label="Choose a league">
+    {scoreLeagues.map(([slug, name], index) => (
+      <button type="button" role="tab" data-score-league={slug} aria-selected={index === 0 ? "true" : "false"}>{name}</button>
+    ))}
+  </div>
+
+  <div class="score-panel" aria-live="polite" aria-busy="true">
+    <div class="score-loading"><span></span><span></span><span></span><span></span></div>
+  </div>
+  <noscript><p class="score-note">JavaScript is required for the latest score feed. The completed-season archive remains fully available without it.</p></noscript>
+</section>
+
+<script is:inline>
+  document.querySelectorAll("[data-score-centre]").forEach((centre) => {
+    const panel = centre.querySelector(".score-panel");
+    const tabs = [...centre.querySelectorAll("[data-score-league]")];
+    const cache = new Map();
+    const dateFormatter = new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "short" });
+    const timeFormatter = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false });
+
+    const node = (tag, className, text) => {
+      const element = document.createElement(tag);
+      if (className) element.className = className;
+      if (text !== undefined) element.textContent = text;
+      return element;
+    };
+
+    const eventCard = (event, kind) => {
+      const card = node("article", "score-card");
+      const meta = node("div", "score-card__meta");
+      const when = new Date(event.timestamp);
+      meta.append(node("span", "score-card__kind", kind === "recent" ? "Latest result" : "Next fixture"));
+      meta.append(node("span", "", `${dateFormatter.format(when)} · ${event.round ? `Round ${event.round}` : event.season || ""}`));
+      const match = node("div", "score-card__match");
+      const home = node("span", "score-card__team", event.home);
+      const score = node("strong", "score-card__score", kind === "recent" ? `${event.homeScore ?? "–"}  ${event.awayScore ?? "–"}` : timeFormatter.format(when));
+      const away = node("span", "score-card__team score-card__team--away", event.away);
+      match.append(home, score, away);
+      card.append(meta, match);
+      if (event.venue) card.append(node("p", "score-card__venue", event.venue));
+      return card;
+    };
+
+    const render = (payload) => {
+      panel.replaceChildren();
+      const grid = node("div", "score-grid");
+      if (payload.recent?.length) grid.append(eventCard(payload.recent[0], "recent"));
+      if (payload.upcoming?.length) grid.append(eventCard(payload.upcoming[0], "upcoming"));
+      if (!grid.children.length) grid.append(node("p", "score-empty", "No recent or scheduled league matches are available yet."));
+      panel.append(grid);
+      const note = node("p", "score-note");
+      const updated = new Date(payload.updatedAt);
+      note.append(`Updated ${timeFormatter.format(updated)} · Data: `);
+      const source = node("a", "", payload.attribution.name);
+      source.href = payload.attribution.url;
+      source.rel = "nofollow noopener";
+      source.target = "_blank";
+      note.append(source);
+      panel.append(note);
+      panel.setAttribute("aria-busy", "false");
+    };
+
+    const load = async (slug) => {
+      panel.setAttribute("aria-busy", "true");
+      panel.innerHTML = '<div class="score-loading"><span></span><span></span><span></span><span></span></div>';
+      try {
+        let payload = cache.get(slug);
+        if (!payload) {
+          const response = await fetch(`/api/scores?league=${encodeURIComponent(slug)}`);
+          if (!response.ok) throw new Error("Scores unavailable");
+          payload = await response.json();
+          cache.set(slug, payload);
+        }
+        render(payload);
+      } catch {
+        panel.replaceChildren(node("p", "score-empty", "The live feed is taking a breather. Please try again in a moment."));
+        panel.setAttribute("aria-busy", "false");
+      }
+    };
+
+    tabs.forEach((tab) => tab.addEventListener("click", () => {
+      tabs.forEach((item) => item.setAttribute("aria-selected", String(item === tab)));
+      load(tab.dataset.scoreLeague);
+    }));
+    const requestedLeague = new URLSearchParams(location.search).get("league");
+    const initialTab = tabs.find((item) => item.dataset.scoreLeague === requestedLeague) || tabs[0];
+    tabs.forEach((item) => item.setAttribute("aria-selected", String(item === initialTab)));
+    load(initialTab.dataset.scoreLeague);
+  });
+</script>
+
+<style is:global>
+  .score-centre { background: #0c1722; color: #fff; border-radius: 24px; padding: clamp(1.15rem, 3vw, 2rem); box-shadow: 0 20px 55px rgba(8,18,27,.2); overflow: hidden; position: relative; }
+  .score-centre::after { content:""; position:absolute; width:260px; height:260px; border-radius:50%; right:-100px; top:-130px; background:radial-gradient(circle, rgba(112,255,176,.15), transparent 68%); pointer-events:none; }
+  .score-centre__head { display:flex; align-items:end; justify-content:space-between; gap:1rem; margin-bottom:1rem; position:relative; z-index:1; }
+  .score-centre h2 { font-size:clamp(1.35rem,3vw,2rem); letter-spacing:-.035em; line-height:1.1; }
+  .eyebrow { display:flex; align-items:center; gap:.45rem; color:#8fa1b2; font-size:.67rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; margin-bottom:.45rem; }
+  .status-dot { width:7px; height:7px; border-radius:50%; background:#54e38e; box-shadow:0 0 0 5px rgba(84,227,142,.12); }
+  .score-centre__all { color:#fff; font-size:.82rem; font-weight:700; white-space:nowrap; }
+  .score-centre__all:hover { color:#9ff0bd; }
+  .score-tabs { display:flex; gap:.4rem; overflow-x:auto; scrollbar-width:none; padding:.25rem 0 1rem; position:relative; z-index:1; }
+  .score-tabs::-webkit-scrollbar { display:none; }
+  .score-tabs button { border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.04); color:#aab7c3; border-radius:999px; padding:.48rem .75rem; font:inherit; font-size:.75rem; font-weight:700; white-space:nowrap; cursor:pointer; }
+  .score-tabs button[aria-selected="true"] { background:#fff; border-color:#fff; color:#0c1722; }
+  .score-grid { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; position:relative; z-index:1; }
+  .score-card { background:rgba(255,255,255,.065); border:1px solid rgba(255,255,255,.1); border-radius:16px; padding:1rem; }
+  .score-card__meta { display:flex; justify-content:space-between; gap:.75rem; color:#7f91a3; font-size:.65rem; margin-bottom:.85rem; }
+  .score-card__kind { color:#9ff0bd; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+  .score-card__match { display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); align-items:center; gap:.75rem; }
+  .score-card__team { font-weight:750; line-height:1.2; }
+  .score-card__team--away { text-align:right; }
+  .score-card__score { background:#050b11; border-radius:9px; padding:.38rem .58rem; font-size:1.05rem; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .score-card__venue { color:#7f91a3; font-size:.68rem; margin-top:.7rem; text-align:center; }
+  .score-note { color:#718395; font-size:.66rem; margin-top:.7rem; text-align:right; }
+  .score-note a { color:#9fb0c0; }
+  .score-empty { grid-column:1/-1; color:#aab7c3; padding:1rem 0; }
+  .score-loading { display:grid; grid-template-columns:repeat(4,1fr); gap:.75rem; }
+  .score-loading span { min-height:96px; border-radius:16px; background:linear-gradient(100deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.1) 40%,rgba(255,255,255,.04) 55%); background-size:300% 100%; animation:score-shimmer 1.3s infinite; }
+  @keyframes score-shimmer { to { background-position:-100% 0; } }
+  @media (max-width:680px) {
+    .score-centre { border-radius:18px; }
+    .score-centre__head { align-items:start; }
+    .score-centre__all { font-size:0; }
+    .score-centre__all span { font-size:1.2rem; }
+    .score-grid { grid-template-columns:1fr; }
+    .score-card__meta { flex-wrap:wrap; }
+    .score-loading { grid-template-columns:1fr; }
+    .score-loading span { min-height:112px; }
+  }
+</style>

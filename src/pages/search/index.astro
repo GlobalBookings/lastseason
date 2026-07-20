@@ -37,9 +37,9 @@ const searchJson = JSON.stringify(items).replace(/</g, "\\u003c");
     <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span class="sep">/</span><span class="current">Search</span></nav>
     <section class="page-hero"><h1>Search the archive</h1><p class="subtitle">Find reviewed season pages, clubs, players, records and tools.</p></section>
     <section class="search-panel" aria-labelledby="search-heading">
-      <h2 id="search-heading" class="visually-hidden">Search</h2>
+      <h2 id="search-heading" class="sr-only">Search</h2>
       <label for="site-search">Search by name, league, season or club</label>
-      <input id="site-search" type="search" autocomplete="off" placeholder="Try Liverpool, 2003-04 or Thierry Henry" />
+      <input id="site-search" class="search-input" type="search" autocomplete="off" placeholder="Try Liverpool, 2003-04 or Thierry Henry" />
       <p id="search-summary" class="meta">Start typing to search {items.length.toLocaleString()} archive entries.</p>
       <div id="search-results" class="search-results" aria-live="polite"></div>
     </section>

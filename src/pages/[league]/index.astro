@@ -3,7 +3,7 @@ import Base from "../../layouts/Base.astro";
 import SeasonCard from "../../components/SeasonCard.astro";
 import DataNotice from "../../components/DataNotice.astro";
 import { leagues } from "../../data/leagues/index";
-import { getSeasonData } from "../../utils/data";
+import { getSeasonData, unverifiedSeasonKeys } from "../../utils/data";
 
 export function getStaticPaths() {
   return leagues.map((l) => ({
@@ -13,6 +13,9 @@ export function getStaticPaths() {
 }
 
 const { league } = Astro.props;
+const reviewedSeasons = league.seasons.filter((season: string) => !unverifiedSeasonKeys.has(`${league.slug}/${season}`));
+const latestSeason = reviewedSeasons[0];
+const latestData = getSeasonData(league.slug, latestSeason);
 const breadcrumbSchema = JSON.stringify({
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
@@ -20,6 +23,20 @@ const breadcrumbSchema = JSON.stringify({
     { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://lastseason.co.uk/" },
     { "@type": "ListItem", "position": 2, "name": league.name },
   ],
+});
+const collectionSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": `${league.name} completed seasons`,
+  "url": `https://lastseason.co.uk/${league.slug}/`,
+  "description": `Final tables, leading scorers and reviews from published ${league.name} seasons.`,
+  "isPartOf": { "@id": "https://lastseason.co.uk/#website" },
+  "mainEntity": {
+    "@type": "ItemList",
+    "itemListElement": reviewedSeasons.map((season: string, index: number) => ({
+      "@type": "ListItem", "position": index + 1, "name": `${league.name} ${season}`, "url": `https://lastseason.co.uk/${league.slug}/${season}/`,
+    })),
+  },
 });
 ---
 
@@ -31,6 +48,7 @@ const breadcrumbSchema = JSON.stringify({
   robots={league.slug === "mls" ? "noindex, follow" : undefined}
 >
   <script is:inline type="application/ld+json" set:html={breadcrumbSchema} />
+  <script is:inline type="application/ld+json" set:html={collectionSchema} />
 
   <div class="container">
     <nav class="breadcrumbs" aria-label="Breadcrumb">
@@ -39,12 +57,26 @@ const breadcrumbSchema = JSON.stringify({
       <span class="current">{league.name}</span>
     </nav>
 
-    <section class="page-hero">
-      <h1>{league.name}</h1>
-      <p class="subtitle">{league.country} &mdash; {league.seasons.length} published seasons</p>
+    <section class="page-hero league-hero">
+      <div>
+        <span class="page-kicker">{league.country} football archive</span>
+        <h1>{league.name}</h1>
+        <p class="subtitle">{reviewedSeasons.length} reviewed seasons with final tables, leading scorers and season stories.</p>
+      </div>
+      <div class="league-hero__actions">
+        <button type="button" class="favourite-button" data-favourite-league={league.slug} aria-pressed="false"><span aria-hidden="true">★</span><span data-favourite-label>Save league</span></button>
+        <a class="button" href={league.slug === "mls" ? "/scores/" : `/scores/?league=${league.slug}`}>Latest results & fixtures</a>
+      </div>
     </section>
 
-    <DataNotice leagueSlug={league.slug} status={league.slug === "mls" ? "illustrative" : "review"} />
+    {latestData && <a class="latest-season-banner" href={`/${league.slug}/${latestSeason}/`} style={`--league-color:${league.accentColor}`}>
+      <span><small>Latest completed season</small><strong>{latestSeason}</strong></span>
+      <span><small>Champions</small><strong>{latestData.champion}</strong></span>
+      <span><small>Golden Boot</small><strong>{latestData.topScorer} · {latestData.topScorerGoals}</strong></span>
+      <span class="latest-season-banner__arrow" aria-hidden="true">→</span>
+    </a>}
+
+    <DataNotice leagueSlug={league.slug} status={league.slug === "mls" ? "illustrative" : "verified"} />
 
     <section class="section">
       <h2 class="section-title">All Seasons</h2>
@@ -87,3 +119,21 @@ const breadcrumbSchema = JSON.stringify({
     </section>
   </div>
 </Base>
+
+<style>
+  .league-hero { display:flex; align-items:end; justify-content:space-between; gap:2rem; padding-top:3.5rem; margin-bottom:1.25rem; }
+  .page-kicker { color:var(--accent); font-size:.68rem; font-weight:850; letter-spacing:.11em; text-transform:uppercase; }
+  .league-hero h1 { font-size:clamp(2.5rem,7vw,5rem); margin-top:.35rem; }
+  .league-hero__actions { display:flex; flex-wrap:wrap; gap:.6rem; padding-bottom:.25rem; }
+  .latest-season-banner { display:grid; grid-template-columns:repeat(3,1fr) auto; align-items:center; gap:1rem; color:var(--text); background:#fff; border:1px solid var(--border); border-left:4px solid var(--league-color); border-radius:14px; padding:1rem 1.1rem; margin-bottom:1.25rem; }
+  .latest-season-banner:hover { color:var(--text); box-shadow:var(--shadow-md); }
+  .latest-season-banner > span { display:flex; flex-direction:column; }
+  .latest-season-banner small { color:var(--text-muted); font-size:.6rem; font-weight:800; letter-spacing:.07em; text-transform:uppercase; }
+  .latest-season-banner strong { font-size:.87rem; }
+  .latest-season-banner__arrow { font-size:1.3rem; color:var(--accent); }
+  @media (max-width:760px) {
+    .league-hero { align-items:start; flex-direction:column; gap:1rem; padding-top:2.5rem; }
+    .latest-season-banner { grid-template-columns:1fr 1fr; }
+    .latest-season-banner > span:nth-child(3) { display:none; }
+  }
+</style>

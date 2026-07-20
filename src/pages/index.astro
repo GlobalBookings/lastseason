@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import SeasonCard from "../components/SeasonCard.astro";
+import ScoreCentre from "../components/ScoreCentre.astro";
 import { leagues } from "../data/leagues/index";
 import { getSeasonData, getAllLoadedSeasons, unverifiedSeasonKeys } from "../utils/data";
 import { plGoldenBoots, plTitleCounts } from "../data/records/premier-league";
@@ -15,77 +16,113 @@ const latestChampionRow = latestPremierLeague.standings.find((row) => row.clubSl
 const latestGoldenBoot = plGoldenBoots[0];
 const latestTitleCount = plTitleCounts.find((item) => item.club === latestPremierLeague.champion)?.titles;
 const reviewedLeagues = leagues.filter((league) => league.seasons.some((season) => !unverifiedSeasonKeys.has(`${league.slug}/${season}`)));
+const leagueShelfJson = JSON.stringify(reviewedLeagues.map((league) => ({ slug: league.slug, name: league.name, country: league.country, color: league.accentColor }))).replace(/</g, "\\u003c");
+const homepageSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "@id": "https://lastseason.co.uk/#archive",
+  "name": "Completed football season archive",
+  "url": "https://lastseason.co.uk/",
+  "description": "Final league tables, leading scorers, season reviews, results and interactive football history tools.",
+  "isPartOf": { "@id": "https://lastseason.co.uk/#website" },
+  "mainEntity": {
+    "@type": "ItemList",
+    "itemListElement": reviewedLeagues.map((league, index) => ({
+      "@type": "ListItem", "position": index + 1, "name": league.name, "url": `https://lastseason.co.uk/${league.slug}/`,
+    })),
+  },
+});
 ---
 
 <Base
   title="Last Season  -  Completed Football Seasons, Tables & Tools"
   description="Explore a growing archive of completed football seasons, final tables and leading scorers. Compare seasons, recalculate points and download reviewed table data."
   canonical="/"
+  schema={homepageSchema}
 >
   <section class="home-hero" style="background-image: url('/img/hero-floodlights.jpg');">
-    <div class="container">
-      <h1>Football seasons,<br />made explorable.</h1>
-      <p class="subtitle">A growing archive of completed seasons, final tables and leading scorers, with interactive comparisons and transparent source notes.</p>
-      <div class="hero-stats">
-        <div class="hero-stat">
-          <span class="hero-stat-value">{reviewedLeagues.length}</span>
-          <span class="hero-stat-label">Reviewed Leagues</span>
-        </div>
-        <div class="hero-stat">
-          <span class="hero-stat-value">{totalSeasons}</span>
-          <span class="hero-stat-label">Seasons</span>
-        </div>
-        <div class="hero-stat">
-          <span class="hero-stat-value">{totalClubs}+</span>
-          <span class="hero-stat-label">Clubs</span>
-        </div>
-        <div class="hero-stat">
-          <span class="hero-stat-value">{(totalGoals / 1000).toFixed(0)}k+</span>
-          <span class="hero-stat-label">Goals</span>
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <span class="hero-kicker"><span></span> The football archive that keeps moving</span>
+        <h1>Today’s score.<br /><em>Every season behind it.</em></h1>
+        <p class="subtitle">Fresh results meet final tables, Golden Boot winners and the stories that made each season matter.</p>
+        <form class="hero-search" action="/search/" method="get" role="search">
+          <label for="home-search" class="sr-only">Search the football archive</label>
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+          <input id="home-search" name="q" type="search" placeholder="Search club, player or season…" />
+          <button type="submit">Explore</button>
+        </form>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <span class="hero-stat-value">{reviewedLeagues.length}</span>
+            <span class="hero-stat-label">Reviewed leagues</span>
+          </div>
+          <div class="hero-stat">
+            <span class="hero-stat-value">{totalSeasons}</span>
+            <span class="hero-stat-label">Seasons</span>
+          </div>
+          <div class="hero-stat">
+            <span class="hero-stat-value">{totalClubs}+</span>
+            <span class="hero-stat-label">Clubs</span>
+          </div>
+          <div class="hero-stat">
+            <span class="hero-stat-value">{(totalGoals / 1000).toFixed(0)}k+</span>
+            <span class="hero-stat-label">Goals</span>
+          </div>
         </div>
       </div>
-      <div class="hero-cta">
-        <a href="/premier-league/" class="btn btn-primary">Browse Premier League</a>
-        <a href="/search/" class="btn btn-outline">Search the archive</a>
-        <a href="/tools/" class="btn btn-outline">Open the tools</a>
-      </div>
+      <aside class="hero-spotlight" aria-label="Latest completed Premier League season">
+        <span class="hero-spotlight__label">Latest completed season</span>
+        <div class="hero-spotlight__league"><span>PL</span> Premier League {latestPremierLeagueSeason}</div>
+        <div class="hero-spotlight__winner"><small>Champions</small><strong>{latestPremierLeague.champion}</strong><span>{latestChampionRow?.pts} points</span></div>
+        <div class="hero-spotlight__footer"><span>Golden Boot<br /><strong>{latestPremierLeague.topScorer}</strong></span><span>{latestPremierLeague.topScorerGoals}<small> goals</small></span></div>
+        <a href={`/premier-league/${latestPremierLeagueSeason}/`}>Read the season story <span aria-hidden="true">→</span></a>
+      </aside>
     </div>
   </section>
 
-  <div class="container">
-    <section class="quick-links-bar">
+  <div class="container home-main">
+    <div class="score-centre-wrap">
+      <ScoreCentre compact={true} />
+    </div>
+
+    <section class="return-shelf" id="return-shelf" hidden aria-labelledby="return-shelf-title">
+      <div class="return-shelf__head">
+        <div><span class="section-kicker">Your football shelf</span><h2 id="return-shelf-title">Carry on exploring</h2></div>
+        <button type="button" id="clear-history">Clear recent</button>
+      </div>
+      <div class="return-shelf__grid" id="return-shelf-grid"></div>
+    </section>
+
+    <section class="quick-links-bar" aria-label="Popular archive destinations">
       <a href="/records/all-time-top-scorers/" class="quick-link">
-        <span class="quick-link-icon">&#9917;</span>
-        <span class="quick-link-text">All-Time Top Scorers</span>
+        <span class="quick-link-icon">01</span>
+        <span class="quick-link-text">All-time scorers</span>
       </a>
       <a href="/records/winners/" class="quick-link">
-        <span class="quick-link-icon">&#127942;</span>
-        <span class="quick-link-text">PL Winners List</span>
+        <span class="quick-link-icon">02</span>
+        <span class="quick-link-text">Premier League winners</span>
       </a>
       <a href="/records/golden-boot/" class="quick-link">
-        <span class="quick-link-icon">&#128095;</span>
+        <span class="quick-link-icon">03</span>
         <span class="quick-link-text">Golden Boot</span>
       </a>
       <a href="/kits/" class="quick-link">
-        <span class="quick-link-icon">&#128085;</span>
-        <span class="quick-link-text">Kit Archive</span>
+        <span class="quick-link-icon">04</span>
+        <span class="quick-link-text">Kit archive</span>
       </a>
       <a href="/records/relegation-history/" class="quick-link">
-        <span class="quick-link-icon">&#128315;</span>
-        <span class="quick-link-text">Relegation History</span>
-      </a>
-      <a href="/clubs/" class="quick-link">
-        <span class="quick-link-icon">&#127969;</span>
-        <span class="quick-link-text">All Clubs</span>
+        <span class="quick-link-icon">05</span>
+        <span class="quick-link-text">Relegation history</span>
       </a>
       <a href="/tools/season-compare/" class="quick-link">
-        <span class="quick-link-icon">&#8644;</span>
-        <span class="quick-link-text">Compare Seasons</span>
+        <span class="quick-link-icon">06</span>
+        <span class="quick-link-text">Compare seasons</span>
       </a>
     </section>
 
-    <section class="latest-section">
-      <h2 class="section-title">Latest Headlines</h2>
+    <section class="latest-section editorial-section">
+      <div class="editorial-heading"><div><span class="section-kicker">Worth knowing</span><h2>Fresh from the archive</h2></div><a href="/records/">Explore records →</a></div>
       <div class="headline-grid">
         <a href={`/premier-league/${latestPremierLeagueSeason}/`} class="headline-card headline-card--feature">
           <span class="headline-label">Latest Published Season</span>
@@ -105,25 +142,29 @@ const reviewedLeagues = leagues.filter((league) => league.seasons.some((season) 
       </div>
     </section>
 
-    <section class="section">
-      <h2 class="section-title">Use the archive</h2>
+    <section class="section editorial-section">
+      <div class="editorial-heading"><div><span class="section-kicker">Make the data yours</span><h2>Use the archive</h2></div><a href="/tools/">All tools →</a></div>
       <div class="tool-grid">
-        <a class="tool-card" href="/tools/season-compare/"><h3>Season comparison</h3><p>Put champions, points, goals and leading scorers side by side.</p></a>
-        <a class="tool-card" href="/tools/table-calculator/"><h3>Points calculator</h3><p>See how a final table changes under different win and draw points.</p></a>
-        <a class="tool-card" href="/tools/club-history/"><h3>Club history explorer</h3><p>Trace a club's published league finishes across the archive.</p></a>
+        <a class="tool-card" href="/tools/season-compare/"><span class="tool-card__number">01</span><h3>Season comparison</h3><p>Put champions, points, goals and leading scorers side by side.</p></a>
+        <a class="tool-card" href="/tools/table-calculator/"><span class="tool-card__number">02</span><h3>Points calculator</h3><p>See how a final table changes under different win and draw points.</p></a>
+        <a class="tool-card" href="/tools/club-history/"><span class="tool-card__number">03</span><h3>Club history explorer</h3><p>Trace a club's published league finishes across the archive.</p></a>
       </div>
     </section>
 
     <div class="home-leagues">
+      <div class="archive-intro"><div><span class="section-kicker">The long view</span><h2>Explore by league</h2></div><p>Every card opens a completed season with its final table, leading scorers and the story behind the numbers.</p></div>
       {reviewedLeagues.map((league) => {
         const reviewedSeasons = league.seasons.filter((season) => !unverifiedSeasonKeys.has(`${league.slug}/${season}`));
         const latestSeason = reviewedSeasons[0];
         const data = getSeasonData(league.slug, latestSeason);
         return (
-          <section class="league-section">
+          <section class="league-section" style={`--league-color:${league.accentColor}`}>
             <div class="league-section-header">
-              <h2><a href={`/${league.slug}/`}>{league.name}</a></h2>
-              <a href={`/${league.slug}/`} class="view-all">All seasons &rarr;</a>
+              <div><span>{league.country}</span><h2><a href={`/${league.slug}/`}>{league.name}</a></h2></div>
+              <div class="league-section-actions">
+                <button type="button" class="favourite-button" data-favourite-league={league.slug} aria-pressed="false"><span aria-hidden="true">★</span><span data-favourite-label>Save league</span></button>
+                <a href={`/${league.slug}/`} class="view-all">All seasons →</a>
+              </div>
             </div>
             {data ? (
               <div class="card-grid">
@@ -158,41 +199,90 @@ const reviewedLeagues = leagues.filter((league) => league.seasons.some((season) 
       })}
     </div>
   </div>
+
+  <script is:inline type="application/json" id="league-shelf-data" set:html={leagueShelfJson}></script>
+  <script is:inline>
+    const shelf = document.getElementById("return-shelf");
+    const shelfGrid = document.getElementById("return-shelf-grid");
+    const leagueData = JSON.parse(document.getElementById("league-shelf-data")?.textContent || "[]");
+    const shelfCard = (title, subtitle, path, color) => {
+      const link = document.createElement("a"); link.href = path; link.className = "return-card"; link.style.setProperty("--shelf-color", color || "#3d195b");
+      const small = document.createElement("span"); small.textContent = subtitle;
+      const strong = document.createElement("strong"); strong.textContent = title;
+      const arrow = document.createElement("span"); arrow.textContent = "→"; arrow.setAttribute("aria-hidden", "true");
+      link.append(small, strong, arrow); return link;
+    };
+    const renderShelf = () => {
+      shelfGrid.replaceChildren();
+      let history = [], favourites = [];
+      try { history = JSON.parse(localStorage.getItem("lastseason-history") || "[]"); favourites = JSON.parse(localStorage.getItem("lastseason-favourite-leagues") || "[]"); } catch {}
+      favourites.slice(0, 3).forEach((slug) => {
+        const league = leagueData.find((item) => item.slug === slug);
+        if (league) shelfGrid.append(shelfCard(league.name, "Saved league", `/${league.slug}/`, league.color));
+      });
+      history.slice(0, Math.max(0, 4 - shelfGrid.children.length)).forEach((item) => shelfGrid.append(shelfCard(item.title, "Recently viewed", item.path)));
+      shelf.hidden = shelfGrid.children.length === 0;
+    };
+    document.getElementById("clear-history")?.addEventListener("click", () => { try { localStorage.removeItem("lastseason-history"); } catch {} renderShelf(); });
+    document.addEventListener("lastseason:favourites", renderShelf);
+    renderShelf();
+  </script>
 </Base>
 
 <style>
-  .hero-cta {
-    display: flex;
-    gap: 0.75rem;
-    margin-top: 1.5rem;
-    flex-wrap: wrap;
-  }
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.65rem 1.5rem;
-    font-size: 0.92rem;
-    font-weight: 600;
-    border-radius: var(--radius-lg);
-    text-decoration: none;
-    transition: all 0.2s;
-  }
-  .btn-primary {
-    background: #fff;
-    color: var(--bg-dark);
-  }
-  .btn-primary:hover { background: rgba(255,255,255,0.9); transform: translateY(-1px); text-decoration: none; }
-  .btn-outline {
-    background: transparent;
-    color: #fff;
-    border: 1.5px solid rgba(255,255,255,0.5);
-  }
-  .btn-outline:hover { border-color: #fff; background: rgba(255,255,255,0.08); text-decoration: none; }
+  .home-hero { padding:clamp(4rem,8vw,7.25rem) 0 7rem; background-position:center 45%; }
+  .home-hero::before { background:linear-gradient(90deg,rgba(8,17,25,.97) 0%,rgba(8,17,25,.9) 48%,rgba(8,17,25,.66) 100%); }
+  .hero-grid { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(290px,.65fr); gap:clamp(2rem,7vw,6rem); align-items:center; }
+  .hero-copy { min-width:0; }
+  .hero-kicker { display:flex; align-items:center; gap:.55rem; color:#adbdca; font-size:.68rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; margin-bottom:1rem; }
+  .hero-kicker span { width:24px; height:1px; background:#67e399; }
+  .home-hero h1 { font-size:clamp(2.8rem,6.2vw,5.8rem); max-width:11ch; line-height:.94; margin-bottom:1.25rem; }
+  .home-hero h1 em { color:#8ce9af; font-style:normal; font-weight:500; }
+  .home-hero .subtitle { font-size:clamp(1rem,1.5vw,1.16rem); max-width:48ch; }
+  .hero-search { width:min(100%,570px); display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:.65rem; margin-top:1.75rem; padding:.38rem .4rem .38rem .85rem; border:1px solid rgba(255,255,255,.28); border-radius:13px; background:rgba(255,255,255,.12); backdrop-filter:blur(14px); }
+  .hero-search input { min-width:0; width:100%; border:0; outline:0; background:transparent; color:#fff; font:600 .92rem var(--font); }
+  .hero-search input::placeholder { color:rgba(255,255,255,.55); }
+  .hero-search button { border:0; border-radius:9px; background:#fff; color:#0b1620; padding:.65rem .9rem; font-weight:800; cursor:pointer; }
+  .home-hero .hero-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:0; width:min(100%,570px); margin-top:1.5rem; padding-top:1.15rem; }
+  .home-hero .hero-stat { padding-right:1rem; }
+  .home-hero .hero-stat-value { font-size:1.45rem; }
+  .home-hero .hero-stat-label { font-size:.58rem; }
+  .hero-spotlight { align-self:end; background:rgba(6,13,19,.76); border:1px solid rgba(255,255,255,.13); border-radius:22px; padding:1.25rem; box-shadow:0 22px 60px rgba(0,0,0,.28); backdrop-filter:blur(16px); }
+  .hero-spotlight__label { color:#8ce9af; font-size:.62rem; font-weight:850; letter-spacing:.11em; text-transform:uppercase; }
+  .hero-spotlight__league { display:flex; align-items:center; gap:.55rem; margin:.85rem 0 1.35rem; color:#bcc8d2; font-size:.74rem; }
+  .hero-spotlight__league span { display:grid; place-items:center; width:29px; height:29px; border-radius:8px; background:#3d195b; color:#fff; font-weight:850; }
+  .hero-spotlight__winner { display:grid; grid-template-columns:1fr auto; padding-bottom:1.1rem; border-bottom:1px solid rgba(255,255,255,.1); }
+  .hero-spotlight__winner small { grid-column:1/-1; color:#718393; font-size:.61rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; }
+  .hero-spotlight__winner strong { font-size:clamp(1.5rem,3vw,2.2rem); letter-spacing:-.04em; }
+  .hero-spotlight__winner span { align-self:end; color:#aebbc6; font-size:.72rem; }
+  .hero-spotlight__footer { display:flex; align-items:end; justify-content:space-between; gap:1rem; padding:1rem 0; color:#8192a1; font-size:.66rem; }
+  .hero-spotlight__footer strong { color:#fff; font-size:.8rem; }
+  .hero-spotlight__footer > span:last-child { color:#fff; font-size:1.45rem; font-weight:850; }
+  .hero-spotlight__footer small { color:#8192a1; font-size:.62rem; font-weight:600; }
+  .hero-spotlight > a { display:flex; justify-content:space-between; align-items:center; border-radius:10px; background:#fff; color:#0b1620; padding:.72rem .85rem; font-size:.75rem; font-weight:800; }
+  .home-main { position:relative; padding-bottom:4rem; }
+  .score-centre-wrap { margin-top:-4.1rem; position:relative; z-index:4; }
+
+  .section-kicker { color:var(--accent); font-size:.64rem; font-weight:850; letter-spacing:.12em; text-transform:uppercase; }
+  .editorial-section { padding:2.75rem 0 0; }
+  .editorial-heading { display:flex; justify-content:space-between; align-items:end; gap:1.5rem; margin-bottom:1rem; }
+  .editorial-heading h2, .archive-intro h2, .return-shelf h2 { font-size:clamp(1.65rem,4vw,2.55rem); line-height:1.05; letter-spacing:-.04em; margin-top:.28rem; }
+  .editorial-heading > a { color:var(--text); font-size:.75rem; font-weight:750; }
+
+  .return-shelf { margin-top:2.75rem; padding:1.25rem; border:1px solid var(--border); border-radius:18px; background:#fff; }
+  .return-shelf[hidden] { display:none; }
+  .return-shelf__head { display:flex; justify-content:space-between; align-items:end; gap:1rem; margin-bottom:1rem; }
+  .return-shelf__head button { border:0; background:transparent; color:var(--text-muted); font:650 .7rem var(--font); cursor:pointer; }
+  .return-shelf__grid { display:grid; grid-template-columns:repeat(4,1fr); gap:.65rem; }
+  :global(.return-card) { display:grid; grid-template-columns:1fr auto; gap:.2rem .5rem; border:1px solid var(--border); border-left:3px solid var(--shelf-color); border-radius:12px; padding:.85rem; color:var(--text); }
+  :global(.return-card:hover) { background:var(--bg-alt); color:var(--text); }
+  :global(.return-card small), :global(.return-card > span:first-child) { grid-column:1/-1; color:var(--text-muted); font-size:.6rem; font-weight:750; letter-spacing:.07em; text-transform:uppercase; }
+  :global(.return-card strong) { font-size:.78rem; line-height:1.25; }
 
   .quick-links-bar {
     display: flex;
     gap: 0.5rem;
-    padding: 1.25rem 0 0.5rem;
+    padding: 2rem 0 0.25rem;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
@@ -201,23 +291,23 @@ const reviewedLeagues = leagues.filter((league) => league.seasons.some((season) 
   .quick-link {
     display: flex;
     align-items: center;
-    gap: 0.4rem;
-    padding: 0.5rem 0.85rem;
-    background: var(--bg-card);
+    gap: 0.5rem;
+    padding: 0.55rem 0.8rem 0.55rem 0.6rem;
+    background: transparent;
     border: 1px solid var(--border);
     border-radius: 100px;
     text-decoration: none;
     color: var(--text);
     font-size: 0.82rem;
-    font-weight: 500;
+    font-weight: 700;
     white-space: nowrap;
     transition: all 0.2s;
     flex-shrink: 0;
   }
   .quick-link:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); text-decoration: none; }
-  .quick-link-icon { font-size: 1rem; }
+  .quick-link-icon { display:grid; place-items:center; width:25px; height:25px; border-radius:50%; background:var(--text); color:#fff; font-size:.58rem; font-weight:850; }
 
-  .latest-section { padding: 1.5rem 0 0.5rem; }
+  .latest-section { padding-top:3.5rem; }
   .headline-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -227,16 +317,16 @@ const reviewedLeagues = leagues.filter((league) => league.seasons.some((season) 
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
-    padding: 1.25rem;
-    background: var(--bg-card);
+    padding: 1.35rem;
+    background: linear-gradient(145deg,#fff,#f8faf8);
     border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
+    border-radius: 16px;
     text-decoration: none;
     color: var(--text);
     transition: all 0.2s;
   }
   .headline-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); border-color: rgba(0,0,0,0.12); text-decoration: none; }
-  .headline-card--feature { border-left: 3px solid var(--accent, #3d195b); }
+  .headline-card--feature { border-top:3px solid var(--accent,#3d195b); }
   .headline-label {
     font-size: 0.72rem;
     font-weight: 700;
@@ -246,8 +336,47 @@ const reviewedLeagues = leagues.filter((league) => league.seasons.some((season) 
   }
   .headline-title { font-size: 1.05rem; font-weight: 700; line-height: 1.3; }
   .headline-sub { font-size: 0.82rem; color: var(--text-secondary); }
+  .tool-card { position:relative; min-height:170px; padding:1.5rem; border-top:0; border-radius:16px; overflow:hidden; }
+  .tool-card__number { color:var(--text-muted); font:800 .65rem var(--font-mono); }
+  .tool-card h3 { margin-top:1.8rem; font-size:1.15rem; }
+  .tool-card::after { content:"→"; position:absolute; right:1.2rem; top:1.1rem; color:var(--accent); font-weight:800; }
+
+  .archive-intro { display:grid; grid-template-columns:.8fr 1.2fr; gap:clamp(2rem,7vw,7rem); align-items:end; padding-bottom:2rem; }
+  .archive-intro p { color:var(--text-secondary); max-width:55ch; }
+  .home-leagues { padding-top:4.5rem; }
+  .league-section { border-top:1px solid var(--border); padding-top:1.25rem; }
+  .league-section-header { border:0; padding:0; align-items:center; }
+  .league-section-header > div:first-child > span { display:block; color:var(--league-color); font-size:.6rem; font-weight:850; letter-spacing:.1em; text-transform:uppercase; }
+  .league-section-header h2 { font-size:1.4rem; }
+  .league-section-actions { display:flex; align-items:center; gap:.75rem; }
+  .favourite-button { display:flex; align-items:center; gap:.35rem; border:1px solid var(--border); border-radius:999px; background:#fff; color:var(--text-muted); padding:.4rem .65rem; font:700 .68rem var(--font); cursor:pointer; }
+  .favourite-button > span:first-child { color:#b7c0c8; }
+  .favourite-button.is-favourite { border-color:color-mix(in srgb,var(--league-color),#fff 65%); background:color-mix(in srgb,var(--league-color),#fff 94%); color:var(--league-color); }
+  .favourite-button.is-favourite > span:first-child { color:var(--league-color); }
+  .league-section .card-grid { grid-template-columns:repeat(3,1fr); }
+  .league-section :global(.season-card) { min-height:155px; border-top:3px solid var(--league-color); }
 
   @media (max-width: 768px) {
+    .home-hero { padding:3.5rem 0 5.5rem; }
+    .hero-grid { grid-template-columns:1fr; }
+    .hero-spotlight { display:none; }
+    .home-hero h1 { font-size:clamp(2.65rem,13vw,4rem); }
+    .home-hero .hero-stats { grid-template-columns:repeat(4,1fr); gap:.35rem; }
+    .home-hero .hero-stat { padding:0; }
+    .home-hero .hero-stat-value { font-size:1.2rem; }
+    .home-hero .hero-stat-label { font-size:.5rem; }
+    .score-centre-wrap { margin-top:-3.1rem; }
+    .return-shelf__grid { grid-template-columns:1fr 1fr; }
     .headline-grid { grid-template-columns: 1fr; }
+    .archive-intro { grid-template-columns:1fr; gap:.75rem; }
+    .league-section .card-grid { grid-template-columns:1fr; }
+    .league-section-actions .view-all { display:none; }
+    .editorial-heading > a { display:none; }
+  }
+  @media (max-width:480px) {
+    .hero-search button { padding:.62rem .72rem; }
+    .home-hero .subtitle { font-size:.95rem; }
+    .return-shelf__grid { grid-template-columns:1fr; }
+    .favourite-button [data-favourite-label] { display:none; }
   }
 </style>

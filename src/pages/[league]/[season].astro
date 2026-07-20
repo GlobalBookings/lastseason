@@ -90,6 +90,7 @@ const breadcrumbSchema = JSON.stringify({
       <a class="button" href={`/tools/season-compare/?a=${leagueSlug}-${season}`}>Compare this season</a>
       <a class="button button--secondary" href={`/tools/table-calculator/?season=${leagueSlug}-${season}`}>Recalculate table</a>
       {!isUnverified && <a class="button button--secondary" href={`/data/${leagueSlug}/${season}.csv`} download>Download table CSV</a>}
+      <button type="button" class="button button--secondary favourite-button" data-favourite-league={leagueSlug} aria-pressed="false"><span aria-hidden="true">★</span><span data-favourite-label>Save league</span></button>
     </div>
 
     <section class="section" id="table">

@@ -31,6 +31,8 @@ import { leagueSources, siteReviewDate } from "../data/sources";
         <li><strong>Top scorer:</strong> league goals in the named season unless the page states otherwise.</li>
         <li><strong>Kit colour study:</strong> a stylised representation of broad colours and era metadata, not a replica or authentication record.</li>
       </ul>
+      <h2>Current results and fixtures</h2>
+      <p>The match centre is deliberately separate from the reviewed historical archive. Recent results and upcoming fixtures are supplied by <a href="https://www.thesportsdb.com/" rel="nofollow noopener" target="_blank">TheSportsDB</a>, normalised by our Cloudflare Worker and cached briefly for performance. Current-feed records do not alter completed-season archive data.</p>
       <h2>Primary competition sources</h2>
       {leagues.map((league) => (
         <section>

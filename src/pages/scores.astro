@@ -1,0 +1,91 @@
+---
+import Base from "../layouts/Base.astro";
+import ScoreCentre from "../components/ScoreCentre.astro";
+
+const schema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "CollectionPage",
+      "name": "Football results and fixtures",
+      "url": "https://lastseason.co.uk/scores/",
+      "description": "Recent results and the next scheduled fixtures for major European football leagues.",
+      "isPartOf": { "@id": "https://lastseason.co.uk/#website" },
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "Which football leagues are covered?", "acceptedAnswer": { "@type": "Answer", "text": "Last Season currently shows recent results and upcoming fixtures for the Premier League, Championship, La Liga, Bundesliga, Serie A and Ligue 1." } },
+        { "@type": "Question", "name": "How often is the score feed updated?", "acceptedAnswer": { "@type": "Answer", "text": "The page refreshes from the score service on each visit, with short edge caching for speed and reliability." } },
+        { "@type": "Question", "name": "Can I explore completed seasons after checking a score?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Last Season links current football interest to final tables, leading scorers, club histories, records and season comparison tools." } },
+      ],
+    },
+  ],
+});
+---
+
+<Base
+  title="Football Results & Upcoming Fixtures"
+  description="Check the latest result and next fixture for the Premier League, Championship, La Liga, Bundesliga, Serie A and Ligue 1, then explore every completed season."
+  canonical="/scores/"
+  schema={schema}
+>
+  <div class="container scores-page">
+    <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span class="sep">/</span><span class="current">Scores</span></nav>
+    <section class="page-hero scores-page__hero">
+      <span class="page-kicker">Today meets history</span>
+      <h1>Results now. Context forever.</h1>
+      <p class="subtitle">Check the latest league result and what is coming next, then jump into the final table, scorers and story of the completed season.</p>
+    </section>
+
+    <ScoreCentre heading="Latest league results & next fixtures" />
+
+    <section class="scores-copy section">
+      <div>
+        <span class="page-kicker">Why Last Season?</span>
+        <h2>Scores with somewhere to go next</h2>
+      </div>
+      <div class="scores-copy__text">
+        <p>A score is useful for a minute. The archive makes it useful for much longer. Move from the latest result into final league tables, Golden Boot winners, title races and club histories.</p>
+        <p>The feed refreshes automatically and is cached at the edge for speed. During the close season, the next confirmed league fixture appears as soon as the provider publishes it.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Go deeper</h2>
+      <div class="tool-grid">
+        <a class="tool-card" href="/premier-league/"><h3>Premier League archive</h3><p>Every published final table from 1992–93 onwards.</p></a>
+        <a class="tool-card" href="/tools/club-history/"><h3>Club history explorer</h3><p>Follow a club’s league finishes across the archive.</p></a>
+        <a class="tool-card" href="/tools/season-compare/"><h3>Compare seasons</h3><p>Put champions, points and scoring records side by side.</p></a>
+      </div>
+    </section>
+
+    <section class="section score-faq">
+      <span class="page-kicker">Quick answers</span>
+      <h2>Football scores FAQ</h2>
+      <div class="score-faq__grid">
+        <details><summary>Which leagues are covered?</summary><p>The Premier League, Championship, La Liga, Bundesliga, Serie A and Ligue 1 are available in the match centre.</p></details>
+        <details><summary>How fresh is the feed?</summary><p>The page requests fresh provider data on each visit, with a short Cloudflare edge cache to keep it fast and resilient.</p></details>
+        <details><summary>Where can I find the full season?</summary><p>Open any league archive for completed final tables, scorers and reviews, or use the comparison and club-history tools.</p></details>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .scores-page { padding-bottom:4rem; }
+  .scores-page__hero { max-width:760px; margin-bottom:1.25rem; padding-top:3.5rem; }
+  .scores-page__hero h1 { font-size:clamp(2.5rem,7vw,5rem); max-width:12ch; }
+  .page-kicker { color:var(--accent); font-size:.7rem; font-weight:850; letter-spacing:.12em; text-transform:uppercase; }
+  .scores-copy { display:grid; grid-template-columns:.8fr 1.2fr; gap:clamp(2rem,7vw,6rem); padding:4rem 0 1.5rem; align-items:start; }
+  .scores-copy h2 { font-size:clamp(1.75rem,4vw,2.8rem); letter-spacing:-.04em; line-height:1.05; margin-top:.5rem; }
+  .scores-copy__text { color:var(--text-secondary); font-size:1.02rem; }
+  .scores-copy__text p + p { margin-top:1rem; }
+  .score-faq { padding-top:2rem; }
+  .score-faq h2 { font-size:clamp(1.75rem,4vw,2.8rem); letter-spacing:-.04em; margin:.4rem 0 1rem; }
+  .score-faq__grid { display:grid; grid-template-columns:repeat(3,1fr); gap:.75rem; }
+  .score-faq details { border:1px solid var(--border); border-radius:14px; background:#fff; padding:1rem; }
+  .score-faq summary { cursor:pointer; font-weight:750; }
+  .score-faq p { color:var(--text-secondary); font-size:.84rem; margin-top:.7rem; }
+  @media (max-width:700px) { .scores-copy { grid-template-columns:1fr; gap:1rem; padding-top:3rem; } .score-faq__grid { grid-template-columns:1fr; } }
+</style>
