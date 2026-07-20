@@ -1,0 +1,49 @@
+---
+import Base from "../layouts/Base.astro";
+import { leagues } from "../data/leagues/index";
+import { leagueSources, siteReviewDate } from "../data/sources";
+---
+
+<Base
+  title="Data Methodology & Sources"
+  description="How Last Season scopes, checks, sources and corrects historical football data."
+  canonical="/methodology/"
+>
+  <div class="container">
+    <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span class="sep">/</span><span class="current">Methodology</span></nav>
+    <section class="page-hero">
+      <h1>Data methodology & sources</h1>
+      <p class="subtitle">Clear scope, automated checks and an open correction process.</p>
+    </section>
+    <article class="prose section">
+      <p class="callout"><strong>Current status:</strong> the archive structure and automated checks were reviewed on {siteReviewDate}. Manual primary-source review is continuing league by league.</p>
+      <h2>Publication process</h2>
+      <ol>
+        <li>A season remains outside public derived totals until it is explicitly added to the published league configuration.</li>
+        <li>Build-time checks test route metadata, duplicate positions, match totals, goal difference, champion consistency, total goals and top-scorer consistency.</li>
+        <li>Pages identify when records are partial, illustrative or under review.</li>
+        <li>Corrections are applied to the shared season record so connected club, player and comparison pages update together.</li>
+      </ol>
+      <h2>Definitions</h2>
+      <ul>
+        <li><strong>Champion:</strong> the competition winner, which may differ from first place in competitions with playoffs.</li>
+        <li><strong>Archive total:</strong> a total calculated only from published seasons represented on Last Season.</li>
+        <li><strong>Top scorer:</strong> league goals in the named season unless the page states otherwise.</li>
+        <li><strong>Kit colour study:</strong> a stylised representation of broad colours and era metadata, not a replica or authentication record.</li>
+      </ul>
+      <h2>Primary competition sources</h2>
+      {leagues.map((league) => (
+        <section>
+          <h3>{league.name}</h3>
+          <ul>
+            {(leagueSources[league.slug] ?? []).map((source) => (
+              <li><a href={source.url} rel="noopener" target="_blank">{source.name}</a> - {source.scope}</li>
+            ))}
+          </ul>
+        </section>
+      ))}
+      <h2>Corrections</h2>
+      <p>Include the page URL, the field you believe is wrong and a primary-source link where possible. See the <a href="/corrections/">corrections page</a>.</p>
+    </article>
+  </div>
+</Base>

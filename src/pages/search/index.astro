@@ -1,0 +1,73 @@
+---
+import Base from "../../layouts/Base.astro";
+import { leagues } from "../../data/leagues/index";
+import { getAllLoadedSeasons } from "../../utils/data";
+
+type SearchItem = { title: string; subtitle: string; url: string; type: string; keywords: string };
+const seasons = getAllLoadedSeasons();
+const items: SearchItem[] = [];
+for (const league of leagues) items.push({ title: league.name, subtitle: `${league.country} · Published season archive`, url: `/${league.slug}/`, type: "League", keywords: league.country });
+for (const season of seasons) items.push({ title: `${season.league} ${season.seasonDisplay}`, subtitle: `${season.champion} · ${season.topScorer}`, url: `/${season.leagueSlug}/${season.season}/`, type: "Season", keywords: `${season.champion} ${season.topScorer}` });
+
+const clubs = new Map<string, { name: string; leagues: Set<string> }>();
+const players = new Map<string, { name: string; clubs: Set<string> }>();
+for (const season of seasons) {
+  for (const row of season.standings) {
+    const club = clubs.get(row.clubSlug) ?? { name: row.club, leagues: new Set<string>() };
+    club.leagues.add(season.league); clubs.set(row.clubSlug, club);
+  }
+  for (const player of [...season.scorers, ...season.assisters, ...season.cleanSheets]) {
+    const entry = players.get(player.playerSlug) ?? { name: player.name, clubs: new Set<string>() };
+    entry.clubs.add(player.club); players.set(player.playerSlug, entry);
+  }
+}
+for (const [slug, club] of clubs) items.push({ title: club.name, subtitle: [...club.leagues].join(" · "), url: `/clubs/${slug}/`, type: "Club", keywords: [...club.leagues].join(" ") });
+for (const [slug, player] of players) items.push({ title: player.name, subtitle: [...player.clubs].slice(0, 3).join(" · "), url: `/players/${slug}/`, type: "Player", keywords: [...player.clubs].join(" ") });
+items.push(
+  { title: "Season comparison", subtitle: "Compare completed football seasons", url: "/tools/season-compare/", type: "Tool", keywords: "compare goals points champions" },
+  { title: "Table calculator", subtitle: "Try alternative points systems", url: "/tools/table-calculator/", type: "Tool", keywords: "recalculate wins draws points" },
+  { title: "Club history explorer", subtitle: "Plot archive finishing positions", url: "/tools/club-history/", type: "Tool", keywords: "club timeline position chart" },
+  { title: "Premier League records", subtitle: "Winners, scorers and season records", url: "/records/", type: "Records", keywords: "record winners golden boot relegation" },
+);
+const searchJson = JSON.stringify(items).replace(/</g, "\\u003c");
+---
+
+<Base title="Search the Football Archive" description="Search Last Season for completed seasons, clubs, players, league records and interactive tools." canonical="/search/">
+  <div class="container prose">
+    <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span class="sep">/</span><span class="current">Search</span></nav>
+    <section class="page-hero"><h1>Search the archive</h1><p class="subtitle">Find reviewed season pages, clubs, players, records and tools.</p></section>
+    <section class="search-panel" aria-labelledby="search-heading">
+      <h2 id="search-heading" class="visually-hidden">Search</h2>
+      <label for="site-search">Search by name, league, season or club</label>
+      <input id="site-search" type="search" autocomplete="off" placeholder="Try Liverpool, 2003-04 or Thierry Henry" />
+      <p id="search-summary" class="meta">Start typing to search {items.length.toLocaleString()} archive entries.</p>
+      <div id="search-results" class="search-results" aria-live="polite"></div>
+    </section>
+  </div>
+  <script is:inline type="application/json" id="search-data" set:html={searchJson}></script>
+  <script is:inline>
+    const data = JSON.parse(document.getElementById("search-data")?.textContent || "[]");
+    const input = document.getElementById("site-search");
+    const results = document.getElementById("search-results");
+    const summary = document.getElementById("search-summary");
+    const params = new URLSearchParams(location.search);
+    const normalise = (value) => value.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, " ").trim();
+    const render = () => {
+      const raw = input.value.trim(); const query = normalise(raw);
+      results.replaceChildren();
+      if (!query) { summary.textContent = `Start typing to search ${data.length.toLocaleString()} archive entries.`; return; }
+      const terms = query.split(/\s+/);
+      const matches = data.filter((item) => terms.every((term) => normalise(`${item.title} ${item.subtitle} ${item.keywords} ${item.type}`).includes(term))).slice(0, 40);
+      summary.textContent = `${matches.length}${matches.length === 40 ? "+" : ""} result${matches.length === 1 ? "" : "s"} for “${raw}”.`;
+      for (const item of matches) {
+        const link = document.createElement("a"); link.href = item.url; link.className = "search-result";
+        const tag = document.createElement("span"); tag.className = "card-tag"; tag.textContent = item.type;
+        const title = document.createElement("strong"); title.textContent = item.title;
+        const detail = document.createElement("span"); detail.className = "meta"; detail.textContent = item.subtitle;
+        link.append(tag, title, detail); results.append(link);
+      }
+      const next = new URL(location.href); if (raw) next.searchParams.set("q", raw); else next.searchParams.delete("q"); history.replaceState({}, "", next);
+    };
+    input.value = params.get("q") || ""; input.addEventListener("input", render); render();
+  </script>
+</Base>

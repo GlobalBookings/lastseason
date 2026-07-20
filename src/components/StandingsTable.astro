@@ -6,7 +6,7 @@ interface Props {
   leagueSlug: string;
 }
 
-const { standings, leagueSlug } = Astro.props;
+const { standings } = Astro.props;
 const hasPromotion = standings.some(s => s.zone === "promotion");
 ---
 

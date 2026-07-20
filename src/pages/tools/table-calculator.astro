@@ -1,0 +1,30 @@
+---
+import Base from "../../layouts/Base.astro";
+import { getAllLoadedSeasons } from "../../utils/data";
+const seasons = getAllLoadedSeasons().map((season) => ({ id: `${season.leagueSlug}-${season.season}`, label: `${season.league} ${season.seasonDisplay}`, rows: season.standings.map(({ club, w, d, l, gf, ga }) => ({ club, w, d, l, gf, ga })) }));
+const json = JSON.stringify(seasons).replace(/</g, "\\u003c");
+---
+
+<Base title="Football League Table Calculator" description="Recalculate completed football league tables using alternative points for wins and draws." canonical="/tools/table-calculator/">
+  <div class="container prose">
+    <nav class="breadcrumbs"><a href="/">Home</a><span class="sep">/</span><a href="/tools/">Tools</a><span class="sep">/</span><span class="current">Table calculator</span></nav>
+    <section class="page-hero"><h1>League table calculator</h1><p class="subtitle">What if a win were worth two points—or four?</p></section>
+    <section class="tool-panel">
+      <div class="control-grid">
+        <label>Final table<select id="table-season"></select></label>
+        <label>Points per win<input id="win-points" type="number" min="0" max="10" step="1" value="3" /></label>
+        <label>Points per draw<input id="draw-points" type="number" min="0" max="10" step="1" value="1" /></label>
+      </div>
+      <p class="meta">Teams are sorted by recalculated points, then goal difference and goals scored. Historic deductions and competition-specific tie-breakers are not modelled.</p>
+      <div id="calculated-table" class="tool-output" aria-live="polite"></div>
+    </section>
+  </div>
+  <script is:inline type="application/json" id="table-data" set:html={json}></script>
+  <script is:inline>
+    const seasons = JSON.parse(document.getElementById("table-data")?.textContent || "[]"); const select = document.getElementById("table-season"), win = document.getElementById("win-points"), draw = document.getElementById("draw-points"), output = document.getElementById("calculated-table");
+    for (const season of seasons) { const option = document.createElement("option"); option.value = season.id; option.textContent = season.label; select.append(option); }
+    const params = new URLSearchParams(location.search); select.value = params.get("season") || seasons[0]?.id || ""; win.value = params.get("win") || "3"; draw.value = params.get("draw") || "1";
+    const render = () => { const season = seasons.find((s) => s.id === select.value); if (!season) return; const wp = Number(win.value), dp = Number(draw.value); const rows = season.rows.map((r) => ({ ...r, gd: r.gf-r.ga, pts: r.w*wp+r.d*dp })).sort((a,b) => b.pts-a.pts || b.gd-a.gd || b.gf-a.gf || a.club.localeCompare(b.club)); output.innerHTML = `<div class="table-wrap"><table class="stats-table"><thead><tr><th>Pos</th><th>Club</th><th class="num">W</th><th class="num">D</th><th class="num">L</th><th class="num">GD</th><th class="num">Pts</th></tr></thead><tbody>${rows.map((r,i) => `<tr><td>${i+1}</td><td>${r.club}</td><td class="num">${r.w}</td><td class="num">${r.d}</td><td class="num">${r.l}</td><td class="num">${r.gd > 0 ? "+" : ""}${r.gd}</td><td class="num"><strong>${r.pts}</strong></td></tr>`).join("")}</tbody></table></div>`; const url = new URL(location.href); url.searchParams.set("season", season.id); url.searchParams.set("win", wp); url.searchParams.set("draw", dp); history.replaceState({}, "", url); };
+    for (const control of [select, win, draw]) control.addEventListener("input", render); render();
+  </script>
+</Base>

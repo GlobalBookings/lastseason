@@ -27,7 +27,7 @@ export const plAllTimeScorers = [
 ];
 
 export const plWinners = [
-  { season: "2024-25", winner: "Liverpool", manager: "Arne Slot", points: 86, runnerUp: "Arsenal" },
+  { season: "2024-25", winner: "Liverpool", manager: "Arne Slot", points: 84, runnerUp: "Arsenal" },
   { season: "2023-24", winner: "Manchester City", manager: "Pep Guardiola", points: 91, runnerUp: "Arsenal" },
   { season: "2022-23", winner: "Manchester City", manager: "Pep Guardiola", points: 89, runnerUp: "Arsenal" },
   { season: "2021-22", winner: "Manchester City", manager: "Pep Guardiola", points: 93, runnerUp: "Liverpool" },
@@ -64,7 +64,7 @@ export const plWinners = [
 
 export const plGoldenBoots = [
   { season: "2024-25", player: "Mohamed Salah", slug: "mohamed-salah", club: "Liverpool", goals: 29 },
-  { season: "2023-24", player: "Cole Palmer", slug: "cole-palmer", club: "Chelsea", goals: 22 },
+  { season: "2023-24", player: "Erling Haaland", slug: "erling-haaland", club: "Manchester City", goals: 27 },
   { season: "2022-23", player: "Erling Haaland", slug: "erling-haaland", club: "Manchester City", goals: 36 },
   { season: "2021-22", player: "Mohamed Salah / Son Heung-min", slug: "mohamed-salah", club: "Liverpool / Tottenham", goals: 23 },
   { season: "2020-21", player: "Harry Kane", slug: "harry-kane", club: "Tottenham Hotspur", goals: 23 },

@@ -1,11 +1,13 @@
 ---
 import Base from "../../../layouts/Base.astro";
 import KitIllustration from "../../../components/KitIllustration.astro";
+import DataNotice from "../../../components/DataNotice.astro";
 import { allClubKitArchives } from "../../../data/kits/index";
+import type { ClubKitArchive, HistoricKit } from "../../../data/kits/index";
 import { leagues } from "../../../data/leagues/index";
 
 export function getStaticPaths() {
-  const paths: any[] = [];
+  const paths: { params: { slug: string; kit: string }; props: { club: ClubKitArchive; kit: HistoricKit } }[] = [];
   for (const club of allClubKitArchives) {
     for (const kit of club.kits) {
       paths.push({
@@ -17,8 +19,8 @@ export function getStaticPaths() {
   return paths;
 }
 
-const { club, kit } = Astro.props;
-const league = leagues.find(l => l.slug === club.leagueSlug);
+const { club, kit } = Astro.props as { club: ClubKitArchive; kit: HistoricKit };
+const league = leagues.find((l) => l.slug === club.leagueSlug);
 const typeLabel: Record<string, string> = { home: "Home Kit", away: "Away Kit", third: "Third Kit", goalkeeper: "Goalkeeper Kit" };
 const label = typeLabel[kit.type] || kit.type;
 
@@ -33,8 +35,8 @@ const breadcrumbSchema = JSON.stringify({
   ],
 });
 
-const otherKitsSameSeason = club.kits.filter(k => k.season === kit.season && k.type !== kit.type);
-const adjacentSeasons = [...new Set(club.kits.map(k => k.season))].sort((a, b) => b.localeCompare(a));
+const otherKitsSameSeason = club.kits.filter((k: HistoricKit) => k.season === kit.season && k.type !== kit.type);
+const adjacentSeasons = [...new Set(club.kits.map((k: HistoricKit) => k.season))].sort((a: string, b: string) => b.localeCompare(a));
 const currentIdx = adjacentSeasons.indexOf(kit.season);
 const prevSeason = currentIdx < adjacentSeasons.length - 1 ? adjacentSeasons[currentIdx + 1] : null;
 const nextSeason = currentIdx > 0 ? adjacentSeasons[currentIdx - 1] : null;
@@ -51,8 +53,9 @@ const typeShort: Record<string, string> = { home: "Home", away: "Away", third: "
   description={`${club.club} ${kit.season} ${label.toLowerCase()} made by ${kit.manufacturer}${kit.sponsor ? `, sponsored by ${kit.sponsor}` : ""}. Find where to buy this shirt on eBay, Classic Football Shirts and other retailers.`}
   canonical={`/kits/${club.clubSlug}/${kit.season}-${kit.type}/`}
   accentColor={league?.accentColor}
+  robots="noindex, follow"
 >
-  <script type="application/ld+json" set:html={breadcrumbSchema} />
+  <script is:inline type="application/ld+json" set:html={breadcrumbSchema} />
 
   <div class="container">
     <nav class="breadcrumbs" aria-label="Breadcrumb">
@@ -72,6 +75,8 @@ const typeShort: Record<string, string> = { home: "Home", away: "Away", third: "
         {kit.sponsor && <span> &mdash; Sponsored by <strong>{kit.sponsor}</strong></span>}
       </p>
     </section>
+
+    <DataNotice status="illustrative" />
 
     <div class="kit-detail-layout">
       <div class="kit-visual-panel">
@@ -161,28 +166,28 @@ const typeShort: Record<string, string> = { home: "Home", away: "Away", third: "
         <div class="section">
           <h2 class="section-title">Where to Buy</h2>
           <div class="kit-buy-stack">
-            <a href={cfsUrl} rel="nofollow sponsored" target="_blank" class="kit-buy-btn kit-buy-featured">
+            <a href={cfsUrl} rel="nofollow noopener" target="_blank" class="kit-buy-btn kit-buy-featured">
               <div>
                 <span class="kit-buy-name">Classic Football Shirts</span>
                 <span class="kit-buy-desc">Authenticated vintage kits</span>
               </div>
               <span class="kit-buy-arrow">&rarr;</span>
             </a>
-            <a href={ebayUrl} rel="nofollow sponsored" target="_blank" class="kit-buy-btn">
+            <a href={ebayUrl} rel="nofollow noopener" target="_blank" class="kit-buy-btn">
               <div>
                 <span class="kit-buy-name">eBay</span>
                 <span class="kit-buy-desc">New & used shirts</span>
               </div>
               <span class="kit-buy-arrow">&rarr;</span>
             </a>
-            <a href={ebayRetroUrl} rel="nofollow sponsored" target="_blank" class="kit-buy-btn">
+            <a href={ebayRetroUrl} rel="nofollow noopener" target="_blank" class="kit-buy-btn">
               <div>
                 <span class="kit-buy-name">eBay &mdash; Retro Originals</span>
                 <span class="kit-buy-desc">Authentic vintage shirts</span>
               </div>
               <span class="kit-buy-arrow">&rarr;</span>
             </a>
-            <a href={vfsUrl} rel="nofollow sponsored" target="_blank" class="kit-buy-btn">
+            <a href={vfsUrl} rel="nofollow noopener" target="_blank" class="kit-buy-btn">
               <div>
                 <span class="kit-buy-name">Vintage Football Shirts</span>
                 <span class="kit-buy-desc">Retro & classic kits</span>
@@ -191,7 +196,7 @@ const typeShort: Record<string, string> = { home: "Home", away: "Away", third: "
             </a>
           </div>
           <p class="kit-buy-disclaimer">
-            Illustration is a stylised representation of kit colours, not the actual design. Links open external sites. We may earn commission from qualifying purchases.
+            Illustration is a generated representation of colours, not the actual design. Links run retailer searches; Last Season currently receives no commission from them.
           </p>
         </div>
       </div>

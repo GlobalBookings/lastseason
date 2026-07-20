@@ -7,6 +7,7 @@ interface Props {
 }
 
 const { scorers, title = "Top Scorers" } = Astro.props;
+const showAssists = scorers.some((scorer) => scorer.assists !== undefined);
 ---
 
 <section class="section" id="scorers">
@@ -19,7 +20,7 @@ const { scorers, title = "Top Scorers" } = Astro.props;
           <th scope="col">Player</th>
           <th scope="col">Club</th>
           <th class="num" scope="col">Goals</th>
-          <th class="num" scope="col">Assists</th>
+          {showAssists && <th class="num" scope="col">Assists</th>}
         </tr>
       </thead>
       <tbody>
@@ -29,7 +30,7 @@ const { scorers, title = "Top Scorers" } = Astro.props;
             <td><a href={`/players/${s.playerSlug}/`}>{s.name}</a></td>
             <td><a href={`/clubs/${s.clubSlug}/`}>{s.club}</a></td>
             <td class="num"><strong>{s.goals}</strong></td>
-            <td class="num">{s.assists}</td>
+            {showAssists && <td class="num">{s.assists ?? "—"}</td>}
           </tr>
         ))}
       </tbody>

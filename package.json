@@ -8,6 +8,9 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "check": "astro check",
+    "audit:data": "node scripts/audit-seasons.mjs",
+    "validate": "npm run check && npm run build",
     "preview": "astro preview",
     "astro": "astro"
   },

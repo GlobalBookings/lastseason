@@ -7,8 +7,8 @@ const data: SeasonData = {
   seasonDisplay: "2023-24",
   champion: "Manchester City",
   championSlug: "manchester-city",
-  topScorer: "Cole Palmer",
-  topScorerGoals: 22,
+  topScorer: "Erling Haaland",
+  topScorerGoals: 27,
   totalGoals: 1246,
   standings: [
     { pos: 1, club: "Manchester City", clubSlug: "manchester-city", p: 38, w: 28, d: 7, l: 3, gf: 96, ga: 34, gd: 62, pts: 91, zone: "cl" },
@@ -33,8 +33,8 @@ const data: SeasonData = {
     { pos: 20, club: "Sheffield United", clubSlug: "sheffield-united", p: 38, w: 3, d: 7, l: 28, gf: 35, ga: 104, gd: -69, pts: 16, zone: "relegation" },
   ],
   scorers: [
+    { name: "Erling Haaland", playerSlug: "erling-haaland", club: "Manchester City", clubSlug: "manchester-city", goals: 27, assists: 5 },
     { name: "Cole Palmer", playerSlug: "cole-palmer", club: "Chelsea", clubSlug: "chelsea", goals: 22, assists: 11 },
-    { name: "Erling Haaland", playerSlug: "erling-haaland", club: "Manchester City", clubSlug: "manchester-city", goals: 21, assists: 5 },
     { name: "Alexander Isak", playerSlug: "alexander-isak", club: "Newcastle United", clubSlug: "newcastle-united", goals: 21, assists: 2 },
     { name: "Phil Foden", playerSlug: "phil-foden", club: "Manchester City", clubSlug: "manchester-city", goals: 19, assists: 8 },
     { name: "Dominic Solanke", playerSlug: "dominic-solanke", club: "AFC Bournemouth", clubSlug: "bournemouth", goals: 19, assists: 3 },

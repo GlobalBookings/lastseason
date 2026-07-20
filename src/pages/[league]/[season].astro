@@ -6,22 +6,15 @@ import AssistersTable from "../../components/AssistersTable.astro";
 import CleanSheetsTable from "../../components/CleanSheetsTable.astro";
 import Awards from "../../components/Awards.astro";
 import RelegationPromotion from "../../components/RelegationPromotion.astro";
-import BettingCta from "../../components/BettingCta.astro";
-import { leagues } from "../../data/leagues/index";
-import { getSeasonData, getAdjacentSeasons, getLeague } from "../../utils/data";
+import DataNotice from "../../components/DataNotice.astro";
+import { getSeasonData, getAdjacentSeasons, getLeague, getAllSeasonPaths, unverifiedSeasonKeys } from "../../utils/data";
 import { buildSeasonSchema } from "../../utils/schema";
 
 export function getStaticPaths() {
-  const paths: any[] = [];
-  for (const league of leagues) {
-    for (const season of league.seasons) {
-      paths.push({
-        params: { league: league.slug, season },
-        props: { leagueSlug: league.slug, season },
-      });
-    }
-  }
-  return paths;
+  return getAllSeasonPaths().map(({ leagueSlug, season }) => ({
+    params: { league: leagueSlug, season },
+    props: { leagueSlug, season },
+  }));
 }
 
 const { leagueSlug, season } = Astro.props;
@@ -33,8 +26,9 @@ if (!data || !league) {
   return Astro.redirect("/404");
 }
 
-const schema = buildSeasonSchema(data);
 const narrativeParagraphs = data.narrative.split("\n\n").filter(Boolean);
+const isUnverified = unverifiedSeasonKeys.has(`${leagueSlug}/${season}`);
+const schema = isUnverified ? undefined : buildSeasonSchema(data);
 
 const breadcrumbSchema = JSON.stringify({
   "@context": "https://schema.org",
@@ -46,31 +40,6 @@ const breadcrumbSchema = JSON.stringify({
   ],
 });
 
-const faqSchema = JSON.stringify({
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": `Who won the ${data.league} in ${data.seasonDisplay}?`,
-      "acceptedAnswer": { "@type": "Answer", "text": `${data.champion} won the ${data.league} ${data.seasonDisplay} season.` },
-    },
-    {
-      "@type": "Question",
-      "name": `Who was the top scorer in the ${data.league} ${data.seasonDisplay}?`,
-      "acceptedAnswer": { "@type": "Answer", "text": `${data.topScorer} was the top scorer with ${data.topScorerGoals} goals.` },
-    },
-    {
-      "@type": "Question",
-      "name": `Who was relegated from the ${data.league} in ${data.seasonDisplay}?`,
-      "acceptedAnswer": { "@type": "Answer", "text": data.relegated.length > 0 ? `${data.relegated.join(", ")} were relegated.` : "No teams were relegated." },
-    },
-  ],
-});
-
-const combinedSchema = `${schema}
-<script type="application/ld+json">${breadcrumbSchema}</script>
-<script type="application/ld+json">${faqSchema}</script>`;
 ---
 
 <Base
@@ -79,9 +48,9 @@ const combinedSchema = `${schema}
   canonical={`/${leagueSlug}/${season}/`}
   schema={schema}
   accentColor={league.accentColor}
+  robots={isUnverified ? "noindex, follow" : undefined}
 >
-  <script type="application/ld+json" set:html={breadcrumbSchema} />
-  <script type="application/ld+json" set:html={faqSchema} />
+  <script is:inline type="application/ld+json" set:html={breadcrumbSchema} />
 
   <div class="container">
     <nav class="breadcrumbs" aria-label="Breadcrumb">
@@ -115,6 +84,14 @@ const combinedSchema = `${schema}
       </div>
     </section>
 
+    <DataNotice leagueSlug={leagueSlug} status={isUnverified ? "review" : "verified"} />
+
+    <div class="tool-actions section" aria-label="Explore and download this season">
+      <a class="button" href={`/tools/season-compare/?a=${leagueSlug}-${season}`}>Compare this season</a>
+      <a class="button button--secondary" href={`/tools/table-calculator/?season=${leagueSlug}-${season}`}>Recalculate table</a>
+      {!isUnverified && <a class="button button--secondary" href={`/data/${leagueSlug}/${season}.csv`} download>Download table CSV</a>}
+    </div>
+
     <section class="section" id="table">
       <h2 class="section-title">Final Table</h2>
       <StandingsTable standings={data.standings} leagueSlug={leagueSlug} />
@@ -131,8 +108,6 @@ const combinedSchema = `${schema}
         {narrativeParagraphs.map((p) => <p>{p}</p>)}
       </div>
     </section>
-
-    <BettingCta league={data.league} />
 
     <RelegationPromotion relegated={data.relegated} promoted={data.promoted} />
 

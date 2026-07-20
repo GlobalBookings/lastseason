@@ -2,32 +2,34 @@
 import Base from "../layouts/Base.astro";
 import SeasonCard from "../components/SeasonCard.astro";
 import { leagues } from "../data/leagues/index";
-import { getSeasonData, getAllLoadedSeasons } from "../utils/data";
-import { plAllTimeScorers, plWinners, plGoldenBoots, plTitleCounts } from "../data/records/premier-league";
+import { getSeasonData, getAllLoadedSeasons, unverifiedSeasonKeys } from "../utils/data";
+import { plGoldenBoots, plTitleCounts } from "../data/records/premier-league";
 
 const allSeasons = getAllLoadedSeasons();
 const totalSeasons = allSeasons.length;
 const totalClubs = new Set(allSeasons.flatMap(s => s.standings.map(r => r.clubSlug))).size;
 const totalGoals = allSeasons.reduce((sum, s) => sum + s.totalGoals, 0);
-const totalPlayers = new Set(allSeasons.flatMap(s => s.scorers.map(sc => sc.playerSlug))).size;
-
-const latestWinner = plWinners[0];
+const latestPremierLeagueSeason = leagues[0].seasons[0];
+const latestPremierLeague = getSeasonData("premier-league", latestPremierLeagueSeason)!;
+const latestChampionRow = latestPremierLeague.standings.find((row) => row.clubSlug === latestPremierLeague.championSlug);
 const latestGoldenBoot = plGoldenBoots[0];
+const latestTitleCount = plTitleCounts.find((item) => item.club === latestPremierLeague.champion)?.titles;
+const reviewedLeagues = leagues.filter((league) => league.seasons.some((season) => !unverifiedSeasonKeys.has(`${league.slug}/${season}`)));
 ---
 
 <Base
-  title="Last Season  -  Every Season. Every Stat. Football History Archived."
-  description="Historical football stats archived. Final tables, top scorers, season reviews, club records, kits and more across the Premier League, La Liga, Bundesliga, Serie A, Ligue 1 and MLS."
+  title="Last Season  -  Completed Football Seasons, Tables & Tools"
+  description="Explore a growing archive of completed football seasons, final tables and leading scorers. Compare seasons, recalculate points and download reviewed table data."
   canonical="/"
 >
   <section class="home-hero" style="background-image: url('/img/hero-floodlights.jpg');">
     <div class="container">
-      <h1>Every season.<br />Every stat.</h1>
-      <p class="subtitle">The definitive archive of football history. Final tables, top scorers, records and full season reviews across Europe's top leagues.</p>
+      <h1>Football seasons,<br />made explorable.</h1>
+      <p class="subtitle">A growing archive of completed seasons, final tables and leading scorers, with interactive comparisons and transparent source notes.</p>
       <div class="hero-stats">
         <div class="hero-stat">
-          <span class="hero-stat-value">{leagues.length}</span>
-          <span class="hero-stat-label">Leagues</span>
+          <span class="hero-stat-value">{reviewedLeagues.length}</span>
+          <span class="hero-stat-label">Reviewed Leagues</span>
         </div>
         <div class="hero-stat">
           <span class="hero-stat-value">{totalSeasons}</span>
@@ -44,7 +46,8 @@ const latestGoldenBoot = plGoldenBoots[0];
       </div>
       <div class="hero-cta">
         <a href="/premier-league/" class="btn btn-primary">Browse Premier League</a>
-        <a href="/records/" class="btn btn-outline">Records & Stats</a>
+        <a href="/search/" class="btn btn-outline">Search the archive</a>
+        <a href="/tools/" class="btn btn-outline">Open the tools</a>
       </div>
     </div>
   </section>
@@ -75,15 +78,19 @@ const latestGoldenBoot = plGoldenBoots[0];
         <span class="quick-link-icon">&#127969;</span>
         <span class="quick-link-text">All Clubs</span>
       </a>
+      <a href="/tools/season-compare/" class="quick-link">
+        <span class="quick-link-icon">&#8644;</span>
+        <span class="quick-link-text">Compare Seasons</span>
+      </a>
     </section>
 
     <section class="latest-section">
       <h2 class="section-title">Latest Headlines</h2>
       <div class="headline-grid">
-        <a href="/premier-league/2023-24/" class="headline-card headline-card--feature">
-          <span class="headline-label">Latest Season</span>
-          <span class="headline-title">Premier League 2023-24</span>
-          <span class="headline-sub">{latestWinner.winner} won their {plTitleCounts.find(t => t.club === latestWinner.winner)?.titles}th title with {latestWinner.points} points</span>
+        <a href={`/premier-league/${latestPremierLeagueSeason}/`} class="headline-card headline-card--feature">
+          <span class="headline-label">Latest Published Season</span>
+          <span class="headline-title">Premier League {latestPremierLeagueSeason}</span>
+          <span class="headline-sub">{latestPremierLeague.champion} won Premier League title number {latestTitleCount} with {latestChampionRow?.pts} points</span>
         </a>
         <a href="/records/all-time-top-scorers/" class="headline-card">
           <span class="headline-label">All-Time Record</span>
@@ -98,9 +105,19 @@ const latestGoldenBoot = plGoldenBoots[0];
       </div>
     </section>
 
+    <section class="section">
+      <h2 class="section-title">Use the archive</h2>
+      <div class="tool-grid">
+        <a class="tool-card" href="/tools/season-compare/"><h3>Season comparison</h3><p>Put champions, points, goals and leading scorers side by side.</p></a>
+        <a class="tool-card" href="/tools/table-calculator/"><h3>Points calculator</h3><p>See how a final table changes under different win and draw points.</p></a>
+        <a class="tool-card" href="/tools/club-history/"><h3>Club history explorer</h3><p>Trace a club's published league finishes across the archive.</p></a>
+      </div>
+    </section>
+
     <div class="home-leagues">
-      {leagues.map((league) => {
-        const latestSeason = league.seasons[0];
+      {reviewedLeagues.map((league) => {
+        const reviewedSeasons = league.seasons.filter((season) => !unverifiedSeasonKeys.has(`${league.slug}/${season}`));
+        const latestSeason = reviewedSeasons[0];
         const data = getSeasonData(league.slug, latestSeason);
         return (
           <section class="league-section">
@@ -119,7 +136,7 @@ const latestGoldenBoot = plGoldenBoots[0];
                   totalGoals={data.totalGoals}
                   accentColor={league.accentColor}
                 />
-                {league.seasons.slice(1, 3).map((s) => {
+                {reviewedSeasons.slice(1, 3).map((s) => {
                   const sd = getSeasonData(league.slug, s);
                   return sd ? (
                     <SeasonCard

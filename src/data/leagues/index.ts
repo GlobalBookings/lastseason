@@ -13,7 +13,7 @@ export const leagues: League[] = [
     slug: "championship",
     country: "England",
     accentColor: "#c8102e",
-    seasons: ["2023-24", "2022-23", "2021-22"],
+    seasons: ["2024-25", "2023-24", "2022-23", "2021-22"],
   },
   {
     name: "La Liga",
@@ -27,14 +27,14 @@ export const leagues: League[] = [
     slug: "bundesliga",
     country: "Germany",
     accentColor: "#d20515",
-    seasons: ["2023-24", "2022-23"],
+    seasons: ["2024-25", "2023-24", "2022-23"],
   },
   {
     name: "Serie A",
     slug: "serie-a",
     country: "Italy",
     accentColor: "#024494",
-    seasons: ["2023-24", "2022-23"],
+    seasons: ["2024-25", "2023-24", "2022-23"],
   },
   {
     name: "Ligue 1",

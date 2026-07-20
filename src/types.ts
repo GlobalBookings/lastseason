@@ -27,7 +27,7 @@ export interface Scorer {
   club: string;
   clubSlug: string;
   goals: number;
-  assists: number;
+  assists?: number;
 }
 
 export interface Assister {

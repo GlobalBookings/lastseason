@@ -87,8 +87,6 @@ function generateClubKits(def: ClubKitDef): ClubKitArchive {
 
 const PL = "Premier League";
 const PLS = "premier-league";
-const CH = "Championship";
-const CHS = "championship";
 const LL = "La Liga";
 const LLS = "la-liga";
 const BL = "Bundesliga";
@@ -99,8 +97,6 @@ const L1 = "Ligue 1";
 const L1S = "ligue-1";
 const SP = "Scottish Premiership";
 const SPS = "scottish-premiership";
-const MLS_N = "MLS";
-const MLS_S = "mls";
 
 const clubDefs: ClubKitDef[] = [
   // ---- PREMIER LEAGUE ----

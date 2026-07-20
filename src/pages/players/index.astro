@@ -20,9 +20,10 @@ const players = Array.from(playerMap.values()).sort((a, b) => b.goals - a.goals)
 ---
 
 <Base
-  title="All Players  -  Career Stats & Goal Records"
-  description="Browse all football players tracked at Last Season with career goals, assists and season-by-season stats across multiple leagues."
+  title="Players in the Published Season Archive"
+  description="Browse players found in reviewed Last Season datasets. Totals cover only the published seasons and categories shown."
   canonical="/players/"
+  robots="noindex, follow"
 >
   <div class="container">
     <nav class="breadcrumbs" aria-label="Breadcrumb">
@@ -33,7 +34,7 @@ const players = Array.from(playerMap.values()).sort((a, b) => b.goals - a.goals)
 
     <section class="page-hero">
       <h1>All Players</h1>
-      <p class="subtitle">{players.length} players tracked, sorted by total goals</p>
+      <p class="subtitle">{players.length} players found, sorted by goals in the published archive—not career totals</p>
     </section>
 
     <section class="section">

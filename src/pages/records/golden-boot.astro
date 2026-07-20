@@ -53,9 +53,10 @@ const seasonToSlug = (s: string) => s.toLowerCase();
   title="Premier League Golden Boot Winners  -  Every Top Scorer by Season"
   description="Every Premier League Golden Boot winner from 1992-93 to 2024-25. See which player finished as the top scorer in every Premier League season, with goals and clubs."
   canonical="/records/golden-boot/"
+  robots="noindex, follow"
 >
-  <script type="application/ld+json" set:html={breadcrumbSchema} />
-  <script type="application/ld+json" set:html={faqSchema} />
+  <script is:inline type="application/ld+json" set:html={breadcrumbSchema} />
+  <script is:inline type="application/ld+json" set:html={faqSchema} />
 
   <div class="container">
     <nav class="breadcrumbs" aria-label="Breadcrumb">

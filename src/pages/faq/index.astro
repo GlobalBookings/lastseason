@@ -23,8 +23,9 @@ const breadcrumbSchema = JSON.stringify({
   title="Football FAQ  -  Answers to the Most Searched Football Questions"
   description="Answers to the most commonly searched football questions. Premier League rules, transfers, Champions League, world football, and the laws of the game  -  all explained."
   canonical="/faq/"
+  robots="noindex, follow"
 >
-  <script type="application/ld+json" set:html={breadcrumbSchema} />
+  <script is:inline type="application/ld+json" set:html={breadcrumbSchema} />
 
   <div class="container">
     <nav class="breadcrumbs" aria-label="Breadcrumb">
@@ -46,8 +47,8 @@ const breadcrumbSchema = JSON.stringify({
           <span class="hero-stat-label">Questions Answered</span>
         </div>
         <div class="hero-stat">
-          <span class="hero-stat-value">100%</span>
-          <span class="hero-stat-label">Fact-Checked</span>
+          <span class="hero-stat-value">Plain</span>
+          <span class="hero-stat-label">English Answers</span>
         </div>
       </div>
     </section>
@@ -68,7 +69,7 @@ const breadcrumbSchema = JSON.stringify({
       <h2 class="section-title">About Our FAQ</h2>
       <div class="narrative">
         <p>These pages answer the questions that millions of football fans search for every month. Whether you're new to the sport or settling a debate with a mate, we've got you covered with clear, accurate answers backed by data.</p>
-        <p>Every answer is fact-checked against official sources and updated regularly. For deeper dives into the stats, head to our <a href="/records/">Records &amp; Stats</a> section or browse individual <a href="/premier-league/">league pages</a> for full season archives.</p>
+        <p>Rules and competitions change, so check the governing body's current regulations before relying on an answer. For source scope and corrections, see our <a href="/methodology/">methodology</a>. For deeper dives, visit <a href="/records/">Records &amp; Stats</a> or a <a href="/premier-league/">league archive</a>.</p>
       </div>
     </section>
   </div>

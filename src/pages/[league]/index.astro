@@ -1,6 +1,7 @@
 ---
 import Base from "../../layouts/Base.astro";
 import SeasonCard from "../../components/SeasonCard.astro";
+import DataNotice from "../../components/DataNotice.astro";
 import { leagues } from "../../data/leagues/index";
 import { getSeasonData } from "../../utils/data";
 
@@ -23,12 +24,13 @@ const breadcrumbSchema = JSON.stringify({
 ---
 
 <Base
-  title={`${league.name}  -  All Seasons, Tables & Stats`}
-  description={`Every archived season for the ${league.name}. Final tables, top scorers, relegation, promotion and full season reviews.`}
+  title={`${league.name}  -  Published Seasons, Tables & Stats`}
+  description={`The published ${league.name} archive: final tables, leading scorers and season reviews, with source and review status shown.`}
   canonical={`/${league.slug}/`}
   accentColor={league.accentColor}
+  robots={league.slug === "mls" ? "noindex, follow" : undefined}
 >
-  <script type="application/ld+json" set:html={breadcrumbSchema} />
+  <script is:inline type="application/ld+json" set:html={breadcrumbSchema} />
 
   <div class="container">
     <nav class="breadcrumbs" aria-label="Breadcrumb">
@@ -39,8 +41,10 @@ const breadcrumbSchema = JSON.stringify({
 
     <section class="page-hero">
       <h1>{league.name}</h1>
-      <p class="subtitle">{league.country} &mdash; {league.seasons.length} seasons archived</p>
+      <p class="subtitle">{league.country} &mdash; {league.seasons.length} published seasons</p>
     </section>
+
+    <DataNotice leagueSlug={league.slug} status={league.slug === "mls" ? "illustrative" : "review"} />
 
     <section class="section">
       <h2 class="section-title">All Seasons</h2>

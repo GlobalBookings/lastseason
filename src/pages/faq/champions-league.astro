@@ -61,9 +61,10 @@ const faqSchema = JSON.stringify({
   title="Champions League FAQ  -  Format, History & Records"
   description="How the Champions League works, who has won the most titles, qualification rules, prize money, the anthem, Europa League and all-time top scorers  -  all explained."
   canonical="/faq/champions-league/"
+  robots="noindex, follow"
 >
-  <script type="application/ld+json" set:html={breadcrumbSchema} />
-  <script type="application/ld+json" set:html={faqSchema} />
+  <script is:inline type="application/ld+json" set:html={breadcrumbSchema} />
+  <script is:inline type="application/ld+json" set:html={faqSchema} />
 
   <div class="container">
     <nav class="breadcrumbs" aria-label="Breadcrumb">

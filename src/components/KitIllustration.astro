@@ -8,13 +8,12 @@ interface Props {
   manufacturer?: string;
 }
 
-const { primary, secondary, tertiary, type = "home", size = "md", manufacturer } = Astro.props;
+const { primary, secondary, size = "md" } = Astro.props;
 
 const sizes = { sm: { w: 80, h: 96 }, md: { w: 140, h: 168 }, lg: { w: 200, h: 240 } };
 const { w, h } = sizes[size];
 
 const contrast = secondary;
-const accent = tertiary || secondary;
 ---
 
 <div class={`kit-illustration kit-illustration-${size}`} aria-hidden="true">

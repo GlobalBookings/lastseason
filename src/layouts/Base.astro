@@ -8,11 +8,23 @@ interface Props {
   schema?: string;
   accentColor?: string;
   ogType?: string;
+  image?: string;
+  robots?: string;
 }
 
-const { title, description, canonical, schema, accentColor, ogType = "website" } = Astro.props;
+const {
+  title,
+  description,
+  canonical,
+  schema,
+  accentColor,
+  ogType = "website",
+  image = "/img/hero-floodlights.jpg",
+  robots = "index, follow, max-snippet:-1, max-image-preview:large",
+} = Astro.props;
 const siteUrl = "https://lastseason.co.uk";
-const fullCanonical = canonical ? `${siteUrl}${canonical}` : siteUrl;
+const fullCanonical = canonical?.startsWith("http") ? canonical : canonical ? `${siteUrl}${canonical}` : siteUrl;
+const fullImage = image.startsWith("http") ? image : `${siteUrl}${image}`;
 const fullTitle = title.includes("Last Season") ? title : `${title} | Last Season`;
 ---
 
@@ -24,11 +36,9 @@ const fullTitle = title.includes("Last Season") ? title : `${title} | Last Seaso
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={fullCanonical} />
-    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
+    <meta name="robots" content={robots} />
+    <meta name="theme-color" content="#0f1923" />
 
-    <!-- Geo targeting for UK -->
-    <meta name="geo.region" content="GB" />
-    <meta name="geo.placename" content="United Kingdom" />
     <link rel="alternate" hreflang="en-GB" href={fullCanonical} />
     <link rel="alternate" hreflang="x-default" href={fullCanonical} />
 
@@ -39,51 +49,53 @@ const fullTitle = title.includes("Last Season") ? title : `${title} | Last Seaso
     <meta property="og:url" content={fullCanonical} />
     <meta property="og:site_name" content="Last Season" />
     <meta property="og:locale" content="en_GB" />
+    <meta property="og:image" content={fullImage} />
+    <meta property="og:image:alt" content="Last Season football archive" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
-
-    <!-- Bing specific -->
-    <meta name="msvalidate.01" content="" />
+    <meta name="twitter:image" content={fullImage} />
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
 
-    <!-- Font: Inter (preload for performance) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'" />
-
     <!-- Schema markup -->
-    {schema && <script type="application/ld+json" set:html={schema} />}
+    {schema && <script is:inline type="application/ld+json" set:html={schema} />}
 
-    <!-- Site-wide Organization schema -->
-    <script type="application/ld+json" set:html={JSON.stringify({
+    <script is:inline type="application/ld+json" set:html={JSON.stringify({
       "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "Last Season",
-      "url": siteUrl,
-      "description": "Historical football season data  -  final tables, top scorers, season reviews.",
-      "inLanguage": "en-GB",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": `${siteUrl}/#organization`,
+          "name": "Last Season",
+          "url": siteUrl,
+          "logo": `${siteUrl}/favicon.svg`,
+          "email": "hello@lastseason.co.uk",
+        },
+        {
+          "@type": "WebSite",
+          "@id": `${siteUrl}/#website`,
+          "name": "Last Season",
+          "url": siteUrl,
+          "publisher": { "@id": `${siteUrl}/#organization` },
+          "description": "An interactive archive of completed football seasons, final tables, scorers and club history.",
+          "inLanguage": "en-GB",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": `${siteUrl}/search/?q={search_term_string}`,
+            "query-input": "required name=search_term_string",
+          },
+        },
+      ],
     })} />
 
     <!-- Accent colour override -->
     {accentColor && <style set:html={`:root { --accent: ${accentColor}; --accent-light: ${accentColor}12; }`} />}
 
-    <!-- Ezoic: add script tag here once account is active -->
-
-    <!-- Google Analytics 4 -->
-    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-C2K4PMZEDJ"></script>
-    <script is:inline>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-C2K4PMZEDJ');
-    </script>
   </head>
   <body>
     <a href="#main-content" class="skip-link">Skip to content</a>
@@ -104,9 +116,9 @@ const fullTitle = title.includes("Last Season") ? title : `${title} | Last Seaso
             <a href="/serie-a/">Serie A</a>
             <a href="/ligue-1/">Ligue 1</a>
             <a href="/scottish-premiership/">Scottish Prem</a>
-            <a href="/mls/">MLS</a>
-            <a href="/kits/" style="color:rgba(255,255,255,0.95);background:rgba(255,255,255,0.08);border-radius:6px;">Kits</a>
-            <a href="/records/" style="color:rgba(255,255,255,0.95);background:rgba(255,255,255,0.08);border-radius:6px;">Records</a>
+            <a href="/tools/" class="nav-feature">Tools</a>
+            <a href="/records/" class="nav-feature">Records</a>
+            <a href="/search/" class="nav-search" aria-label="Search Last Season">Search</a>
           </nav>
 
           <button class="nav-toggle" aria-label="Open menu" aria-expanded="false" id="nav-toggle">
@@ -130,11 +142,13 @@ const fullTitle = title.includes("Last Season") ? title : `${title} | Last Seaso
         <a href="/scottish-premiership/">Scottish Premiership</a>
         <a href="/mls/">MLS</a>
         <div class="nav-section-title">Browse</div>
-        <a href="/kits/">Kits 2024-25</a>
+        <a href="/kits/">Kit Colour Archive</a>
         <a href="/records/">Records & Stats</a>
         <a href="/faq/">Football FAQ</a>
         <a href="/clubs/">All Clubs</a>
         <a href="/players/">All Players</a>
+        <a href="/tools/">Interactive Tools</a>
+        <a href="/search/">Search</a>
       </div>
     </header>
 
@@ -166,24 +180,46 @@ const fullTitle = title.includes("Last Season") ? title : `${title} | Last Seaso
           <div>
             <div class="footer-heading">Site</div>
             <ul class="footer-link-list">
-              <li><a href="/kits/">Kits 2024-25</a></li>
+              <li><a href="/tools/">Interactive Tools</a></li>
+              <li><a href="/search/">Search</a></li>
+              <li><a href="/kits/">Kit Colour Archive</a></li>
               <li><a href="/records/">Records & Stats</a></li>
               <li><a href="/faq/">Football FAQ</a></li>
               <li><a href="/clubs/">All Clubs</a></li>
               <li><a href="/players/">All Players</a></li>
+            </ul>
+          </div>
+          <div>
+            <div class="footer-heading">Trust</div>
+            <ul class="footer-link-list">
+              <li><a href="/about/">About</a></li>
+              <li><a href="/methodology/">Methodology & Sources</a></li>
+              <li><a href="/corrections/">Corrections</a></li>
+              <li><a href="/partners/">Data & Partnerships</a></li>
               <li><a href="/privacy/">Privacy Policy</a></li>
               <li><a href="/cookies/">Cookie Policy</a></li>
+              <li><button class="footer-choice-button" type="button" data-reset-analytics>Privacy choices</button></li>
             </ul>
           </div>
         </div>
         <div class="footer-bottom">
           <p class="footer-legal">&copy; {new Date().getFullYear()} lastseason.co.uk</p>
-          <div class="gambling-disclaimer">
-            18+ | <a href="https://www.begambleaware.org" rel="nofollow" target="_blank">BeGambleAware.org</a> | When the fun stops, stop. Affiliate links on this site may earn commission. All betting links carry rel="nofollow sponsored". T&Cs apply.
-          </div>
+          <p class="footer-legal">Independent football archive. Corrections are welcomed and logged.</p>
         </div>
       </div>
     </footer>
+
+    <aside class="privacy-choice" id="privacy-choice" hidden aria-label="Privacy choices" aria-live="polite">
+      <div>
+        <strong>Your privacy choices</strong>
+        <p>We use optional, privacy-conscious analytics to understand which archive pages are useful. No advertising trackers are loaded.</p>
+        <a href="/cookies/">Cookie details</a>
+      </div>
+      <div class="privacy-choice-actions">
+        <button type="button" data-analytics-choice="denied">Reject analytics</button>
+        <button type="button" class="privacy-accept" data-analytics-choice="granted">Allow analytics</button>
+      </div>
+    </aside>
 
     <script is:inline>
       const toggle = document.getElementById("nav-toggle");
@@ -192,12 +228,46 @@ const fullTitle = title.includes("Last Season") ? title : `${title} | Last Seaso
         toggle.addEventListener("click", () => {
           const open = nav.classList.toggle("is-open");
           toggle.setAttribute("aria-expanded", String(open));
+          document.body.classList.toggle("nav-open", open);
         });
       }
       document.querySelectorAll(".table-wrap").forEach(wrap => {
         const check = () => wrap.classList.toggle("is-scrollable", wrap.scrollWidth > wrap.clientWidth + 2);
         check();
         window.addEventListener("resize", check);
+      });
+
+      const analyticsKey = "lastseason-analytics-choice";
+      const privacyChoice = document.getElementById("privacy-choice");
+      const loadAnalytics = () => {
+        if (document.querySelector('script[data-lastseason-analytics]')) return;
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = function(){ window.dataLayer.push(arguments); };
+        window.gtag("js", new Date());
+        window.gtag("config", "G-C2K4PMZEDJ", { anonymize_ip: true });
+        const script = document.createElement("script");
+        script.async = true;
+        script.dataset.lastseasonAnalytics = "true";
+        script.src = "https://www.googletagmanager.com/gtag/js?id=G-C2K4PMZEDJ";
+        document.head.appendChild(script);
+      };
+      let analyticsChoice = null;
+      try { analyticsChoice = localStorage.getItem(analyticsKey); } catch {}
+      if (analyticsChoice === "granted") loadAnalytics();
+      if (!analyticsChoice && privacyChoice) privacyChoice.hidden = false;
+      document.querySelectorAll("[data-analytics-choice]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const choice = button.getAttribute("data-analytics-choice");
+          try { localStorage.setItem(analyticsKey, choice); } catch {}
+          if (choice === "granted") loadAnalytics();
+          if (privacyChoice) privacyChoice.hidden = true;
+        });
+      });
+      document.querySelectorAll("[data-reset-analytics]").forEach((button) => {
+        button.addEventListener("click", () => {
+          try { localStorage.removeItem(analyticsKey); } catch {}
+          if (privacyChoice) privacyChoice.hidden = false;
+        });
       });
     </script>
   </body>

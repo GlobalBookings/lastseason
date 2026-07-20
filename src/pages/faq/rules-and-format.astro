@@ -69,9 +69,10 @@ const faqSchema = JSON.stringify({
   title="Football Rules FAQ  -  Offside, VAR, Substitutions & More"
   description="Football rules explained simply. Offside, VAR, substitutions, extra time, penalties, yellow and red cards, injury time and more  -  clear answers for fans and newcomers."
   canonical="/faq/rules-and-format/"
+  robots="noindex, follow"
 >
-  <script type="application/ld+json" set:html={breadcrumbSchema} />
-  <script type="application/ld+json" set:html={faqSchema} />
+  <script is:inline type="application/ld+json" set:html={breadcrumbSchema} />
+  <script is:inline type="application/ld+json" set:html={faqSchema} />
 
   <div class="container">
     <nav class="breadcrumbs" aria-label="Breadcrumb">

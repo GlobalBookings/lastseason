@@ -65,9 +65,10 @@ const faqSchema = JSON.stringify({
   title="World Football FAQ  -  Leagues, Cups & International Football"
   description="The English football pyramid, FA Cup, League Cup, World Cup, Ballon d'Or and promotion and relegation  -  answers to the most searched world football questions."
   canonical="/faq/world-football/"
+  robots="noindex, follow"
 >
-  <script type="application/ld+json" set:html={breadcrumbSchema} />
-  <script type="application/ld+json" set:html={faqSchema} />
+  <script is:inline type="application/ld+json" set:html={breadcrumbSchema} />
+  <script is:inline type="application/ld+json" set:html={faqSchema} />
 
   <div class="container">
     <nav class="breadcrumbs" aria-label="Breadcrumb">

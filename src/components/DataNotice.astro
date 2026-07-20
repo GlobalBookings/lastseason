@@ -1,0 +1,33 @@
+---
+import { leagueSources, siteReviewDate } from "../data/sources";
+
+interface Props {
+  leagueSlug?: string;
+  compact?: boolean;
+  status?: "verified" | "review" | "illustrative";
+}
+
+const { leagueSlug, compact = false, status = "review" } = Astro.props;
+const sources = leagueSlug ? (leagueSources[leagueSlug] ?? []) : [];
+const statusCopy = {
+  verified: "Automated consistency checks passed. Source links are provided for independent verification.",
+  review: "This material has a known consistency gap or remains under manual primary-source review. Use it cautiously.",
+  illustrative: "This material is illustrative and should not be treated as an authenticated historical record.",
+}[status];
+---
+
+<aside class:list={["data-notice", { "data-notice--compact": compact }]} aria-label="Data scope and sources">
+  <strong>Data scope</strong>
+  <span>{statusCopy}</span>
+  {sources.length > 0 && (
+    <span>
+      Sources: {sources.map((source, index) => (
+        <Fragment>
+          {index > 0 && ", "}
+          <a href={source.url} rel="noopener" target="_blank">{source.name}</a>
+        </Fragment>
+      ))}.
+    </span>
+  )}
+  <span>Site review: {siteReviewDate}. <a href="/methodology/">Methodology</a> · <a href="/corrections/">Report a correction</a></span>
+</aside>

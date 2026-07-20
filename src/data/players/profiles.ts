@@ -76,7 +76,7 @@ export const playerProfiles: PlayerProfile[] = [
     marketValue: "£100m",
     preferredFoot: "Right",
     shirtNumber: 20,
-    description: "Breakout Chelsea star who won the 2023-24 Premier League Golden Boot with 22 goals in his debut season at Stamford Bridge. An ice-cold finisher with elite vision and set-piece delivery.",
+    description: "Breakout Chelsea attacker who scored 22 Premier League goals in his debut season at Stamford Bridge. A creative finisher with strong vision and set-piece delivery.",
   },
   {
     name: "Declan Rice",

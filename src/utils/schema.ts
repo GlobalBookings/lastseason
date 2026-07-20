@@ -1,39 +1,33 @@
 import type { SeasonData } from "../types";
 
 export function buildSeasonSchema(data: SeasonData): string {
-  const schema = {
-    "@context": "https://schema.org",
-    "@type": "SportsEvent",
-    name: `${data.league} ${data.seasonDisplay} Season`,
-    description: data.metaDescription,
-    url: `https://lastseason.co.uk/${data.leagueSlug}/${data.season}/`,
-    location: {
-      "@type": "Country",
-      name: data.leagueSlug === "premier-league" || data.leagueSlug === "championship"
-        ? "England"
-        : data.leagueSlug === "la-liga"
-          ? "Spain"
-          : data.leagueSlug === "bundesliga"
-            ? "Germany"
-            : data.leagueSlug === "serie-a"
-              ? "Italy"
-              : data.leagueSlug === "ligue-1"
-                ? "France"
-                : data.leagueSlug === "scottish-premiership"
-                  ? "Scotland"
-                  : "United States",
-    },
-    competitor: data.standings.slice(0, 4).map((s) => ({
-      "@type": "SportsTeam",
-      name: s.club,
-    })),
-  };
+  const url = `https://lastseason.co.uk/${data.leagueSlug}/${data.season}/`;
+  const csvUrl = `https://lastseason.co.uk/data/${data.leagueSlug}/${data.season}.csv`;
 
-  const tableSchema = {
+  return JSON.stringify({
     "@context": "https://schema.org",
-    "@type": "Table",
-    about: `${data.league} ${data.seasonDisplay} Final Standings`,
-  };
-
-  return JSON.stringify([schema, tableSchema]);
+    "@graph": [
+      {
+        "@type": "Dataset",
+        "@id": `${url}#dataset`,
+        name: `${data.league} ${data.seasonDisplay} final table and season statistics`,
+        description: data.metaDescription,
+        url,
+        isAccessibleForFree: true,
+        inLanguage: "en-GB",
+        temporalCoverage: data.seasonDisplay,
+        creator: { "@id": "https://lastseason.co.uk/#organization" },
+        variableMeasured: ["Position", "Played", "Wins", "Draws", "Losses", "Goals for", "Goals against", "Goal difference", "Points"],
+        distribution: {
+          "@type": "DataDownload",
+          encodingFormat: "text/csv",
+          contentUrl: csvUrl,
+        },
+      },
+      {
+        "@type": "Table",
+        about: { "@id": `${url}#dataset` },
+      },
+    ],
+  });
 }

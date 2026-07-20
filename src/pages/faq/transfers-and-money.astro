@@ -69,9 +69,10 @@ const faqSchema = JSON.stringify({
   title="Football Transfers & Money FAQ  -  Salaries, Fees & Financial Fair Play"
   description="Everything you need to know about football transfers, player salaries, Financial Fair Play, release clauses, loan deals and the transfer window  -  all explained clearly."
   canonical="/faq/transfers-and-money/"
+  robots="noindex, follow"
 >
-  <script type="application/ld+json" set:html={breadcrumbSchema} />
-  <script type="application/ld+json" set:html={faqSchema} />
+  <script is:inline type="application/ld+json" set:html={breadcrumbSchema} />
+  <script is:inline type="application/ld+json" set:html={faqSchema} />
 
   <div class="container">
     <nav class="breadcrumbs" aria-label="Breadcrumb">

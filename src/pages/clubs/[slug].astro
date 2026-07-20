@@ -2,6 +2,7 @@
 import Base from "../../layouts/Base.astro";
 import { getAllLoadedSeasons } from "../../utils/data";
 import { clubProfiles } from "../../data/clubs/profiles";
+import DataNotice from "../../components/DataNotice.astro";
 
 export function getStaticPaths() {
   const allSeasons = getAllLoadedSeasons();
@@ -58,8 +59,8 @@ const pLeague = profile?.league ?? "";
 const pLeagueSlug = profile?.leagueSlug ?? "";
 
 const desc = hasProfile
-  ? `${club.name}  -  ${pNickname}. Stadium: ${pStadium} (${pCapacity}). Owner: ${pOwner}. Season history, stats and records.`
-  : `${club.name} season-by-season stats, league positions and history at Last Season.`;
+  ? `${club.name} published season history and an editorial club profile. Current-profile fields remain under review.`
+  : `${club.name} league positions and statistics across seasons published by Last Season.`;
 
 const breadcrumbSchema = JSON.stringify({
   "@context": "https://schema.org",
@@ -95,11 +96,11 @@ const faqSchema = hasProfile ? JSON.stringify({
 }) : "";
 
 const subtitleText = hasProfile ? `${pNickname} · ${pCity}, ${pCountry} · Est. ${pFounded}` : "";
-const pageTitle = hasProfile ? `${club.name}  -  ${pNickname}  -  Season History, Stats & Club Profile` : `${club.name}  -  Season History & Stats`;
+const pageTitle = `${club.name}  -  Published Season History & Stats`;
 ---
 
-<Base title={pageTitle} description={desc} canonical={`/clubs/${club.slug}/`}>
-  <script type="application/ld+json" set:html={breadcrumbSchema} />
+<Base title={pageTitle} description={desc} canonical={`/clubs/${club.slug}/`} robots="noindex, follow">
+  <script is:inline type="application/ld+json" set:html={breadcrumbSchema} />
   <Fragment set:html={orgSchema ? `<script type="application/ld+json">${orgSchema}</script>` : ""} />
   <Fragment set:html={faqSchema ? `<script type="application/ld+json">${faqSchema}</script>` : ""} />
 
@@ -114,11 +115,13 @@ const pageTitle = hasProfile ? `${club.name}  -  ${pNickname}  -  Season History
       <div class="hero-stats">
         <div class="hero-stat"><span class="hero-stat-value">{bestFinish}{suffix}</span><span class="hero-stat-label">Best Finish</span></div>
         <div class="hero-stat"><span class="hero-stat-value">{club.seasons.length}</span><span class="hero-stat-label">Seasons</span></div>
-        <div class="hero-stat"><span class="hero-stat-value">{titles}</span><span class="hero-stat-label">Titles</span></div>
+        <div class="hero-stat"><span class="hero-stat-value">{titles}</span><span class="hero-stat-label">Archive Titles</span></div>
         <div class="hero-stat"><span class="hero-stat-value">{totalGoals}</span><span class="hero-stat-label">Goals</span></div>
         <div class="hero-stat"><span class="hero-stat-value">{totalWins}</span><span class="hero-stat-label">Wins</span></div>
       </div>
     </section>
+
+    <DataNotice status="review" />
 
     <section class="section" style={hasProfile ? "" : "display:none"}>
       <h2 class="section-title">Club Profile</h2>
@@ -148,7 +151,7 @@ const pageTitle = hasProfile ? `${club.name}  -  ${pNickname}  -  Season History
     </section>
 
     <section class="section">
-      <h2 class="section-title">Season History</h2>
+      <h2 class="section-title">Published Season History</h2>
       <div class="table-wrap" role="region" aria-label="Season history table" tabindex="0">
         <table class="stats-table" aria-label="Season history">
           <thead>

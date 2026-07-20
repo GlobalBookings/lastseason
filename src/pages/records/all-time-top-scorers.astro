@@ -48,9 +48,10 @@ const faqSchema = JSON.stringify({
   title="Premier League All-Time Top Scorers  -  Complete List"
   description="The complete list of Premier League all-time top scorers. See who has scored the most goals in Premier League history, with appearances, goals-per-game ratios and clubs."
   canonical="/records/all-time-top-scorers/"
+  robots="noindex, follow"
 >
-  <script type="application/ld+json" set:html={breadcrumbSchema} />
-  <script type="application/ld+json" set:html={faqSchema} />
+  <script is:inline type="application/ld+json" set:html={breadcrumbSchema} />
+  <script is:inline type="application/ld+json" set:html={faqSchema} />
 
   <div class="container">
     <nav class="breadcrumbs" aria-label="Breadcrumb">

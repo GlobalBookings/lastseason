@@ -1,6 +1,7 @@
 ---
 import Base from "../../layouts/Base.astro";
 import KitIllustration from "../../components/KitIllustration.astro";
+import DataNotice from "../../components/DataNotice.astro";
 import { allClubKitArchives, getKitArchivesByLeague } from "../../data/kits/index";
 import { leagues } from "../../data/leagues/index";
 
@@ -9,14 +10,15 @@ const totalClubs = allClubKitArchives.length;
 ---
 
 <Base
-  title="Football Kit Archive  -  Every Club, Every Season"
-  description="Browse the complete football kit archive. Home, away and third kits for clubs across the Premier League, La Liga, Bundesliga, Serie A and more. Find where to buy vintage and retro shirts."
+  title="Football Kit Colour Timeline"
+  description="Browse a generated visual study of football kit colour palettes, manufacturers and sponsors. Illustrations are not authenticated shirt designs."
   canonical="/kits/"
+  robots="noindex, follow"
 >
   <section class="home-hero kits-hero" style="background-image: url('/img/hero-stadium.jpg');">
     <div class="container">
       <h1>Football Kit<br />Archive</h1>
-      <p class="subtitle">Every club. Every season. Home and away kits from the 1980s to today, with links to buy vintage and retro shirts.</p>
+      <p class="subtitle">A generated colour and manufacturer timeline. These illustrations are not authenticated reproductions of the shirts.</p>
       <div class="hero-stats">
         <div class="hero-stat">
           <span class="hero-stat-value">{totalClubs}</span>
@@ -35,6 +37,7 @@ const totalClubs = allClubKitArchives.length;
   </section>
 
   <div class="container home-leagues">
+    <DataNotice status="illustrative" />
     {leagues.map((league) => {
       const clubs = getKitArchivesByLeague(league.slug);
       if (!clubs || clubs.length === 0) return null;

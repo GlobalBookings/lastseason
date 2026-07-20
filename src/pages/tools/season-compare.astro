@@ -1,0 +1,42 @@
+---
+import Base from "../../layouts/Base.astro";
+import { getAllLoadedSeasons } from "../../utils/data";
+
+const seasons = getAllLoadedSeasons().map((season) => {
+  const champion = season.standings.find((row) => row.clubSlug === season.championSlug);
+  const matches = season.standings.reduce((sum, row) => sum + row.p, 0) / 2;
+  return { id: `${season.leagueSlug}-${season.season}`, label: `${season.league} ${season.seasonDisplay}`, league: season.league, season: season.seasonDisplay, champion: season.champion, championPoints: champion?.pts ?? null, topScorer: season.topScorer, topScorerGoals: season.topScorerGoals, totalGoals: season.totalGoals, clubs: season.standings.length, matches, goalsPerMatch: matches ? season.totalGoals / matches : 0 };
+});
+const json = JSON.stringify(seasons).replace(/</g, "\\u003c");
+---
+
+<Base title="Compare Football Seasons" description="Compare champions, points, goals and leading scorers across completed football seasons." canonical="/tools/season-compare/">
+  <div class="container prose">
+    <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span class="sep">/</span><a href="/tools/">Tools</a><span class="sep">/</span><span class="current">Season comparison</span></nav>
+    <section class="page-hero"><h1>Compare football seasons</h1><p class="subtitle">Put two reviewed archive seasons side by side.</p></section>
+    <section class="tool-panel">
+      <div class="control-grid">
+        <label>Season A<select id="season-a"></select></label>
+        <label>Season B<select id="season-b"></select></label>
+      </div>
+      <div id="comparison" class="tool-output" aria-live="polite"></div>
+      <button type="button" id="copy-link" class="button button--secondary">Copy comparison link</button>
+      <span id="copy-status" class="meta" aria-live="polite"></span>
+    </section>
+  </div>
+  <script is:inline type="application/json" id="season-data" set:html={json}></script>
+  <script is:inline>
+    const seasons = JSON.parse(document.getElementById("season-data")?.textContent || "[]");
+    const a = document.getElementById("season-a"), b = document.getElementById("season-b"), output = document.getElementById("comparison");
+    for (const select of [a, b]) for (const season of seasons) { const option = document.createElement("option"); option.value = season.id; option.textContent = season.label; select.append(option); }
+    const params = new URLSearchParams(location.search); a.value = params.get("a") || seasons[0]?.id || ""; b.value = params.get("b") || seasons[1]?.id || seasons[0]?.id || "";
+    const row = (label, x, y) => `<tr><th>${label}</th><td>${x}</td><td>${y}</td></tr>`;
+    const render = () => {
+      const left = seasons.find((s) => s.id === a.value), right = seasons.find((s) => s.id === b.value); if (!left || !right) return;
+      output.innerHTML = `<div class="table-wrap"><table class="stats-table comparison-table"><thead><tr><th>Metric</th><th>${left.label}</th><th>${right.label}</th></tr></thead><tbody>${row("Champion", left.champion, right.champion)}${row("Champion points", left.championPoints ?? "–", right.championPoints ?? "–")}${row("Leading scorer", `${left.topScorer} (${left.topScorerGoals})`, `${right.topScorer} (${right.topScorerGoals})`)}${row("Total goals", left.totalGoals.toLocaleString(), right.totalGoals.toLocaleString())}${row("Goals per match", left.goalsPerMatch.toFixed(2), right.goalsPerMatch.toFixed(2))}${row("Clubs", left.clubs, right.clubs)}</tbody></table></div>`;
+      const url = new URL(location.href); url.searchParams.set("a", left.id); url.searchParams.set("b", right.id); history.replaceState({}, "", url);
+    };
+    a.addEventListener("change", render); b.addEventListener("change", render); render();
+    document.getElementById("copy-link").addEventListener("click", async () => { await navigator.clipboard.writeText(location.href); document.getElementById("copy-status").textContent = "Link copied."; });
+  </script>
+</Base>

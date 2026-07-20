@@ -73,9 +73,10 @@ const faqSchema = JSON.stringify({
   title="Premier League FAQ  -  Most Asked Questions Answered"
   description="Answers to the most searched Premier League questions. How many teams, who has won the most titles, how relegation works, the Big Six, VAR, goal difference and more."
   canonical="/faq/premier-league/"
+  robots="noindex, follow"
 >
-  <script type="application/ld+json" set:html={breadcrumbSchema} />
-  <script type="application/ld+json" set:html={faqSchema} />
+  <script is:inline type="application/ld+json" set:html={breadcrumbSchema} />
+  <script is:inline type="application/ld+json" set:html={faqSchema} />
 
   <div class="container">
     <nav class="breadcrumbs" aria-label="Breadcrumb">
