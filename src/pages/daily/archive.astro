@@ -1,0 +1,36 @@
+---
+import Base from "../../layouts/Base.astro";
+import { addDays, getSeasonPuzzle, isoDate } from "../../utils/games";
+
+const today = isoDate();
+const days = Array.from({ length: 60 }, (_, index) => {
+  const date = addDays(today, -index);
+  return { date, puzzle: getSeasonPuzzle(date) };
+});
+---
+
+<Base title="Past Daily Football Challenges" description="Replay recent Last Season Daily football history challenges and explore the final tables and scorers behind every answer." canonical="/daily/archive/">
+  <div class="container archive-page">
+    <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span class="sep">/</span><a href="/daily/">Daily game</a><span class="sep">/</span><span class="current">Archive</span></nav>
+    <header class="page-hero"><span class="section-kicker">The daily archive</span><h1>Past challenges</h1><p class="subtitle">Missed a day? Every published challenge remains playable and links back to the season behind it.</p></header>
+    <div class="daily-archive-grid">
+      {days.map(({ date, puzzle }, index) => (
+        <a href={`/daily/${date}/`} class="daily-archive-card" style={`--card-accent:${puzzle.accent}`}>
+          <span>{new Date(`${date}T12:00:00Z`).toLocaleDateString("en-GB", { day:"numeric", month:"short", year:"numeric" })}</span>
+          <strong>{index === 0 ? "Today’s mystery season" : `Challenge ${date.replaceAll("-", "")}`}</strong>
+          <small>{puzzle.category} · Play challenge →</small>
+        </a>
+      ))}
+    </div>
+  </div>
+</Base>
+
+<style>
+  .archive-page { padding-bottom:4rem; }
+  .page-hero { max-width:760px; }
+  .daily-archive-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:.75rem; }
+  .daily-archive-card { display:flex; flex-direction:column; min-height:145px; justify-content:space-between; padding:1.15rem; background:#fff; border:1px solid var(--border); border-top:4px solid var(--card-accent); border-radius:14px; color:var(--text); box-shadow:var(--shadow-xs); }
+  .daily-archive-card:hover { color:var(--text); transform:translateY(-2px); box-shadow:var(--shadow-md); }
+  .daily-archive-card span,.daily-archive-card small { color:var(--text-muted); font-size:.7rem; }
+  .daily-archive-card strong { font-size:1rem; }
+</style>

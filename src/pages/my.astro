@@ -1,0 +1,150 @@
+---
+import Base from "../layouts/Base.astro";
+import { leagues } from "../data/leagues/index";
+import { getAllLoadedSeasons } from "../utils/data";
+
+const clubMap = new Map<string, string>();
+getAllLoadedSeasons().forEach((season) => season.standings.forEach((row) => clubMap.set(row.clubSlug, row.club)));
+const uniqueClubs = [...new Map(
+  [...clubMap].map(([slug, name]) => [name, { slug, name }])
+).values()].sort((a, b) => a.name.localeCompare(b.name));
+const dashboardData = JSON.stringify({
+  leagues: leagues.map((league) => ({ slug: league.slug, name: league.name, color: league.accentColor })),
+  clubs: uniqueClubs,
+}).replace(/</g, "\\u003c");
+---
+
+<Base title="My Last Season - Your Football Dashboard" description="Follow clubs and leagues, see your daily football game streak, unlock achievements and continue exploring your personal football archive." canonical="/my/" robots="noindex, follow">
+  <script is:inline type="application/json" id="my-dashboard-data" set:html={dashboardData}></script>
+  <div class="container my-page">
+    <header class="my-hero">
+      <div><span class="section-kicker">Your football shelf</span><h1>My Last Season</h1><p>Favourites, daily-game form and the next things worth exploring—kept privately in this browser.</p></div>
+      <form data-profile-form><label for="my-nickname">Leaderboard name</label><div><input id="my-nickname" maxlength="24" placeholder="Archive fan" /><button type="submit">Save</button></div><small>No account required. Your name is only shared when you submit a game result.</small></form>
+    </header>
+
+    <section class="my-game-panel">
+      <div><span class="section-kicker">Last Season Daily</span><h2 data-my-greeting>Ready for today’s challenge?</h2><p data-my-game-copy>A fresh mystery season is waiting.</p></div>
+      <div class="my-game-stats"><div><strong data-my-played>0</strong><span>Played</span></div><div><strong data-my-win-rate>0%</strong><span>Win rate</span></div><div><strong data-my-streak>0</strong><span>Streak</span></div><div><strong data-my-best>0</strong><span>Best</span></div></div>
+      <a href="/daily/" class="button">Play today</a>
+    </section>
+
+    <div class="my-grid">
+      <section class="my-card">
+        <div class="my-card__head"><div><span class="section-kicker">Following</span><h2>My clubs</h2></div><a href="/clubs/">Find clubs</a></div>
+        <div data-my-clubs class="my-list"></div>
+        <label class="my-add-label" for="my-club-select">Add a club</label>
+        <div class="my-add"><select id="my-club-select" data-club-select><option value="">Choose a club…</option></select><button type="button" data-add-club>Add</button></div>
+      </section>
+      <section class="my-card">
+        <div class="my-card__head"><div><span class="section-kicker">Following</span><h2>My leagues</h2></div><a href="/#leagues">Browse leagues</a></div>
+        <div data-my-leagues class="my-list"></div>
+        <label class="my-add-label" for="my-league-select">Add a league</label>
+        <div class="my-add"><select id="my-league-select" data-league-select><option value="">Choose a league…</option></select><button type="button" data-add-league>Add</button></div>
+      </section>
+    </div>
+
+    <section class="my-card my-match-card" data-my-match-card hidden>
+      <div class="my-card__head"><div><span class="section-kicker">Coming up</span><h2>Your fixture radar</h2></div><a href="/scores/">Full match centre</a></div>
+      <div class="my-fixtures" data-my-fixtures></div>
+    </section>
+
+    <div class="my-grid">
+      <section class="my-card"><span class="section-kicker">Milestones</span><h2>Achievements</h2><div class="my-achievements" data-my-achievements></div></section>
+      <section class="my-card reminder-card"><span class="section-kicker">Keep the streak alive</span><h2>Daily reminder</h2><p>Add a private recurring calendar reminder. It works without notifications, tracking or an account.</p><a class="button button-secondary" href="/daily-reminder.ics" download>Add calendar reminder</a><small>Email reminders will be enabled when the delivery service is connected.</small></section>
+    </div>
+  </div>
+</Base>
+
+<script is:inline>
+  (() => {
+    const data = JSON.parse(document.getElementById("my-dashboard-data")?.textContent || "{}");
+    const read = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); } catch { return fallback; } };
+    const write = (key, value) => { try { localStorage.setItem(key, JSON.stringify(value)); } catch {} };
+    const profileForm = document.querySelector("[data-profile-form]");
+    const nicknameInput = document.getElementById("my-nickname");
+    const profile = read("lastseason-profile", {}); nicknameInput.value = profile.nickname || "";
+    profileForm.addEventListener("submit", (event) => { event.preventDefault(); write("lastseason-profile", { ...profile, nickname: nicknameInput.value.trim().slice(0,24) || "Archive fan" }); document.querySelector("[data-my-greeting]").textContent = `Nice to see you, ${nicknameInput.value.trim() || "Archive fan"}.`; });
+    if (profile.nickname) document.querySelector("[data-my-greeting]").textContent = `Nice to see you, ${profile.nickname}.`;
+
+    const stats = read("lastseason-game-stats-v1", { played:0,wins:0,streak:0,bestStreak:0,distribution:[0,0,0,0,0,0] });
+    document.querySelector("[data-my-played]").textContent = stats.played || 0;
+    document.querySelector("[data-my-win-rate]").textContent = `${stats.played ? Math.round(stats.wins / stats.played * 100) : 0}%`;
+    document.querySelector("[data-my-streak]").textContent = stats.streak || 0;
+    document.querySelector("[data-my-best]").textContent = stats.bestStreak || 0;
+    if (stats.lastPlayed === new Date(Date.now() - new Date().getTimezoneOffset()*60000).toISOString().slice(0,10)) document.querySelector("[data-my-game-copy]").textContent = "Today’s result is in. Explore another game or come back tomorrow.";
+
+    const clubKey = "lastseason-favourite-clubs"; const leagueKey = "lastseason-favourite-leagues";
+    let clubs = read(clubKey, []); let leagues = read(leagueKey, []);
+    const clubSelect = document.querySelector("[data-club-select]"); const leagueSelect = document.querySelector("[data-league-select]");
+    data.clubs.forEach((club) => { const option=document.createElement("option"); option.value=club.slug; option.textContent=club.name; clubSelect.append(option); });
+    data.leagues.forEach((league) => { const option=document.createElement("option"); option.value=league.slug; option.textContent=league.name; leagueSelect.append(option); });
+    const empty = (copy) => { const item=document.createElement("p"); item.className="my-empty"; item.textContent=copy; return item; };
+    const renderFollowing = () => {
+      const clubWrap=document.querySelector("[data-my-clubs]"); const leagueWrap=document.querySelector("[data-my-leagues]"); clubWrap.replaceChildren(); leagueWrap.replaceChildren();
+      if (!clubs.length) clubWrap.append(empty("No clubs followed yet."));
+      clubs.forEach((slug) => { const club=data.clubs.find((item)=>item.slug===slug); if(!club)return; const row=document.createElement("div"); row.innerHTML=`<a href="/clubs/${slug}/"></a><button type="button" aria-label="Unfollow ${club.name}">×</button>`; row.querySelector("a").textContent=club.name; row.querySelector("button").onclick=()=>{clubs=clubs.filter((item)=>item!==slug);write(clubKey,clubs);renderFollowing();loadFixtures();}; clubWrap.append(row); });
+      if (!leagues.length) leagueWrap.append(empty("No leagues saved yet."));
+      leagues.forEach((slug) => { const league=data.leagues.find((item)=>item.slug===slug); if(!league)return; const row=document.createElement("div"); row.style.setProperty("--row-color",league.color); row.innerHTML=`<a href="/${slug}/"></a><button type="button" aria-label="Remove ${league.name}">×</button>`; row.querySelector("a").textContent=league.name; row.querySelector("button").onclick=()=>{leagues=leagues.filter((item)=>item!==slug);write(leagueKey,leagues);renderFollowing();loadFixtures();}; leagueWrap.append(row); });
+    };
+    document.querySelector("[data-add-club]").onclick=()=>{if(clubSelect.value&&!clubs.includes(clubSelect.value)){clubs.push(clubSelect.value);write(clubKey,clubs);renderFollowing();loadFixtures();}};
+    document.querySelector("[data-add-league]").onclick=()=>{if(leagueSelect.value&&!leagues.includes(leagueSelect.value)){leagues.push(leagueSelect.value);write(leagueKey,leagues);renderFollowing();loadFixtures();}};
+
+    const achievements=[
+      [stats.wins>=1,"First whistle","Win your first daily game"],[stats.streak>=3,"Hat-trick","Build a three-day streak"],[stats.streak>=7,"Invincible week","Build a seven-day streak"],[(stats.distribution?.[0]||0)>=1,"First touch","Solve in one guess"],[stats.wins>=10,"Historian","Win ten daily games"]
+    ];
+    const achievementWrap=document.querySelector("[data-my-achievements]"); achievements.forEach(([earned,name,copy])=>{const item=document.createElement("div");item.className=earned?"is-earned":"";item.innerHTML=`<span>${earned?"✓":"○"}</span><div><strong></strong><small></small></div>`;item.querySelector("strong").textContent=name;item.querySelector("small").textContent=copy;achievementWrap.append(item);});
+
+    async function loadFixtures(){
+      const fixtureWrap=document.querySelector("[data-my-fixtures]"); const card=document.querySelector("[data-my-match-card]"); fixtureWrap.replaceChildren(); const slugs=[...new Set(leagues.slice(0,3))]; if(!slugs.length){card.hidden=true;return;}
+      const results=await Promise.all(slugs.map(async(slug)=>{try{const response=await fetch(`/api/scores?league=${slug}`);return response.ok?await response.json():null;}catch{return null;}}));
+      results.filter(Boolean).flatMap((result)=>result.upcoming?.slice(0,2).map((match)=>({...match,league:result.league.name}))||[]).slice(0,6).forEach((match)=>{const item=document.createElement("article");const date=new Date(match.timestamp);item.innerHTML=`<span></span><div><strong></strong><small></small></div><time></time>`;item.querySelector("span").textContent=match.league;item.querySelector("strong").textContent=`${match.home} v ${match.away}`;item.querySelector("small").textContent=match.venue||"Fixture";item.querySelector("time").textContent=Number.isNaN(date.getTime())?match.date:date.toLocaleDateString("en-GB",{day:"numeric",month:"short"});fixtureWrap.append(item);});
+      card.hidden=fixtureWrap.children.length===0;
+    }
+    renderFollowing(); loadFixtures();
+  })();
+</script>
+
+<style>
+  .my-page { padding-bottom:4rem; }
+  .my-hero { display:grid; grid-template-columns:1fr minmax(280px,.5fr); gap:2rem; align-items:end; padding:3.5rem 0 2rem; }
+  .my-hero h1 { font-size:clamp(2.8rem,6vw,5.2rem); letter-spacing:-.07em; line-height:.95; margin:.5rem 0; }
+  .my-hero p { color:var(--text-secondary); max-width:55ch; }
+  .my-hero form { padding:1rem; background:#fff; border:1px solid var(--border); border-radius:14px; }
+  .my-hero form label,.my-add-label { display:block; font-size:.67rem; text-transform:uppercase; letter-spacing:.07em; font-weight:800; color:var(--text-muted); margin-bottom:.35rem; }
+  .my-hero form > div,.my-add { display:grid; grid-template-columns:1fr auto; gap:.4rem; }
+  .my-hero input,.my-add select { min-width:0; padding:.65rem; border:1px solid var(--border); border-radius:8px; font:600 .8rem var(--font); background:#fff; }
+  .my-hero button,.my-add button { border:0; border-radius:8px; padding:.6rem .75rem; background:#0b1620; color:#fff; font-weight:750; cursor:pointer; }
+  .my-hero form small,.reminder-card small { display:block; color:var(--text-muted); font-size:.65rem; margin-top:.45rem; }
+  .my-game-panel { display:grid; grid-template-columns:1fr auto auto; gap:1.5rem; align-items:center; padding:1.5rem; background:radial-gradient(circle at 80%,rgba(113,230,158,.18),transparent 30%),#0b1620; border-radius:20px; color:#fff; }
+  .my-game-panel h2 { color:#fff; font-size:1.4rem; }
+  .my-game-panel p { color:#9fb0bd; margin:0; font-size:.8rem; }
+  .my-game-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:.45rem; }
+  .my-game-stats div { min-width:65px; text-align:center; padding:.6rem; background:rgba(255,255,255,.07); border-radius:10px; }
+  .my-game-stats strong,.my-game-stats span { display:block; }
+  .my-game-stats span { color:#94a6b4; font-size:.6rem; }
+  .my-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:.8rem; margin-top:.8rem; }
+  .my-card { padding:1.25rem; background:#fff; border:1px solid var(--border); border-radius:16px; }
+  .my-card__head { display:flex; justify-content:space-between; align-items:end; gap:1rem; margin-bottom:1rem; }
+  .my-card__head h2,.my-card h2 { font-size:1.25rem; }
+  .my-card__head > a { font-size:.7rem; font-weight:750; }
+  .my-list { display:grid; gap:.4rem; min-height:48px; margin-bottom:1rem; }
+  .my-list > div { display:grid; grid-template-columns:1fr auto; align-items:center; padding:.6rem .7rem; background:#f4f6f5; border-left:3px solid var(--row-color,#71e69e); border-radius:8px; }
+  .my-list a { color:var(--text); font-weight:750; }
+  .my-list button { border:0; background:transparent; color:var(--text-muted); font-size:1.1rem; cursor:pointer; }
+  .my-empty { color:var(--text-muted); font-size:.78rem; margin:.6rem 0; }
+  .my-fixtures { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:.55rem; }
+  .my-fixtures article { display:grid; grid-template-columns:1fr auto; padding:.75rem; background:#f4f6f5; border-radius:10px; }
+  .my-fixtures article > span { grid-column:1/-1; color:var(--text-muted); font-size:.62rem; text-transform:uppercase; }
+  .my-fixtures strong,.my-fixtures small { display:block; }
+  .my-fixtures small,.my-fixtures time { color:var(--text-muted); font-size:.66rem; }
+  .my-achievements { display:grid; gap:.5rem; margin-top:1rem; }
+  .my-achievements > div { display:grid; grid-template-columns:32px 1fr; gap:.6rem; align-items:center; opacity:.45; }
+  .my-achievements > div.is-earned { opacity:1; }
+  .my-achievements > div > span { display:grid; place-items:center; width:30px; height:30px; border-radius:9px; background:#edf1ef; }
+  .my-achievements .is-earned > span { background:#d8fae5; color:#08733a; }
+  .my-achievements strong,.my-achievements small { display:block; }
+  .my-achievements small { color:var(--text-muted); }
+  .reminder-card p { color:var(--text-secondary); }
+  @media(max-width:850px) { .my-hero,.my-grid { grid-template-columns:1fr; } .my-game-panel { grid-template-columns:1fr; } }
+  @media(max-width:520px) { .my-game-stats { grid-template-columns:repeat(2,1fr); } }
+</style>

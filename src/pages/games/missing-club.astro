@@ -1,0 +1,24 @@
+---
+import Base from "../../layouts/Base.astro";
+import DailyGame from "../../components/DailyGame.astro";
+import { addDays, clubAnswers, getMissingClubPuzzle, isoDate } from "../../utils/games";
+const today = isoDate();
+const puzzle = getMissingClubPuzzle(today);
+const cycle = Array.from({ length: 97 }, (_, index) => getMissingClubPuzzle(addDays("1970-01-01", index)));
+---
+
+<Base title="Missing Club - Daily Football Table Game" description="Identify a mystery football club from its league finish, points and goals in this free daily final-table challenge." canonical="/games/missing-club/">
+  <div class="container game-page-layout">
+    <header><span class="section-kicker">Daily table game</span><h1>Missing Club</h1><p>A club has vanished from the final table. Rebuild its identity using position, points, results and goal clues.</p><a href="/games/">All games →</a></header>
+    <DailyGame puzzle={puzzle} answers={clubAnswers} puzzleCycle={cycle} title="Missing Club" allowLeaderboard={true} />
+  </div>
+</Base>
+
+<style>
+  .game-page-layout { display:grid; grid-template-columns:minmax(230px,.7fr) minmax(440px,1.3fr); gap:clamp(2rem,7vw,5rem); align-items:start; padding-top:3rem; padding-bottom:5rem; }
+  .game-page-layout > header { position:sticky; top:90px; }
+  .game-page-layout h1 { font-size:clamp(2.5rem,5vw,4.5rem); letter-spacing:-.06em; margin:.5rem 0; }
+  .game-page-layout header p { color:var(--text-secondary); }
+  .game-page-layout header a { display:inline-block; margin-top:1rem; font-weight:750; }
+  @media(max-width:800px) { .game-page-layout { grid-template-columns:1fr; } .game-page-layout > header { position:static; } }
+</style>

@@ -1,0 +1,28 @@
+---
+import Base from "../../layouts/Base.astro";
+import { footballAnniversaries } from "../../data/on-this-day";
+---
+
+<Base title="On This Day in Premier League History" description="Explore landmark Premier League title moments by date, with links to complete season tables, scorers and source-backed archive pages." canonical="/on-this-day/">
+  <div class="container otd-page">
+    <header class="page-hero"><span class="section-kicker">The football calendar</span><h1>On this day</h1><p class="subtitle">The dates when title races turned into history—connected to the complete season behind each moment.</p></header>
+    <div class="otd-grid">
+      {footballAnniversaries.map((event) => (
+        <a href={`/on-this-day/${event.slug}/`}><time>{event.dateLabel}</time><span>{event.year}</span><strong>{event.title}</strong><p>{event.summary}</p><small>Read the story →</small></a>
+      ))}
+    </div>
+  </div>
+</Base>
+
+<style>
+  .otd-page { padding-bottom:4rem; }
+  .page-hero { max-width:800px; }
+  .otd-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:.75rem; }
+  .otd-grid a { display:grid; grid-template-columns:1fr auto; min-height:230px; padding:1.2rem; background:#fff; border:1px solid var(--border); border-radius:16px; color:var(--text); }
+  .otd-grid time { color:#087a3e; font-size:.7rem; font-weight:850; text-transform:uppercase; letter-spacing:.08em; }
+  .otd-grid > a > span { color:var(--text-muted); font-size:.7rem; }
+  .otd-grid strong,.otd-grid p,.otd-grid small { grid-column:1/-1; }
+  .otd-grid strong { align-self:end; font-size:1.1rem; }
+  .otd-grid p { color:var(--text-secondary); font-size:.78rem; margin:.45rem 0; }
+  .otd-grid small { color:var(--link); font-weight:750; }
+</style>

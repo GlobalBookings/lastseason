@@ -1,0 +1,24 @@
+---
+import Base from "../../layouts/Base.astro";
+import DailyGame from "../../components/DailyGame.astro";
+import { addDays, getPlayerPuzzle, isoDate, playerAnswers } from "../../utils/games";
+const today = isoDate();
+const puzzle = getPlayerPuzzle(today);
+const cycle = Array.from({ length: 97 }, (_, index) => getPlayerPuzzle(addDays("1970-01-01", index)));
+---
+
+<Base title="Player Path - Daily Footballer Guessing Game" description="Guess the mystery footballer from their season-by-season scoring trail in this free daily football history game." canonical="/games/player-path/">
+  <div class="container game-page-layout">
+    <header><span class="section-kicker">Daily player game</span><h1>Player Path</h1><p>We reveal a player’s trail through the published scoring archive one clue at a time. Name them in as few guesses as possible.</p><a href="/games/">All games →</a></header>
+    <DailyGame puzzle={puzzle} answers={playerAnswers} puzzleCycle={cycle} title="Player Path" allowLeaderboard={true} />
+  </div>
+</Base>
+
+<style>
+  .game-page-layout { display:grid; grid-template-columns:minmax(230px,.7fr) minmax(440px,1.3fr); gap:clamp(2rem,7vw,5rem); align-items:start; padding-top:3rem; padding-bottom:5rem; }
+  .game-page-layout > header { position:sticky; top:90px; }
+  .game-page-layout h1 { font-size:clamp(2.5rem,5vw,4.5rem); letter-spacing:-.06em; margin:.5rem 0; }
+  .game-page-layout header p { color:var(--text-secondary); }
+  .game-page-layout header a { display:inline-block; margin-top:1rem; font-weight:750; }
+  @media(max-width:800px) { .game-page-layout { grid-template-columns:1fr; } .game-page-layout > header { position:static; } }
+</style>

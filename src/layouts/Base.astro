@@ -122,6 +122,7 @@ const isCurrent = (path: string) => currentPath === path || (path !== "/" && cur
 
           <nav class="site-nav" aria-label="Main navigation">
             <a href="/scores/" class="nav-live" aria-current={isCurrent("/scores/") ? "page" : undefined}><span></span>Scores</a>
+            <a href="/daily/" class="nav-daily" aria-current={isCurrent("/daily/") ? "page" : undefined}>Daily game</a>
             <a href="/premier-league/" aria-current={isCurrent("/premier-league/") ? "page" : undefined}>Premier League</a>
             <a href="/championship/" aria-current={isCurrent("/championship/") ? "page" : undefined}>Championship</a>
             <details class="league-menu">
@@ -141,6 +142,7 @@ const isCurrent = (path: string) => currentPath === path || (path !== "/" && cur
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
               <span>Search</span><kbd>/</kbd>
             </button>
+            <a href="/my/" class="nav-profile" aria-current={isCurrent("/my/") ? "page" : undefined}>My LS</a>
           </nav>
 
           <button class="nav-toggle" aria-label="Open menu" aria-expanded="false" id="nav-toggle">
@@ -155,6 +157,8 @@ const isCurrent = (path: string) => currentPath === path || (path !== "/" && cur
 
       <div class="mobile-nav" id="mobile-nav" role="navigation" aria-label="Mobile navigation">
         <a href="/scores/" class="mobile-live-link"><span></span> Latest scores & fixtures</a>
+        <a href="/daily/">Daily football game</a>
+        <a href="/my/">My Last Season</a>
         <div class="nav-section-title">Leagues</div>
         <a href="/premier-league/">Premier League</a>
         <a href="/championship/">Championship</a>
@@ -220,6 +224,10 @@ const isCurrent = (path: string) => currentPath === path || (path !== "/" && cur
             <div class="footer-heading">Site</div>
             <ul class="footer-link-list">
               <li><a href="/tools/">Interactive Tools</a></li>
+              <li><a href="/daily/">Daily Football Game</a></li>
+              <li><a href="/games/">More Football Games</a></li>
+              <li><a href="/on-this-day/">On This Day</a></li>
+              <li><a href="/my/">My Last Season</a></li>
               <li><a href="/scores/">Latest Scores & Fixtures</a></li>
               <li><a href="/compare/">Season Comparisons</a></li>
               <li><a href="/football-shirts/">Football Shirt Buying Guide</a></li>
@@ -337,6 +345,29 @@ const isCurrent = (path: string) => currentPath === path || (path !== "/" && cur
         document.dispatchEvent(new CustomEvent("lastseason:favourites"));
       }));
       syncFavouriteButtons();
+
+      const favouriteClubKey = "lastseason-favourite-clubs";
+      const readFavouriteClubs = () => {
+        try { return JSON.parse(localStorage.getItem(favouriteClubKey) || "[]"); } catch { return []; }
+      };
+      const syncFavouriteClubButtons = () => {
+        const favourites = readFavouriteClubs();
+        document.querySelectorAll("[data-favourite-club]").forEach((button) => {
+          const active = favourites.includes(button.dataset.favouriteClub);
+          button.setAttribute("aria-pressed", String(active));
+          button.classList.toggle("is-favourite", active);
+          const text = button.querySelector("[data-favourite-club-label]");
+          if (text) text.textContent = active ? "Following" : (button.dataset.clubName ? `Follow ${button.dataset.clubName}` : "Follow club");
+        });
+      };
+      document.querySelectorAll("[data-favourite-club]").forEach((button) => button.addEventListener("click", () => {
+        const favourites = readFavouriteClubs();
+        const slug = button.dataset.favouriteClub;
+        const next = favourites.includes(slug) ? favourites.filter((item) => item !== slug) : [...favourites, slug];
+        try { localStorage.setItem(favouriteClubKey, JSON.stringify(next)); } catch {}
+        syncFavouriteClubButtons();
+      }));
+      syncFavouriteClubButtons();
       document.querySelectorAll(".table-wrap").forEach(wrap => {
         const check = () => wrap.classList.toggle("is-scrollable", wrap.scrollWidth > wrap.clientWidth + 2);
         check();

@@ -1,0 +1,74 @@
+---
+import Base from "../../layouts/Base.astro";
+import DailyGame from "../../components/DailyGame.astro";
+import { addDays, getSeasonPuzzle, isoDate, seasonAnswers } from "../../utils/games";
+
+const today = isoDate();
+const puzzle = getSeasonPuzzle(today);
+const cycle = Array.from({ length: seasonAnswers.length }, (_, index) => getSeasonPuzzle(addDays("1970-01-01", index)));
+const schema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Last Season Daily",
+  "url": "https://lastseason.co.uk/daily/",
+  "applicationCategory": "GameApplication",
+  "operatingSystem": "Any",
+  "isAccessibleForFree": true,
+  "description": "A free daily football history game. Identify a mystery season from six progressively revealed clues.",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "GBP" },
+});
+---
+
+<Base title="Last Season Daily - Free Football History Game" description="Play a free daily football history game. Guess the mystery season from champions, scorers, tables and relegation clues, build a streak and share your result." canonical="/daily/" image={`/daily/${today}.png`} schema={schema}>
+  <section class="daily-hero">
+    <div class="container daily-layout">
+      <div class="daily-intro">
+        <span class="section-kicker">One season. Six clues.</span>
+        <h1>How well do you remember football history?</h1>
+        <p>A new mystery season every day, drawn from the reviewed Last Season archive. Guess early for bragging rights or use every clue to protect your streak.</p>
+        <div class="daily-intro__actions">
+          <a href="/daily/archive/">Past challenges</a>
+          <a href="/games/">More games</a>
+          <a href="/my/">My stats</a>
+        </div>
+      </div>
+      <DailyGame puzzle={puzzle} answers={seasonAnswers} puzzleCycle={cycle} allowLeaderboard={true} />
+    </div>
+  </section>
+
+  <section class="container daily-explainer">
+    <div><span>01</span><h2>Read the clue</h2><p>Every wrong answer reveals another verified fact from the season.</p></div>
+    <div><span>02</span><h2>Protect your streak</h2><p>Come back tomorrow and build achievements without creating an account.</p></div>
+    <div><span>03</span><h2>Go deeper</h2><p>The reveal links to the complete final table, scorers and season review.</p></div>
+  </section>
+
+  <section class="container daily-more">
+    <span class="section-kicker">More ways to play</span>
+    <div>
+      <a href="/games/player-path/"><strong>Player Path</strong><span>Identify a scorer from their archive trail →</span></a>
+      <a href="/games/missing-club/"><strong>Missing Club</strong><span>Name a club from its final-table numbers →</span></a>
+      <a href="/games/clubs/arsenal/"><strong>Club challenges</strong><span>Put your own club knowledge to the test →</span></a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .daily-hero { padding:clamp(2.5rem,6vw,5rem) 0; background:radial-gradient(circle at 15% 15%,rgba(113,230,158,.15),transparent 28%),linear-gradient(145deg,#eef4f0,#f8faf9); border-bottom:1px solid var(--border); }
+  .daily-layout { display:grid; grid-template-columns:minmax(0,.8fr) minmax(440px,1.2fr); gap:clamp(2rem,7vw,6rem); align-items:center; }
+  .daily-intro h1 { max-width:12ch; font-size:clamp(2.5rem,5.5vw,5rem); line-height:.96; letter-spacing:-.065em; margin:.65rem 0 1.2rem; }
+  .daily-intro > p { max-width:48ch; color:var(--text-secondary); font-size:1.03rem; }
+  .daily-intro__actions { display:flex; flex-wrap:wrap; gap:.55rem; margin-top:1.5rem; }
+  .daily-intro__actions a { padding:.55rem .75rem; border:1px solid #cbd5d0; border-radius:999px; color:var(--text); font-size:.72rem; font-weight:750; background:#fff; }
+  .daily-explainer { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; margin-top:3rem; margin-bottom:3rem; background:var(--border); border:1px solid var(--border); border-radius:18px; overflow:hidden; }
+  .daily-explainer > div { background:#fff; padding:1.5rem; }
+  .daily-explainer span { color:#16a35d; font-size:.68rem; font-weight:850; }
+  .daily-explainer h2 { font-size:1rem; margin:.4rem 0; }
+  .daily-explainer p { color:var(--text-secondary); font-size:.82rem; margin:0; }
+  .daily-more { margin-bottom:4rem; }
+  .daily-more > div { display:grid; grid-template-columns:repeat(3,1fr); gap:.75rem; margin-top:.7rem; }
+  .daily-more a { display:flex; min-height:130px; flex-direction:column; justify-content:space-between; padding:1.2rem; background:#0b1620; border-radius:16px; color:#fff; }
+  .daily-more a:hover { color:#75e6a3; transform:translateY(-2px); }
+  .daily-more a span { color:#9cafbc; font-size:.75rem; }
+  @media(max-width:900px) { .daily-layout { grid-template-columns:1fr; } .daily-intro h1 { max-width:14ch; } }
+  @media(max-width:640px) { .daily-explainer,.daily-more > div { grid-template-columns:1fr; } }
+</style>

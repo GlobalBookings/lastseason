@@ -17,6 +17,11 @@ const required = [
   "/compare/",
   "/compare/arsenal-2025-26-vs-invincibles-2003-04/",
   "/football-shirts/",
+  "/daily/",
+  "/games/",
+  "/games/player-path/",
+  "/games/missing-club/",
+  "/on-this-day/",
 ];
 
 function outputPath(urlPath) {

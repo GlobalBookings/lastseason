@@ -1,0 +1,44 @@
+---
+import Base from "../../layouts/Base.astro";
+import DailyGame from "../../components/DailyGame.astro";
+import { addDays, getSeasonPuzzle, isoDate, seasonAnswers } from "../../utils/games";
+
+export function getStaticPaths() {
+  const today = isoDate();
+  return Array.from({ length: 60 }, (_, index) => {
+    const date = addDays(today, -index);
+    return { params: { date }, props: { date, puzzle: getSeasonPuzzle(date) } };
+  });
+}
+
+const { date, puzzle } = Astro.props;
+const displayDate = new globalThis.Date(`${date}T12:00:00Z`).toLocaleDateString("en-GB", { weekday:"long", day:"numeric", month:"long", year:"numeric" });
+const schema = JSON.stringify({
+  "@context":"https://schema.org",
+  "@type":"Quiz",
+  "name":`Last Season Daily football challenge for ${displayDate}`,
+  "description":"Identify the mystery football season from six progressively revealed clues.",
+  "datePublished":date,
+  "isPartOf":{"@id":"https://lastseason.co.uk/#website"},
+});
+---
+
+<Base title={`Daily Football Challenge - ${displayDate}`} description={`Play the Last Season Daily football history challenge for ${displayDate}. Identify a mystery season from champions, scorers and final-table clues.`} canonical={`/daily/${date}/`} image={`/daily/${date}.png`} schema={schema}>
+  <div class="container daily-date-page">
+    <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span class="sep">/</span><a href="/daily/">Daily game</a><span class="sep">/</span><span class="current">{displayDate}</span></nav>
+    <div class="dated-layout">
+      <header><span class="section-kicker">Replay the archive</span><h1>{displayDate}</h1><p>This challenge is preserved exactly as it appeared. Your result is stored separately from today’s streak.</p><a href="/daily/">Play today’s challenge →</a></header>
+      <DailyGame puzzle={puzzle} answers={seasonAnswers} title={`Last Season Daily · ${date}`} allowLeaderboard={true} />
+    </div>
+  </div>
+</Base>
+
+<style>
+  .daily-date-page { padding-bottom:4rem; }
+  .dated-layout { display:grid; grid-template-columns:minmax(220px,.65fr) minmax(440px,1.35fr); gap:clamp(2rem,7vw,5rem); align-items:start; }
+  .dated-layout > header { position:sticky; top:90px; }
+  .dated-layout h1 { font-size:clamp(2rem,4vw,3.5rem); letter-spacing:-.055em; line-height:1; margin:.5rem 0 1rem; }
+  .dated-layout header p { color:var(--text-secondary); }
+  .dated-layout header a { display:inline-block; margin-top:1rem; font-weight:750; }
+  @media(max-width:800px) { .dated-layout { grid-template-columns:1fr; } .dated-layout > header { position:static; } }
+</style>

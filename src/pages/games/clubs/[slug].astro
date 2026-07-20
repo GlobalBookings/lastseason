@@ -1,0 +1,40 @@
+---
+import Base from "../../../layouts/Base.astro";
+import DailyGame from "../../../components/DailyGame.astro";
+import { addDays, getClubChallenges, getClubPuzzle, isoDate } from "../../../utils/games";
+
+export function getStaticPaths() {
+  return getClubChallenges().map((challenge) => ({ params: { slug: challenge.slug }, props: { challenge } }));
+}
+
+const { challenge } = Astro.props;
+const today = isoDate();
+const puzzle = getClubPuzzle(challenge, today);
+const cycle = Array.from({ length: challenge.puzzles.length }, (_, index) => getClubPuzzle(challenge, addDays("1970-01-01", index)));
+const description = `Test your ${challenge.name} knowledge. Identify the season from final position, points, results and goals in this free daily club challenge.`;
+---
+
+<Base title={`${challenge.name} Season Quiz - Daily Club Challenge`} description={description} canonical={`/games/clubs/${challenge.slug}/`}>
+  <div class="container club-game-layout">
+    <header>
+      <a href="/games/" class="back-link">← All games</a>
+      <span class="club-game-badge">{challenge.name.slice(0,2).toUpperCase()}</span>
+      <span class="section-kicker">Club archive challenge</span>
+      <h1>Know your {challenge.name} seasons?</h1>
+      <p>Use the final numbers to identify the right campaign. A different published season appears each day.</p>
+      <button type="button" class="favourite-button button" data-favourite-club={challenge.slug} data-club-name={challenge.name} aria-pressed="false"><span aria-hidden="true">★</span><span data-favourite-club-label>Follow {challenge.name}</span></button>
+    </header>
+    <DailyGame puzzle={puzzle} answers={challenge.answers} puzzleCycle={cycle} title={`${challenge.name} Challenge`} />
+  </div>
+</Base>
+
+<style>
+  .club-game-layout { display:grid; grid-template-columns:minmax(250px,.75fr) minmax(440px,1.25fr); gap:clamp(2rem,7vw,5rem); align-items:start; padding-top:3rem; padding-bottom:5rem; }
+  .club-game-layout > header { position:sticky; top:90px; }
+  .back-link { display:block; margin-bottom:1.5rem; font-size:.75rem; font-weight:750; }
+  .club-game-badge { display:grid; place-items:center; width:64px; height:64px; margin-bottom:1rem; border-radius:18px; background:#0b1620; color:#75e6a3; font-weight:850; }
+  .club-game-layout h1 { font-size:clamp(2.2rem,4.5vw,4rem); line-height:1; letter-spacing:-.06em; margin:.5rem 0 1rem; }
+  .club-game-layout header p { color:var(--text-secondary); }
+  .club-game-layout .favourite-button { margin-top:1.2rem; color:var(--text); }
+  @media(max-width:800px) { .club-game-layout { grid-template-columns:1fr; } .club-game-layout > header { position:static; } }
+</style>

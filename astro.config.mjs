@@ -12,6 +12,7 @@ export default defineConfig({
       "/records/",
       "/mls/",
       "/data/",
+      "/my/",
       "/championship/2022-23/",
       "/championship/2021-22/",
       "/la-liga/2023-24/",

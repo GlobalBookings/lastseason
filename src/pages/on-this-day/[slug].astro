@@ -1,0 +1,38 @@
+---
+import Base from "../../layouts/Base.astro";
+import { footballAnniversaries } from "../../data/on-this-day";
+
+export function getStaticPaths() {
+  return footballAnniversaries.map((event) => ({ params: { slug: event.slug }, props: { event } }));
+}
+const { event } = Astro.props;
+const schema = JSON.stringify({
+  "@context":"https://schema.org", "@type":"Article", "headline":event.title,
+  "datePublished":`${event.year}-${event.slug.startsWith("april") ? "04" : event.slug.startsWith("may") ? "05" : "06"}-${(event.slug.split("-").at(-1) ?? "1").padStart(2,"0")}`,
+  "author":{"@type":"Organization","name":"Last Season"}, "publisher":{"@id":"https://lastseason.co.uk/#organization"},
+  "mainEntityOfPage":`https://lastseason.co.uk/on-this-day/${event.slug}/`,
+});
+---
+
+<Base title={`${event.dateLabel}: ${event.title}`} description={`${event.summary} Explore the ${event.seasonLabel} final table and scorers.`} canonical={`/on-this-day/${event.slug}/`} schema={schema}>
+  <article class="container otd-article">
+    <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span class="sep">/</span><a href="/on-this-day/">On this day</a><span class="sep">/</span><span class="current">{event.dateLabel}</span></nav>
+    <header><span class="otd-date">{event.dateLabel} {event.year}</span><h1>{event.title}</h1><p>{event.summary}</p></header>
+    <section class="otd-season"><span class="section-kicker">Continue into the archive</span><h2>{event.seasonLabel}</h2><p>See the final standings, Golden Boot race, season totals and the wider story around this anniversary.</p><a class="button" href={event.seasonUrl}>Explore the complete season</a></section>
+    <footer><span>Source</span><a href={event.sourceUrl} target="_blank" rel="noopener noreferrer">{event.sourceName} ↗</a><p>Last Season summarises this moment and links to the primary source for verification.</p></footer>
+  </article>
+</Base>
+
+<style>
+  .otd-article { max-width:880px; padding-bottom:5rem; }
+  .otd-article > header { padding:clamp(2rem,6vw,5rem) 0; }
+  .otd-date { color:#087a3e; font-size:.72rem; font-weight:850; letter-spacing:.1em; text-transform:uppercase; }
+  .otd-article h1 { max-width:13ch; font-size:clamp(2.7rem,7vw,6rem); line-height:.94; letter-spacing:-.07em; margin:.75rem 0 1.2rem; }
+  .otd-article header p { max-width:60ch; color:var(--text-secondary); font-size:1.1rem; }
+  .otd-season { padding:1.5rem; background:#0b1620; color:#fff; border-radius:20px; }
+  .otd-season h2 { color:#fff; font-size:1.8rem; }
+  .otd-season p { color:#a8b7c2; }
+  .otd-article footer { margin-top:1.5rem; padding-top:1rem; border-top:1px solid var(--border); font-size:.75rem; }
+  .otd-article footer > span { margin-right:.5rem; color:var(--text-muted); }
+  .otd-article footer p { color:var(--text-muted); }
+</style>

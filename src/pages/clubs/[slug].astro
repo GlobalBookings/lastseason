@@ -112,6 +112,10 @@ const pageTitle = `${club.name}  -  Published Season History & Stats`;
     <section class="page-hero">
       <h1>{club.name}</h1>
       <p class="subtitle">{subtitleText}</p>
+      <div class="club-hero-actions">
+        <button type="button" class="favourite-button button" data-favourite-club={club.slug} data-club-name={club.name} aria-pressed="false"><span aria-hidden="true">★</span><span data-favourite-club-label>Follow {club.name}</span></button>
+        {club.seasons.length >= 3 && <a class="button button-secondary" href={`/games/clubs/${club.slug}/`}>Play club challenge</a>}
+      </div>
       <div class="hero-stats">
         <div class="hero-stat"><span class="hero-stat-value">{bestFinish}{suffix}</span><span class="hero-stat-label">Best Finish</span></div>
         <div class="hero-stat"><span class="hero-stat-value">{club.seasons.length}</span><span class="hero-stat-label">Seasons</span></div>
@@ -189,6 +193,8 @@ const pageTitle = `${club.name}  -  Published Season History & Stats`;
 </Base>
 
 <style>
+  .club-hero-actions { display:flex; flex-wrap:wrap; gap:.55rem; margin:.9rem 0 1.25rem; }
+  .club-hero-actions .button { margin:0; }
   .profile-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));

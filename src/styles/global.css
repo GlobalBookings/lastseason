@@ -173,6 +173,9 @@ strong { font-weight: 650; }
 }
 
 .site-nav .nav-live { color:#d9ffe7; }
+.site-nav .nav-daily { color:#07150d; background:#71e69e; font-weight:800; }
+.site-nav .nav-daily:hover,.site-nav .nav-daily[aria-current="page"] { color:#07150d; background:#8cebb0; }
+.site-nav .nav-profile { color:#fff; border:1px solid rgba(255,255,255,.16); }
 .nav-live > span,
 .mobile-live-link > span { width:7px; height:7px; border-radius:50%; background:#54e38e; box-shadow:0 0 0 4px rgba(84,227,142,.12); display:inline-block; margin-right:.28rem; }
 
@@ -1291,6 +1294,11 @@ button:focus-visible {
 /* ============================================
    RESPONSIVE
    ============================================ */
+@media (max-width: 1100px) {
+  .site-nav { display: none; }
+  .nav-toggle { display: block; }
+}
+
 @media (max-width: 768px) {
   .site-nav { display: none; }
   .nav-toggle { display: block; }

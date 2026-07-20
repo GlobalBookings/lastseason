@@ -49,9 +49,62 @@ function json(payload, status = 200) {
   });
 }
 
+function cleanNickname(value) {
+  return String(value || "Archive fan").replace(/[^\p{L}\p{N} _.-]/gu, "").trim().slice(0, 24) || "Archive fan";
+}
+
+async function readLeaderboard(env, url) {
+  if (!env.COMMUNITY_DB) return json({ available: false, solved: 0, averageAttempts: null, leaders: [] });
+  const date = url.searchParams.get("date") || new Date().toISOString().slice(0, 10);
+  const mode = url.searchParams.get("mode") || "season";
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return json({ error: "Invalid date" }, 400);
+  const summary = await env.COMMUNITY_DB.prepare(
+    "SELECT COUNT(*) AS played, SUM(solved) AS solved, AVG(CASE WHEN solved = 1 THEN attempts END) AS averageAttempts FROM daily_scores WHERE puzzle_date = ? AND mode = ?"
+  ).bind(date, mode).first();
+  const leaders = await env.COMMUNITY_DB.prepare(
+    "SELECT nickname, attempts FROM daily_scores WHERE puzzle_date = ? AND mode = ? AND solved = 1 ORDER BY attempts ASC, duration_ms ASC, created_at ASC LIMIT 20"
+  ).bind(date, mode).all();
+  return json({
+    available: true,
+    played: Number(summary?.played || 0),
+    solved: Number(summary?.solved || 0),
+    averageAttempts: summary?.averageAttempts === null ? null : Number(summary.averageAttempts),
+    leaders: leaders.results || [],
+  });
+}
+
+async function writeLeaderboard(request, env) {
+  if (!env.COMMUNITY_DB) return json({ available: false }, 202);
+  let body;
+  try { body = await request.json(); } catch { return json({ error: "Invalid JSON" }, 400); }
+  const date = String(body.date || "");
+  const mode = String(body.mode || "");
+  const playerId = String(body.playerId || "").slice(0, 64);
+  const attempts = Number(body.attempts);
+  const durationMs = Math.max(1000, Math.min(3_600_000, Number(body.durationMs) || 1000));
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !["season", "player", "missing-club"].includes(mode) || !/^[a-zA-Z0-9-]{12,64}$/.test(playerId) || !Number.isInteger(attempts) || attempts < 1 || attempts > 6) {
+    return json({ error: "Invalid score" }, 400);
+  }
+  await env.COMMUNITY_DB.prepare(
+    `INSERT INTO daily_scores (puzzle_date, mode, player_id, nickname, attempts, solved, duration_ms)
+     VALUES (?, ?, ?, ?, ?, ?, ?)
+     ON CONFLICT(puzzle_date, mode, player_id) DO UPDATE SET
+       nickname = excluded.nickname,
+       attempts = MIN(daily_scores.attempts, excluded.attempts),
+       solved = MAX(daily_scores.solved, excluded.solved),
+       duration_ms = MIN(daily_scores.duration_ms, excluded.duration_ms)`
+  ).bind(date, mode, playerId, cleanNickname(body.nickname), attempts, body.solved ? 1 : 0, durationMs).run();
+  return json({ saved: true }, 201);
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (url.pathname === "/api/leaderboard") {
+      if (request.method === "GET") return readLeaderboard(env, url);
+      if (request.method === "POST") return writeLeaderboard(request, env);
+      return json({ error: "Method not allowed" }, 405);
+    }
     if (url.pathname === "/api/scores") {
       const slug = url.searchParams.get("league") || "premier-league";
       const league = SCORE_LEAGUES[slug];

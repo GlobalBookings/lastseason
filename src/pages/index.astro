@@ -86,6 +86,12 @@ const homepageSchema = JSON.stringify({
       <ScoreCentre compact={true} />
     </div>
 
+    <section class="daily-home-callout">
+      <div><span class="section-kicker">One season. Six clues.</span><h2>Last Season Daily</h2><p>A fresh football-history challenge every day. Protect your streak, share your score and unlock the complete season.</p></div>
+      <div class="daily-home-clues" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+      <a href="/daily/" class="button">Play today’s challenge</a>
+    </section>
+
     <section class="return-shelf" id="return-shelf" hidden aria-labelledby="return-shelf-title">
       <div class="return-shelf__head">
         <div><span class="section-kicker">Your football shelf</span><h2 id="return-shelf-title">Carry on exploring</h2></div>
@@ -151,7 +157,7 @@ const homepageSchema = JSON.stringify({
       </div>
     </section>
 
-    <div class="home-leagues">
+    <div class="home-leagues" id="leagues">
       <div class="archive-intro"><div><span class="section-kicker">The long view</span><h2>Explore by league</h2></div><p>Every card opens a completed season with its final table, leading scorers and the story behind the numbers.</p></div>
       {reviewedLeagues.map((league) => {
         const reviewedSeasons = league.seasons.filter((season) => !unverifiedSeasonKeys.has(`${league.slug}/${season}`));
@@ -258,6 +264,14 @@ const homepageSchema = JSON.stringify({
   .hero-spotlight__footer { display:flex; align-items:end; justify-content:space-between; gap:1rem; padding:1rem 0; color:#8192a1; font-size:.66rem; }
   .hero-spotlight__footer strong { color:#fff; font-size:.8rem; }
   .hero-spotlight__footer > span:last-child { color:#fff; font-size:1.45rem; font-weight:850; }
+  .daily-home-callout { display:grid; grid-template-columns:1fr auto auto; gap:1.5rem; align-items:center; margin:1.25rem 0; padding:1.3rem 1.45rem; border-radius:18px; background:radial-gradient(circle at 75%,rgba(113,230,158,.18),transparent 28%),#0b1620; color:#fff; }
+  .daily-home-callout h2 { color:#fff; font-size:1.45rem; }
+  .daily-home-callout p { max-width:58ch; margin:0; color:#9eafbb; font-size:.8rem; }
+  .daily-home-callout .button { margin:0; white-space:nowrap; }
+  .daily-home-clues { display:flex; gap:.3rem; }
+  .daily-home-clues span { width:22px; height:8px; border-radius:999px; background:#344653; }
+  .daily-home-clues span:first-child { background:#71e69e; }
+  @media(max-width:760px) { .daily-home-callout { grid-template-columns:1fr; } .daily-home-clues { display:none; } }
   .hero-spotlight__footer small { color:#8192a1; font-size:.62rem; font-weight:600; }
   .hero-spotlight > a { display:flex; justify-content:space-between; align-items:center; border-radius:10px; background:#fff; color:#0b1620; padding:.72rem .85rem; font-size:.75rem; font-weight:800; }
   .home-main { position:relative; padding-bottom:4rem; }

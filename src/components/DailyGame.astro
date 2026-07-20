@@ -1,0 +1,324 @@
+---
+import type { AnswerOption, GamePuzzle } from "../utils/games";
+
+interface Props {
+  puzzle: GamePuzzle;
+  answers: AnswerOption[];
+  puzzleCycle?: GamePuzzle[];
+  title?: string;
+  allowLeaderboard?: boolean;
+}
+
+const { puzzle, answers, puzzleCycle = [], title = "Last Season Daily", allowLeaderboard = false } = Astro.props;
+const data = JSON.stringify({ puzzle, answers, puzzleCycle, title, allowLeaderboard }).replace(/</g, "\\u003c");
+---
+
+<section class="daily-game" data-daily-game style={`--game-accent:${puzzle.accent}`}>
+  <script is:inline type="application/json" data-game-data set:html={data}></script>
+
+  <header class="game-head">
+    <div>
+      <span class="game-kicker" data-game-eyebrow>{puzzle.eyebrow}</span>
+      <h2 data-game-title>{title}</h2>
+      <p data-game-date>{puzzle.date ? new Date(`${puzzle.date}T12:00:00Z`).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }) : puzzle.category}</p>
+    </div>
+    <div class="game-streak" aria-label="Current streak"><span aria-hidden="true">🔥</span><strong data-game-streak>0</strong><small>streak</small></div>
+  </header>
+
+  <div class="game-progress" aria-label="Six guesses available">
+    {Array.from({ length: 6 }, (_, index) => <span data-progress-step={index} aria-hidden="true"></span>)}
+  </div>
+
+  <ol class="game-clues" aria-live="polite" data-game-clues>
+    {puzzle.clues.map((clue, index) => (
+      <li data-clue={index} hidden={index > 0}>
+        <span>{String(index + 1).padStart(2, "0")}</span>
+        <p>{clue}</p>
+      </li>
+    ))}
+  </ol>
+
+  <form class="game-guess" data-game-form>
+    <label data-game-label for={`game-answer-${puzzle.mode}`}>Your answer</label>
+    <div>
+      <input id={`game-answer-${puzzle.mode}`} data-game-input list={`game-options-${puzzle.mode}`} autocomplete="off" placeholder={puzzle.mode === "season" || puzzle.mode === "club-season" ? "Start typing a league or season…" : "Start typing a club or player…"} required />
+      <datalist id={`game-options-${puzzle.mode}`} data-game-options>
+        {answers.map((answer) => <option value={answer.label}></option>)}
+      </datalist>
+      <button type="submit">Guess</button>
+    </div>
+    <p class="game-feedback" data-game-feedback aria-live="polite">Clue one is on the board. You have six attempts.</p>
+  </form>
+
+  <section class="game-result" data-game-result hidden aria-live="polite">
+    <div class="game-result__status" data-result-status>Solved</div>
+    <h3 data-result-title>{puzzle.resultTitle}</h3>
+    <p data-result-summary>{puzzle.resultSummary}</p>
+    <div class="game-result__actions">
+      <button type="button" class="button" data-share-result>Share result</button>
+      <a class="button button-secondary" data-result-link href={puzzle.resultUrl}>Explore the answer</a>
+    </div>
+    <p class="game-share-feedback" data-share-feedback aria-live="polite"></p>
+  </section>
+
+  <section class="game-community" data-game-community hidden>
+    <div><span>Today’s community</span><strong data-community-solved>—</strong><small>solved</small></div>
+    <div><span>Average</span><strong data-community-average>—</strong><small>guesses</small></div>
+    <ol data-community-list></ol>
+  </section>
+
+  <footer class="game-foot">
+    <button type="button" data-game-stats-toggle>My stats</button>
+    <span>One puzzle each day · No account required</span>
+  </footer>
+
+  <dialog class="game-stats-dialog" data-game-stats-dialog>
+    <button type="button" class="dialog-close" data-game-stats-close aria-label="Close">×</button>
+    <span class="game-kicker">Your record</span>
+    <h3>Daily stats</h3>
+    <div class="game-stats-grid">
+      <div><strong data-stat-played>0</strong><span>Played</span></div>
+      <div><strong data-stat-win-rate>0%</strong><span>Win rate</span></div>
+      <div><strong data-stat-streak>0</strong><span>Streak</span></div>
+      <div><strong data-stat-best>0</strong><span>Best</span></div>
+    </div>
+    <div class="game-achievements" data-game-achievements></div>
+    <a href="/my/" class="button">Open My Last Season</a>
+  </dialog>
+</section>
+
+<script is:inline>
+  (() => {
+    const normalise = (value) => String(value || "").trim().toLocaleLowerCase("en-GB").replace(/[’']/g, "'").replace(/\s+/g, " ");
+    const dayIndex = (dateKey) => Math.floor(Date.parse(`${dateKey}T00:00:00Z`) / 86400000);
+    const localDateKey = () => {
+      const now = new Date();
+      const offset = now.getTimezoneOffset() * 60000;
+      return new Date(now.getTime() - offset).toISOString().slice(0, 10);
+    };
+    const readJson = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); } catch { return fallback; } };
+    const saveJson = (key, value) => { try { localStorage.setItem(key, JSON.stringify(value)); } catch {} };
+    const statsKey = "lastseason-game-stats-v1";
+
+    document.querySelectorAll("[data-daily-game]").forEach((root) => {
+      const config = JSON.parse(root.querySelector("[data-game-data]")?.textContent || "{}");
+      let puzzle = config.puzzle;
+      const isRuntimeDaily = Array.isArray(config.puzzleCycle) && config.puzzleCycle.length > 0;
+      const dateKey = isRuntimeDaily ? localDateKey() : (puzzle.date || localDateKey());
+      if (isRuntimeDaily) {
+        puzzle = structuredClone(config.puzzleCycle[Math.abs(dayIndex(dateKey)) % config.puzzleCycle.length]);
+        puzzle.date = dateKey;
+        puzzle.id = `${puzzle.mode}:${dateKey}:${puzzle.answerKey}`;
+      }
+
+      root.style.setProperty("--game-accent", puzzle.accent);
+      root.querySelector("[data-game-eyebrow]").textContent = puzzle.eyebrow;
+      root.querySelector("[data-game-date]").textContent = puzzle.date
+        ? new Date(`${puzzle.date}T12:00:00Z`).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })
+        : puzzle.category;
+      const clueList = root.querySelector("[data-game-clues]");
+      clueList.replaceChildren(...puzzle.clues.map((clue, index) => {
+        const item = document.createElement("li"); item.dataset.clue = String(index); item.hidden = index > 0;
+        const number = document.createElement("span"); number.textContent = String(index + 1).padStart(2, "0");
+        const copy = document.createElement("p"); copy.textContent = clue;
+        item.append(number, copy); return item;
+      }));
+
+      const stateKey = `lastseason-game:${puzzle.id}`;
+      const state = readJson(stateKey, { guesses: [], solved: false, finished: false, startedAt: Date.now(), recorded: false });
+      const form = root.querySelector("[data-game-form]");
+      const input = root.querySelector("[data-game-input]");
+      const feedback = root.querySelector("[data-game-feedback]");
+      const result = root.querySelector("[data-game-result]");
+      const answerByLabel = new Map(config.answers.map((answer) => [normalise(answer.label), answer]));
+      const answerByKey = new Map(config.answers.map((answer) => [normalise(answer.key), answer]));
+
+      const getStats = () => readJson(statsKey, { played: 0, wins: 0, streak: 0, bestStreak: 0, lastPlayed: "", distribution: [0,0,0,0,0,0], leagueWins: {}, completed: [] });
+      const drawStats = () => {
+        const stats = getStats();
+        root.querySelector("[data-game-streak]").textContent = String(stats.streak || 0);
+        root.querySelector("[data-stat-played]").textContent = String(stats.played || 0);
+        root.querySelector("[data-stat-win-rate]").textContent = `${stats.played ? Math.round((stats.wins / stats.played) * 100) : 0}%`;
+        root.querySelector("[data-stat-streak]").textContent = String(stats.streak || 0);
+        root.querySelector("[data-stat-best]").textContent = String(stats.bestStreak || 0);
+        const achievements = [
+          [stats.wins >= 1, "First whistle", "Win your first game"],
+          [stats.streak >= 3, "Hat-trick", "Reach a 3-day streak"],
+          [stats.streak >= 7, "Invincible week", "Reach a 7-day streak"],
+          [(stats.distribution?.[0] || 0) >= 1, "First touch", "Solve on guess one"],
+          [stats.wins >= 10, "Historian", "Win 10 games"],
+        ];
+        const wrap = root.querySelector("[data-game-achievements]");
+        wrap.replaceChildren(...achievements.map(([earned, name, description]) => {
+          const badge = document.createElement("div"); badge.className = earned ? "is-earned" : "";
+          badge.innerHTML = `<span aria-hidden="true">${earned ? "✓" : "○"}</span><div><strong></strong><small></small></div>`;
+          badge.querySelector("strong").textContent = name; badge.querySelector("small").textContent = description; return badge;
+        }));
+      };
+
+      const record = () => {
+        if (state.recorded) return;
+        const stats = getStats();
+        const currentDay = dayIndex(dateKey);
+        const lastDay = stats.lastPlayed ? dayIndex(stats.lastPlayed) : null;
+        stats.played += 1;
+        if (state.solved) {
+          stats.wins += 1;
+          stats.distribution[Math.max(0, state.guesses.length - 1)] = (stats.distribution[Math.max(0, state.guesses.length - 1)] || 0) + 1;
+          stats.streak = lastDay === currentDay ? stats.streak : lastDay === currentDay - 1 ? stats.streak + 1 : 1;
+          stats.bestStreak = Math.max(stats.bestStreak, stats.streak);
+          stats.leagueWins[puzzle.category] = (stats.leagueWins[puzzle.category] || 0) + 1;
+        } else if (lastDay !== currentDay) stats.streak = 0;
+        stats.lastPlayed = dateKey;
+        stats.completed = [...new Set([...(stats.completed || []), puzzle.id])].slice(-180);
+        saveJson(statsKey, stats);
+        state.recorded = true; saveJson(stateKey, state); drawStats();
+        document.dispatchEvent(new CustomEvent("lastseason:game-complete", { detail: { puzzle, state, stats } }));
+        if (config.allowLeaderboard) submitCommunity();
+      };
+
+      const reveal = () => {
+        const visible = Math.min(6, Math.max(1, state.finished ? 6 : state.guesses.length + 1));
+        root.querySelectorAll("[data-clue]").forEach((clue, index) => { clue.hidden = index >= visible; });
+        root.querySelectorAll("[data-progress-step]").forEach((step, index) => {
+          step.classList.toggle("is-used", index < state.guesses.length);
+          step.classList.toggle("is-win", state.solved && index === state.guesses.length - 1);
+        });
+        if (!state.finished) return;
+        form.hidden = true; result.hidden = false;
+        root.querySelector("[data-result-status]").textContent = state.solved ? `Solved in ${state.guesses.length}` : "Answer revealed";
+        root.querySelector("[data-result-title]").textContent = puzzle.resultTitle;
+        root.querySelector("[data-result-summary]").textContent = puzzle.resultSummary;
+        root.querySelector("[data-result-link]").href = puzzle.resultUrl;
+        record();
+      };
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault(); if (state.finished) return;
+        const typed = normalise(input.value);
+        const selected = answerByLabel.get(typed) || answerByKey.get(typed);
+        if (!selected) { feedback.textContent = "Choose a valid answer from the suggestions."; input.focus(); return; }
+        state.guesses.push(selected.label);
+        state.solved = selected.key === puzzle.answerKey;
+        state.finished = state.solved || state.guesses.length >= 6;
+        saveJson(stateKey, state);
+        feedback.textContent = state.solved ? "That’s it — excellent archive knowledge." : state.finished ? `The answer was ${puzzle.answer}.` : `${selected.label} is not it. Clue ${state.guesses.length + 1} is now open.`;
+        input.value = ""; reveal();
+      });
+
+      const shareText = () => {
+        const blocks = Array.from({ length: 6 }, (_, index) => index < state.guesses.length ? (state.solved && index === state.guesses.length - 1 ? "🟩" : "⬛") : "⬜").join("");
+        return `${config.title} · ${dateKey}\n${blocks}\n${state.solved ? `${state.guesses.length}/6` : "X/6"} · Streak ${getStats().streak || 0} 🔥\nhttps://lastseason.co.uk/daily/`;
+      };
+      root.querySelector("[data-share-result]").addEventListener("click", async () => {
+        const text = shareText();
+        try {
+          if (navigator.share) await navigator.share({ title: config.title, text });
+          else await navigator.clipboard.writeText(text);
+          root.querySelector("[data-share-feedback]").textContent = navigator.share ? "Shared." : "Result copied to your clipboard.";
+        } catch (error) { if (error?.name !== "AbortError") root.querySelector("[data-share-feedback]").textContent = "Copying failed — please try again."; }
+      });
+
+      const dialog = root.querySelector("[data-game-stats-dialog]");
+      root.querySelector("[data-game-stats-toggle]").addEventListener("click", () => { drawStats(); dialog.showModal(); });
+      root.querySelector("[data-game-stats-close]").addEventListener("click", () => dialog.close());
+
+      const playerId = (() => {
+        try { let id = localStorage.getItem("lastseason-player-id"); if (!id) { id = crypto.randomUUID(); localStorage.setItem("lastseason-player-id", id); } return id; }
+        catch { return crypto.randomUUID(); }
+      })();
+      async function submitCommunity() {
+        try {
+          const profile = readJson("lastseason-profile", {});
+          await fetch("/api/leaderboard", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ playerId, nickname: profile.nickname || "Archive fan", date: dateKey, mode: puzzle.mode, attempts: state.guesses.length, solved: state.solved, durationMs: Math.max(1000, Date.now() - state.startedAt) }) });
+          loadCommunity();
+        } catch {}
+      }
+      async function loadCommunity() {
+        if (!config.allowLeaderboard) return;
+        try {
+          const response = await fetch(`/api/leaderboard?date=${encodeURIComponent(dateKey)}&mode=${encodeURIComponent(puzzle.mode)}`);
+          if (!response.ok) return;
+          const community = await response.json();
+          root.querySelector("[data-game-community]").hidden = false;
+          root.querySelector("[data-community-solved]").textContent = String(community.solved || 0);
+          root.querySelector("[data-community-average]").textContent = community.averageAttempts ? Number(community.averageAttempts).toFixed(1) : "—";
+          const list = root.querySelector("[data-community-list]");
+          list.replaceChildren(...(community.leaders || []).slice(0, 5).map((entry, index) => {
+            const row = document.createElement("li"); row.innerHTML = `<span>${index + 1}</span><strong></strong><small></small>`;
+            row.querySelector("strong").textContent = entry.nickname; row.querySelector("small").textContent = `${entry.attempts}/6`; return row;
+          }));
+        } catch {}
+      }
+
+      drawStats(); reveal(); loadCommunity();
+    });
+  })();
+</script>
+
+<style>
+  .daily-game { overflow:hidden; background:#fff; border:1px solid var(--border); border-radius:24px; box-shadow:var(--shadow-lg); }
+  .game-head { display:flex; justify-content:space-between; gap:1.5rem; padding:clamp(1.25rem,4vw,2rem); background:linear-gradient(135deg,#0b1620,#132737); color:#fff; border-top:4px solid var(--game-accent); }
+  .game-kicker { display:block; color:#75e6a3; font-size:.66rem; font-weight:850; text-transform:uppercase; letter-spacing:.12em; margin-bottom:.35rem; }
+  .game-head h2 { color:#fff; font-size:clamp(1.55rem,4vw,2.3rem); letter-spacing:-.04em; }
+  .game-head p { color:#98a9b7; margin:.2rem 0 0; font-size:.82rem; }
+  .game-streak { min-width:74px; display:grid; grid-template-columns:auto auto; align-items:center; align-content:center; justify-content:center; column-gap:.3rem; padding:.7rem; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.1); border-radius:14px; }
+  .game-streak strong { font-size:1.3rem; }
+  .game-streak small { grid-column:1/-1; color:#91a1ae; font-size:.58rem; letter-spacing:.08em; text-transform:uppercase; text-align:center; }
+  .game-progress { display:grid; grid-template-columns:repeat(6,1fr); gap:.35rem; padding:1rem clamp(1.25rem,4vw,2rem) 0; }
+  .game-progress span { height:5px; border-radius:999px; background:#e6ece9; transition:.2s ease; }
+  .game-progress span.is-used { background:#263845; }
+  .game-progress span.is-win { background:#31c878; }
+  .game-clues { list-style:none; display:grid; gap:.65rem; padding:1.25rem clamp(1.25rem,4vw,2rem); }
+  .game-clues li { display:grid; grid-template-columns:38px 1fr; align-items:center; gap:.8rem; min-height:58px; padding:.65rem .85rem; border:1px solid #e2e8e5; border-radius:13px; background:#f8faf9; animation:clue-in .32s ease both; }
+  .game-clues li > span { display:grid; place-items:center; width:34px; height:34px; border-radius:10px; background:#0b1620; color:#75e6a3; font-size:.66rem; font-weight:850; }
+  .game-clues p { margin:0; line-height:1.4; color:#2d3b46; font-size:.9rem; }
+  .game-guess { padding:0 clamp(1.25rem,4vw,2rem) 1.5rem; }
+  .game-guess label { display:block; margin-bottom:.45rem; font-size:.7rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--text-secondary); }
+  .game-guess > div { display:grid; grid-template-columns:1fr auto; border:1px solid #bac5c0; border-radius:12px; padding:.35rem; background:#fff; box-shadow:0 0 0 3px transparent; transition:.2s; }
+  .game-guess > div:focus-within { border-color:var(--game-accent); box-shadow:0 0 0 3px color-mix(in srgb,var(--game-accent) 15%,transparent); }
+  .game-guess input { min-width:0; border:0; outline:0; padding:.75rem; font:600 .9rem var(--font); color:var(--text); }
+  .game-guess button { border:0; border-radius:8px; background:#0b1620; color:#fff; font:800 .78rem var(--font); padding:.7rem 1rem; cursor:pointer; }
+  .game-feedback,.game-share-feedback { min-height:1.4em; margin:.55rem 0 0; color:var(--text-secondary); font-size:.76rem; }
+  .game-result { margin:0 clamp(1.25rem,4vw,2rem) 1.5rem; padding:1.25rem; background:#edfff3; border:1px solid #ace9c2; border-radius:16px; }
+  .game-result__status { color:#08733a; font-size:.66rem; font-weight:850; letter-spacing:.1em; text-transform:uppercase; }
+  .game-result h3 { margin:.3rem 0 0; font-size:1.45rem; }
+  .game-result p { margin:.15rem 0 0; }
+  .game-result__actions { display:flex; flex-wrap:wrap; gap:.55rem; margin-top:1rem; }
+  .game-result__actions .button { margin:0; }
+  .game-community { display:grid; grid-template-columns:repeat(2,1fr); gap:.65rem; margin:0 clamp(1.25rem,4vw,2rem) 1.25rem; padding:1rem; background:#f4f6f5; border-radius:14px; }
+  .game-community > div { display:grid; grid-template-columns:1fr auto; align-items:end; }
+  .game-community > div span { grid-column:1/-1; color:var(--text-muted); font-size:.65rem; text-transform:uppercase; letter-spacing:.07em; }
+  .game-community > div strong { font-size:1.35rem; }
+  .game-community > div small { color:var(--text-muted); }
+  .game-community ol { grid-column:1/-1; list-style:none; border-top:1px solid var(--border); padding-top:.55rem; }
+  .game-community li { display:grid; grid-template-columns:24px 1fr auto; gap:.5rem; padding:.3rem 0; font-size:.76rem; }
+  .game-community li span,.game-community li small { color:var(--text-muted); }
+  .game-foot { display:flex; justify-content:space-between; gap:1rem; padding:.85rem clamp(1.25rem,4vw,2rem); border-top:1px solid var(--border); color:var(--text-muted); font-size:.68rem; }
+  .game-foot button { border:0; background:none; color:var(--link); font:750 .7rem var(--font); cursor:pointer; }
+  .game-stats-dialog { width:min(92vw,480px); border:0; border-radius:20px; padding:1.5rem; box-shadow:0 24px 80px rgba(0,0,0,.3); }
+  .game-stats-dialog::backdrop { background:rgba(6,13,19,.7); backdrop-filter:blur(4px); }
+  .dialog-close { position:absolute; top:.8rem; right:.8rem; width:34px; height:34px; border:0; border-radius:50%; background:#eef2ef; font-size:1.25rem; cursor:pointer; }
+  .game-stats-dialog h3 { font-size:1.7rem; }
+  .game-stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:.5rem; margin:1rem 0; }
+  .game-stats-grid div { text-align:center; padding:.75rem .35rem; background:#f3f6f4; border-radius:12px; }
+  .game-stats-grid strong,.game-stats-grid span { display:block; }
+  .game-stats-grid strong { font-size:1.25rem; }
+  .game-stats-grid span { color:var(--text-muted); font-size:.62rem; }
+  .game-achievements { display:grid; gap:.45rem; margin:1rem 0; }
+  .game-achievements > div { display:grid; grid-template-columns:30px 1fr; gap:.55rem; align-items:center; opacity:.45; }
+  .game-achievements > div.is-earned { opacity:1; }
+  .game-achievements > div > span { display:grid; place-items:center; width:28px; height:28px; border-radius:9px; background:#e8eeeb; }
+  .game-achievements .is-earned > span { background:#d8fae5; color:#08733a; }
+  .game-achievements strong,.game-achievements small { display:block; }
+  .game-achievements small { color:var(--text-muted); }
+  @keyframes clue-in { from { opacity:0; transform:translateY(-5px); } }
+  @media (max-width:520px) {
+    .game-head { padding:1.15rem; }
+    .game-clues,.game-progress { padding-left:1rem; padding-right:1rem; }
+    .game-guess { padding-left:1rem; padding-right:1rem; }
+    .game-result,.game-community { margin-left:1rem; margin-right:1rem; }
+    .game-foot { align-items:flex-start; padding-left:1rem; padding-right:1rem; }
+    .game-stats-grid { grid-template-columns:repeat(2,1fr); }
+  }
+</style>
