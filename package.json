@@ -9,6 +9,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "check": "astro check",
+    "og:generate": "node scripts/generate-social-images.mjs",
     "audit:data": "node scripts/audit-seasons.mjs",
     "audit:current": "node scripts/audit-seasons.mjs --season=2025-26",
     "audit:release": "node scripts/audit-release.mjs",

@@ -19,8 +19,41 @@ const links = [
 <div class:list={["fantasy-masthead", compact && "fantasy-masthead--compact"]}>
   <div class="container fantasy-masthead__inner">
     <a class="fantasy-brand" href="/fantasy-football/"><span>LS</span><strong>Last Season <em>Fantasy</em></strong></a>
-    <nav aria-label="Fantasy football tools">
-      {links.map(([key, label, href]) => <a href={href} aria-current={active === key ? "page" : undefined}>{label}</a>)}
-    </nav>
+    <div class="fantasy-masthead__tools">
+      <nav aria-label="Fantasy football tools">
+        {links.map(([key, label, href]) => <a href={href} aria-current={active === key ? "page" : undefined}>{label}</a>)}
+      </nav>
+      <button class="fantasy-share" type="button" data-fantasy-share aria-label="Share this fantasy football helper">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><path d="m8.6 10.5 6.8-4M8.6 13.5l6.8 4"></path></svg>
+        <span data-fantasy-share-label aria-live="polite">Share</span>
+      </button>
+    </div>
   </div>
 </div>
+
+<script is:inline>
+  document.querySelectorAll("[data-fantasy-share]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const label = button.querySelector("[data-fantasy-share-label]");
+      const originalLabel = label?.textContent || "Share";
+      const title = document.querySelector('meta[property="og:title"]')?.getAttribute("content") || document.title;
+      const text = document.querySelector('meta[name="description"]')?.getAttribute("content") || "Independent fantasy football advice and data.";
+      const url = document.querySelector('link[rel="canonical"]')?.getAttribute("href") || window.location.href;
+      try {
+        if (navigator.share) {
+          await navigator.share({ title, text, url });
+          if (label) label.textContent = "Shared";
+        } else {
+          await navigator.clipboard.writeText(`${title}\n${url}`);
+          if (label) label.textContent = "Link copied";
+        }
+        window.setTimeout(() => { if (label) label.textContent = originalLabel; }, 1800);
+      } catch (error) {
+        if (error?.name !== "AbortError" && label) {
+          label.textContent = "Try again";
+          window.setTimeout(() => { label.textContent = originalLabel; }, 1800);
+        }
+      }
+    });
+  });
+</script>

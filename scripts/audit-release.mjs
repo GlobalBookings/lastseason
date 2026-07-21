@@ -1,5 +1,6 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join, relative } from "node:path";
+import sharp from "sharp";
 
 const root = process.cwd();
 const dist = join(root, "dist");
@@ -55,6 +56,27 @@ for (const urlPath of required) {
   if (!html.includes(canonical)) errors.push(`Missing self-canonical: ${urlPath}`);
   if (/name="robots" content="[^"]*noindex/i.test(html)) errors.push(`Required page is noindex: ${urlPath}`);
   if (!sitemap.includes(`<loc>${site}${urlPath}</loc>`)) errors.push(`Required page absent from sitemap: ${urlPath}`);
+  const socialImage = html.match(/<meta property="og:image" content="([^"]+)">/i)?.[1];
+  if (!socialImage) {
+    errors.push(`Missing Open Graph image: ${urlPath}`);
+  } else {
+    const socialImagePath = outputPath(new URL(socialImage).pathname);
+    if (!existsSync(socialImagePath)) {
+      errors.push(`Open Graph image does not exist: ${urlPath} -> ${socialImage}`);
+    } else {
+      const metadata = await sharp(socialImagePath).metadata();
+      if (metadata.width !== 1200 || metadata.height !== 630) errors.push(`Open Graph image is not 1200x630: ${urlPath}`);
+    }
+  }
+  for (const tag of [
+    '<meta property="og:image:width" content="1200">',
+    '<meta property="og:image:height" content="630">',
+    '<meta property="og:image:alt"',
+    '<meta name="twitter:card" content="summary_large_image">',
+    '<meta name="twitter:image:alt"',
+  ]) {
+    if (!html.includes(tag)) errors.push(`Missing social metadata ${tag}: ${urlPath}`);
+  }
 }
 
 const htmlFiles = readdirSync(dist, { recursive: true })
