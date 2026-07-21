@@ -1,0 +1,12 @@
+---
+import Base from "../../../layouts/Base.astro";
+import FantasyHeader from "../../../components/FantasyHeader.astro";
+import FantasyDisclaimer from "../../../components/FantasyDisclaimer.astro";
+import { generalTeamNames, clubNameCollections } from "../../../data/fantasy";
+---
+<Base title="Funny Fantasy Football Team Names 2026/27" description="Funny fantasy football team names for 2026/27: current-player puns, retro classics, clever clean names and club-specific ideas." canonical="/fantasy-football/team-names/">
+  <FantasyHeader active="names" /><div class="fantasy-page"><div class="fantasy-tool-hero"><div class="fantasy-container"><nav class="fantasy-breadcrumbs"><a href="/fantasy-football/">Fantasy</a><span>/</span><span>Team names</span></nav><span class="fantasy-eyebrow">Curated, not scraped</span><h1>Funny fantasy football team names.</h1><p>Current players, archive favourites and clean names that still work in a work league. Every suggestion is checked by a human.</p><a class="fantasy-button" href="/fantasy-football/team-name-generator/">Personalise a name</a></div></div>
+  <section class="fantasy-section"><div class="fantasy-container"><div class="fantasy-section__head"><div><span class="fantasy-eyebrow">The shortlist</span><h2>32 names ready to use</h2></div></div><div class="name-list">{generalTeamNames.map(([name,style])=><div class="name-row"><div><strong>{name}</strong><span class="fantasy-pill" style="margin-left:.5rem">{style}</span></div><button type="button" data-copy-name={name}>Copy</button></div>)}</div></div></section>
+  <section class="fantasy-section fantasy-section--tint"><div class="fantasy-container"><div class="fantasy-section__head"><div><span class="fantasy-eyebrow">Pick your club</span><h2>Club-specific names</h2></div></div><div class="fantasy-card-grid fantasy-card-grid--four">{clubNameCollections.map(collection=><a class="fantasy-card" href={`/fantasy-football/team-names/${collection.slug}/`}><span>{collection.names.length} ideas</span><strong>{collection.name}</strong><p>{collection.intro}</p><small>See the names →</small></a>)}</div><FantasyDisclaimer short /></div></section></div>
+  <script is:inline>document.querySelectorAll("[data-copy-name]").forEach(button=>button.addEventListener("click",async()=>{await navigator.clipboard?.writeText(button.dataset.copyName||""); const old=button.textContent; button.textContent="Copied"; setTimeout(()=>button.textContent=old,1200);}));</script>
+</Base>

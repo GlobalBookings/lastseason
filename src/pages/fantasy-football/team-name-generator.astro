@@ -1,0 +1,33 @@
+---
+import Base from "../../layouts/Base.astro";
+import FantasyHeader from "../../components/FantasyHeader.astro";
+import FantasyDisclaimer from "../../components/FantasyDisclaimer.astro";
+import { generalTeamNames, clubNameCollections } from "../../data/fantasy";
+const payload = JSON.stringify({general:generalTeamNames,clubs:clubNameCollections}).replace(/</g,"\\u003c");
+const schema = JSON.stringify({"@context":"https://schema.org","@type":"WebApplication","name":"Fantasy football team-name generator","url":"https://lastseason.co.uk/fantasy-football/team-name-generator/","applicationCategory":"EntertainmentApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"GBP"}});
+---
+
+<Base title="Fantasy Football Team Name Generator 2026/27" description="Generate funny, clever, clean, player-inspired and club-specific fantasy football team names for 2026/27. Free, copy-ready and independently curated." canonical="/fantasy-football/team-name-generator/" schema={schema}>
+  <FantasyHeader active="names" />
+  <div class="fantasy-page"><div class="fantasy-tool-hero"><div class="fantasy-container"><nav class="fantasy-breadcrumbs"><a href="/fantasy-football/">Fantasy</a><span>/</span><span>Team-name generator</span></nav><span class="fantasy-eyebrow">Name lab</span><h1>A name worth keeping past Gameweek 3.</h1><p>Choose a style or club, add an optional favourite-player prompt and get safe, copy-ready ideas—not an unfiltered pile of AI sludge.</p></div></div>
+    <section class="fantasy-section"><div class="fantasy-container name-stage">
+      <div class="name-output" aria-live="polite"><div><small>Your next team name</small><strong id="generated-name">The xG Files</strong><p id="generated-context">Clever · clean · ready to copy</p><div class="fantasy-actions" style="justify-content:center"><button class="fantasy-button" id="generate-name">Another one</button><button class="fantasy-button fantasy-button--secondary" id="copy-name">Copy name</button></div></div></div>
+      <aside class="fantasy-panel"><div class="fantasy-field"><label for="name-club">Club inspiration</label><select id="name-club"><option value="">Any club</option>{clubNameCollections.map(c=><option value={c.slug}>{c.name}</option>)}</select></div><div class="fantasy-field" style="margin-top:.8rem"><label for="name-keyword">Favourite player or word (optional)</label><input id="name-keyword" maxlength="24" placeholder="e.g. Saka" /></div><div style="margin-top:1rem"><span class="fantasy-eyebrow">Style</span><div class="name-filters" id="name-filters">{["all","clever","player","retro","classic","clean"].map((style,i)=><button class="name-filter" data-style={style} aria-pressed={i===0?"true":"false"}>{style[0].toUpperCase()+style.slice(1)}</button>)}</div></div><p class="fantasy-status">Names are moderated for a general football audience. We avoid tragedy, discrimination and personal abuse.</p></aside>
+    </section></div>
+    <section class="fantasy-section fantasy-section--tint"><div class="fantasy-container"><div class="fantasy-section__head"><div><span class="fantasy-eyebrow">Save the shortlist</span><h2>Recent suggestions</h2></div><a href="/fantasy-football/team-names/">Browse the full list →</a></div><div class="name-list" id="recent-names"></div></div></section>
+    <div class="fantasy-container"><FantasyDisclaimer short /></div>
+  </div>
+  <script is:inline type="application/json" id="fantasy-name-data" set:html={payload}></script>
+  <script is:inline>
+    const data=JSON.parse(document.getElementById("fantasy-name-data")?.textContent||"{}"); let style="all", recent=[];
+    const output=document.getElementById("generated-name"), context=document.getElementById("generated-context"), club=document.getElementById("name-club"), keyword=document.getElementById("name-keyword"), recentEl=document.getElementById("recent-names");
+    const cleanKeyword=()=>String(keyword.value||"").replace(/[^a-zA-ZÀ-ž0-9 '\-]/g,"").trim().slice(0,24);
+    const pool=()=>{ const selected=data.clubs.find(c=>c.slug===club.value); if(selected) return selected.names.map(name=>[name,"club"]); const filtered=data.general.filter(item=>style==="all"||item[1]===style); return filtered.length?filtered:data.general; };
+    const customNames=(word)=>word?[`${word} Athletic`,`Expected ${word}`,`${word} and Deliver`,`The ${word} XI`]:[];
+    const renderRecent=()=>{ recentEl.innerHTML=recent.map(name=>`<div class="name-row"><strong>${name.replace(/</g,"&lt;")}</strong><button type="button" data-copy="${name.replace(/"/g,"&quot;")}">Copy</button></div>`).join(""); recentEl.querySelectorAll("[data-copy]").forEach(button=>button.addEventListener("click",()=>navigator.clipboard?.writeText(button.dataset.copy||""))); };
+    const generate=()=>{ const word=cleanKeyword(), choices=[...pool(),...customNames(word).map(name=>[name,"personalised"])]; const pick=choices[Math.floor(Math.random()*choices.length)]||["The xG Files","clever"]; output.textContent=pick[0]; context.textContent=`${pick[1]} · clean · ready to copy`; recent=[pick[0],...recent.filter(n=>n!==pick[0])].slice(0,6); renderRecent(); };
+    const requestedClub=new URLSearchParams(location.search).get("club"); if(requestedClub&&data.clubs.some(c=>c.slug===requestedClub))club.value=requestedClub;
+    document.getElementById("generate-name")?.addEventListener("click",generate); document.getElementById("copy-name")?.addEventListener("click",async()=>{ await navigator.clipboard?.writeText(output.textContent||""); context.textContent="Copied to clipboard"; });
+    document.querySelectorAll("[data-style]").forEach(button=>button.addEventListener("click",()=>{style=button.dataset.style;document.querySelectorAll("[data-style]").forEach(item=>item.setAttribute("aria-pressed",String(item===button)));generate();})); club?.addEventListener("change",generate); keyword?.addEventListener("change",generate); generate();
+  </script>
+</Base>

@@ -1,0 +1,26 @@
+---
+import "../styles/fantasy.css";
+
+interface Props {
+  active?: string;
+  compact?: boolean;
+}
+
+const { active = "", compact = false } = Astro.props;
+const links = [
+  ["builder", "Squad assistant", "/fantasy-football/squad-builder/"],
+  ["fixtures", "Fixtures", "/fantasy-football/fixture-planner/"],
+  ["captain", "Captain picker", "/fantasy-football/captain-picker/"],
+  ["names", "Team names", "/fantasy-football/team-name-generator/"],
+  ["plan", "My plan", "/fantasy-football/my-plan/"],
+];
+---
+
+<div class:list={["fantasy-masthead", compact && "fantasy-masthead--compact"]}>
+  <div class="container fantasy-masthead__inner">
+    <a class="fantasy-brand" href="/fantasy-football/"><span>LS</span><strong>Last Season <em>Fantasy</em></strong></a>
+    <nav aria-label="Fantasy football tools">
+      {links.map(([key, label, href]) => <a href={href} aria-current={active === key ? "page" : undefined}>{label}</a>)}
+    </nav>
+  </div>
+</div>

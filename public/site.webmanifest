@@ -21,6 +21,11 @@
       "name": "Latest scores",
       "short_name": "Scores",
       "url": "/scores/"
+    },
+    {
+      "name": "Fantasy football helpers",
+      "short_name": "Fantasy",
+      "url": "/fantasy-football/"
     }
   ],
   "icons": [

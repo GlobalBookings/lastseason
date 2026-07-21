@@ -1,0 +1,12 @@
+---
+import { fantasyUpdated, fantasySources } from "../data/fantasy";
+
+interface Props { short?: boolean; }
+const { short = false } = Astro.props;
+---
+
+<aside class="fantasy-disclaimer" aria-label="Fantasy data note">
+  <strong>Independent planning helper</strong>
+  <p>{short ? `Editorial planning data reviewed ${fantasyUpdated}. Values are not official game prices.` : `Last Season is independent and is not affiliated with or endorsed by the Premier League or its fantasy game. Planning prices, ratings, player positions and advice are our own editorial model—not official game data. Squads, roles, injuries and prices can change before a deadline, so verify final decisions in the game you use.`}</p>
+  {!short && <div>{fantasySources.map((source) => <a href={source.url} rel="noopener noreferrer" target="_blank">{source.name} ↗</a>)}</div>}
+</aside>

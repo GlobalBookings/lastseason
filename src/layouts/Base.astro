@@ -123,6 +123,7 @@ const isCurrent = (path: string) => currentPath === path || (path !== "/" && cur
           <nav class="site-nav" aria-label="Main navigation">
             <a href="/scores/" class="nav-live" aria-current={isCurrent("/scores/") ? "page" : undefined}><span></span>Scores</a>
             <a href="/daily/" class="nav-daily" aria-current={isCurrent("/daily/") ? "page" : undefined}>Daily game</a>
+            <a href="/fantasy-football/" class="nav-fantasy" aria-current={isCurrent("/fantasy-football/") ? "page" : undefined}>Fantasy</a>
             <a href="/premier-league/" aria-current={isCurrent("/premier-league/") ? "page" : undefined}>Premier League</a>
             <a href="/championship/" aria-current={isCurrent("/championship/") ? "page" : undefined}>Championship</a>
             <details class="league-menu">
@@ -158,6 +159,7 @@ const isCurrent = (path: string) => currentPath === path || (path !== "/" && cur
       <div class="mobile-nav" id="mobile-nav" role="navigation" aria-label="Mobile navigation">
         <a href="/scores/" class="mobile-live-link"><span></span> Latest scores & fixtures</a>
         <a href="/daily/">Daily football game</a>
+        <a href="/fantasy-football/">Fantasy football helpers</a>
         <a href="/my/">My Last Season</a>
         <div class="nav-section-title">Leagues</div>
         <a href="/premier-league/">Premier League</a>
@@ -191,7 +193,7 @@ const isCurrent = (path: string) => currentPath === path || (path !== "/" && cur
           <input id="global-search" name="q" type="search" autocomplete="off" placeholder="Try Arsenal, 2003–04 or Thierry Henry" />
           <button type="submit">Search</button>
         </form>
-        <div class="search-drawer__suggestions"><span>Popular:</span><a href="/premier-league/2003-04/">Invincibles</a><a href="/records/all-time-top-scorers/">Top scorers</a><a href="/tools/season-compare/">Compare seasons</a></div>
+        <div class="search-drawer__suggestions"><span>Popular:</span><a href="/fantasy-football/squad-builder/">Fantasy squad builder</a><a href="/premier-league/2003-04/">Invincibles</a><a href="/records/all-time-top-scorers/">Top scorers</a><a href="/tools/season-compare/">Compare seasons</a></div>
       </div>
     </aside>
 
@@ -224,6 +226,7 @@ const isCurrent = (path: string) => currentPath === path || (path !== "/" && cur
             <div class="footer-heading">Site</div>
             <ul class="footer-link-list">
               <li><a href="/tools/">Interactive Tools</a></li>
+              <li><a href="/fantasy-football/">Fantasy Football Helpers</a></li>
               <li><a href="/daily/">Daily Football Game</a></li>
               <li><a href="/games/">More Football Games</a></li>
               <li><a href="/on-this-day/">On This Day</a></li>

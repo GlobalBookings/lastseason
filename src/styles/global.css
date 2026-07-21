@@ -175,6 +175,8 @@ strong { font-weight: 650; }
 .site-nav .nav-live { color:#d9ffe7; }
 .site-nav .nav-daily { color:#07150d; background:#71e69e; font-weight:800; }
 .site-nav .nav-daily:hover,.site-nav .nav-daily[aria-current="page"] { color:#07150d; background:#8cebb0; }
+.site-nav .nav-fantasy { color:#d9ffc0; border:1px solid rgba(183,255,90,.35); font-weight:750; }
+.site-nav .nav-fantasy:hover,.site-nav .nav-fantasy[aria-current="page"] { color:#07150d; background:#b7ff5a; border-color:#b7ff5a; }
 .site-nav .nav-profile { color:#fff; border:1px solid rgba(255,255,255,.16); }
 .nav-live > span,
 .mobile-live-link > span { width:7px; height:7px; border-radius:50%; background:#54e38e; box-shadow:0 0 0 4px rgba(84,227,142,.12); display:inline-block; margin-right:.28rem; }
@@ -1277,6 +1279,14 @@ main > .container {
   border: 2px solid var(--border);
 }
 
+.fantasy-home-callout { display:flex; align-items:center; justify-content:space-between; gap:2rem; margin:1rem 0 2rem; padding:clamp(1.2rem,3vw,2rem); border-radius:20px; color:#fff; background:radial-gradient(circle at 82% 20%,rgba(183,255,90,.22),transparent 28%),#0b1821; }
+.fantasy-home-callout h2 { color:#fff; margin:.2rem 0 .45rem; font-size:clamp(1.5rem,3vw,2.4rem); letter-spacing:-.045em; }
+.fantasy-home-callout p { max-width:680px; margin:0; color:#aebec7; }
+.fantasy-home-callout .section-kicker { color:#b7ff5a; }
+.fantasy-home-actions { display:flex; align-items:center; flex-wrap:wrap; gap:.8rem; flex:0 0 auto; }
+.fantasy-home-actions a:last-child { color:#dfffc8; font-size:.76rem; font-weight:800; }
+@media(max-width:760px){.fantasy-home-callout{align-items:flex-start;flex-direction:column}.fantasy-home-actions{width:100%}}
+
 /* ============================================
    FOCUS STATES (accessibility)
    ============================================ */
@@ -1294,7 +1304,7 @@ button:focus-visible {
 /* ============================================
    RESPONSIVE
    ============================================ */
-@media (max-width: 1100px) {
+@media (max-width: 1220px) {
   .site-nav { display: none; }
   .nav-toggle { display: block; }
 }

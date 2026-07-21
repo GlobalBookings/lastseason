@@ -1,0 +1,14 @@
+---
+import Base from "../../../layouts/Base.astro";
+import FantasyHeader from "../../../components/FantasyHeader.astro";
+import FantasyDisclaimer from "../../../components/FantasyDisclaimer.astro";
+import { clubNameCollections } from "../../../data/fantasy";
+export function getStaticPaths(){return clubNameCollections.map(collection=>({params:{club:collection.slug},props:{collection}}));}
+const { collection } = Astro.props;
+const schema=JSON.stringify({"@context":"https://schema.org","@type":"ItemList","name":`${collection.name} fantasy football team names`,"itemListElement":collection.names.map((name:string,index:number)=>({"@type":"ListItem","position":index+1,"name":name}))});
+---
+<Base title={`${collection.name} Fantasy Football Team Names 2026/27`} description={`Twelve funny, clean and current ${collection.name} fantasy football team names for 2026/27, with instant copy and a personalised name generator.`} canonical={`/fantasy-football/team-names/${collection.slug}/`} schema={schema}>
+  <FantasyHeader active="names" /><div class="fantasy-page"><div class="fantasy-tool-hero"><div class="fantasy-container"><nav class="fantasy-breadcrumbs"><a href="/fantasy-football/">Fantasy</a><span>/</span><a href="/fantasy-football/team-names/">Team names</a><span>/</span><span>{collection.name}</span></nav><span class="fantasy-eyebrow">Club name lab</span><h1>{collection.name} fantasy team names.</h1><p>{collection.intro} Updated for the 2026/27 pre-season.</p><a class="fantasy-button" href={`/fantasy-football/team-name-generator/?club=${collection.slug}`}>Generate another</a></div></div>
+  <section class="fantasy-section"><div class="fantasy-container"><div class="name-list">{collection.names.map((name:string,index:number)=><div class="name-row"><div><span class="fantasy-pill">{String(index+1).padStart(2,"0")}</span> <strong>{name}</strong></div><button type="button" data-copy-name={name}>Copy</button></div>)}</div><FantasyDisclaimer short /><p class="fantasy-status">Names change as squads and transfers change. If a player leaves, the archive section keeps the pun alive—but the generator prioritises current references.</p></div></section></div>
+  <script is:inline>document.querySelectorAll("[data-copy-name]").forEach(button=>button.addEventListener("click",async()=>{await navigator.clipboard?.writeText(button.dataset.copyName||"");button.textContent="Copied";}));</script>
+</Base>

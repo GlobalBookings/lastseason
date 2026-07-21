@@ -13,6 +13,7 @@ export default defineConfig({
       "/mls/",
       "/data/",
       "/my/",
+      "/fantasy-football/my-plan/",
       "/championship/2022-23/",
       "/championship/2021-22/",
       "/la-liga/2023-24/",

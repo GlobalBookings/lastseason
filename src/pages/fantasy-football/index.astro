@@ -1,0 +1,58 @@
+---
+import Base from "../../layouts/Base.astro";
+import FantasyHeader from "../../components/FantasyHeader.astro";
+import FantasyDisclaimer from "../../components/FantasyDisclaimer.astro";
+import { fantasyKickoff, fantasyPlayers, fantasyUpdated } from "../../data/fantasy";
+
+const evidenceLeaders = [...fantasyPlayers].sort((a,b) => b.evidence-a.evidence).slice(0,5);
+const schema = JSON.stringify({
+  "@context":"https://schema.org","@type":"CollectionPage","name":"Last Season Fantasy football tools","url":"https://lastseason.co.uk/fantasy-football/",
+  "description":"Independent fantasy football planning tools for squads, fixtures, captain choices, player comparisons and team names.",
+  "isPartOf":{"@id":"https://lastseason.co.uk/#website"},
+  "mainEntity":{"@type":"ItemList","itemListElement":[
+    ["Squad assistant","/fantasy-football/squad-builder/"],["Fixture planner","/fantasy-football/fixture-planner/"],["Team-name generator","/fantasy-football/team-name-generator/"],["Captain picker","/fantasy-football/captain-picker/"],
+  ].map(([name,path],i)=>({"@type":"ListItem","position":i+1,"name":name,"url":`https://lastseason.co.uk${path}`}))}
+});
+---
+
+<Base title="Free Fantasy Football Tools & Squad Planner 2026/27" description="Independent fantasy football helpers for 2026/27: build a balanced squad, compare fixtures, rank captain options, find differentials and generate a funny team name." canonical="/fantasy-football/" schema={schema}>
+  <FantasyHeader />
+  <div class="fantasy-page">
+    <section class="fantasy-hero">
+      <div class="fantasy-container fantasy-hero__grid">
+        <div class="fantasy-hero__copy"><span class="fantasy-eyebrow">Independent 2026/27 planning lab</span><h1>Make a smarter first draft.</h1><p>Build a balanced squad, see the fixtures clearly and pressure-test every tempting pick. Advice and data—not another fantasy game.</p><div class="fantasy-actions"><a class="fantasy-button" href="/fantasy-football/squad-builder/">Build my squad</a><a class="fantasy-button fantasy-button--secondary" href="/fantasy-football/team-name-generator/">Find a team name</a></div></div>
+        <aside class="kickoff-card" data-kickoff={fantasyKickoff}><small>Premier League kick-off</small><strong data-kickoff-countdown>Calculating…</strong><p>Friday 21 August · Arsenal v Coventry City. The official fantasy deadline remains subject to confirmation.</p></aside>
+      </div>
+    </section>
+
+    <section class="fantasy-section fantasy-section--tint"><div class="fantasy-container"><div class="fantasy-section__head"><div><span class="fantasy-eyebrow">Start here</span><h2>Your pre-season toolkit</h2></div><p>Each tool saves privately in this browser, so you can return without creating an account.</p></div><div class="fantasy-card-grid fantasy-card-grid--four">
+      <a class="fantasy-card fantasy-card--feature" href="/fantasy-football/squad-builder/"><span>Smart assistant</span><strong>Build a squad</strong><p>Balance evidence, fixtures, minutes and planning value under transparent constraints.</p><small>Open the builder →</small></a>
+      <a class="fantasy-card" href="/fantasy-football/fixture-planner/"><span>Gameweeks 1–6</span><strong>Fixture planner</strong><p>Compare every opening run and find useful defensive rotation pairs.</p><small>View fixtures →</small></a>
+      <a class="fantasy-card" href="/fantasy-football/captain-picker/"><span>Ranked evidence</span><strong>Captain picker</strong><p>Shortlist reliable, aggressive or differential captain candidates.</p><small>Rank candidates →</small></a>
+      <a class="fantasy-card" href="/fantasy-football/team-name-generator/"><span>Actually usable</span><strong>Name generator</strong><p>Club, player, retro and clean ideas—with copy-ready results.</p><small>Generate a name →</small></a>
+    </div></div></section>
+
+    <section class="fantasy-section"><div class="fantasy-container"><div class="fantasy-section__head"><div><span class="fantasy-eyebrow">Reviewed evidence</span><h2>Names already on the whiteboard</h2></div><a href="/fantasy-football/differentials/">See the watchlist →</a></div><div class="ranking-list">
+      {evidenceLeaders.map((player,index)=><article class="ranking-card"><b>{index+1}</b><div><strong>{player.name}</strong><span>{player.club} · {player.position} · {player.note}</span></div><div class="ranking-score"><strong>{player.evidence}</strong><small>evidence</small></div></article>)}
+    </div><p class="fantasy-status" style="margin-top:.8rem">These are not predicted points. The score weights reviewed 2025/26 evidence, early fixtures and likely minutes, then flags anything that still needs a pre-season check.</p></div></section>
+
+    <section class="fantasy-section fantasy-section--tint"><div class="fantasy-container"><div class="fantasy-section__head"><div><span class="fantasy-eyebrow">Go deeper</span><h2>One decision at a time</h2></div></div><div class="fantasy-card-grid">
+      <a class="fantasy-card" href="/fantasy-football/player-compare/"><span>Side by side</span><strong>Player comparison</strong><p>Compare planning value, evidence, fixtures and minutes risk.</p><small>Compare players →</small></a>
+      <a class="fantasy-card" href="/fantasy-football/chip-planner/"><span>All 38 weeks</span><strong>Chip planner</strong><p>Sketch a flexible season plan without pretending future doubles are known.</p><small>Plan chips →</small></a>
+      <a class="fantasy-card" href="/fantasy-football/mini-league-kit/"><span>For the group chat</span><strong>Mini-league kit</strong><p>Generate a league name, a harmless punishment and an end-of-season prize.</p><small>Make the kit →</small></a>
+      <a class="fantasy-card" href="/fantasy-football/my-plan/"><span>Saved locally</span><strong>My fantasy plan</strong><p>Bring your squad, watchlist, chips and deadline checklist together.</p><small>Open my plan →</small></a>
+      <a class="fantasy-card" href="/fantasy-football/gameweek-1/"><span>Opening week</span><strong>Gameweek 1 guide</strong><p>A living checklist for the first deadline, with knowns separated from unknowns.</p><small>Prepare for GW1 →</small></a>
+      <a class="fantasy-card" href="/fantasy-football/team-names/"><span>Browse the list</span><strong>Funny team names</strong><p>Curated current, retro, clever and club-specific suggestions.</p><small>See every name →</small></a>
+      <a class="fantasy-card" href="/fantasy-football/transfer-planner/"><span>Saved squad</span><strong>Transfer planner</strong><p>Test one move against planning value, evidence and the opening fixtures.</p><small>Plan a transfer →</small></a>
+      <a class="fantasy-card" href="/fantasy-football/updates/"><span>Change log</span><strong>What changed?</strong><p>See when the pool, fixtures, assumptions and warnings were last reviewed.</p><small>See updates →</small></a>
+    </div></div></section>
+
+    <div class="fantasy-container"><FantasyDisclaimer /><p class="fantasy-meta">Planning pool reviewed {fantasyUpdated}. Transfer window changes are reviewed editorially rather than scraped.</p></div>
+  </div>
+  <script is:inline>
+    const card = document.querySelector("[data-kickoff]");
+    const output = document.querySelector("[data-kickoff-countdown]");
+    const tick = () => { if (!card || !output) return; const remaining = new Date(card.dataset.kickoff).getTime()-Date.now(); if (remaining <= 0) { output.textContent="Season under way"; return; } const days=Math.floor(remaining/86400000), hours=Math.floor(remaining%86400000/3600000); output.textContent=`${days}d ${hours}h`; };
+    tick(); setInterval(tick,60000);
+  </script>
+</Base>

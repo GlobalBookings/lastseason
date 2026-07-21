@@ -22,6 +22,15 @@ const required = [
   "/games/player-path/",
   "/games/missing-club/",
   "/on-this-day/",
+  "/fantasy-football/",
+  "/fantasy-football/squad-builder/",
+  "/fantasy-football/fixture-planner/",
+  "/fantasy-football/captain-picker/",
+  "/fantasy-football/team-name-generator/",
+  "/fantasy-football/team-names/",
+  "/fantasy-football/gameweek-1/",
+  "/fantasy-football/transfer-planner/",
+  "/fantasy-football/updates/",
 ];
 
 function outputPath(urlPath) {
