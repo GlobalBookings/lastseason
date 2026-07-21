@@ -127,6 +127,17 @@ export default {
       }
     }
 
-    return env.ASSETS.fetch(request);
+    const assetResponse = await env.ASSETS.fetch(request);
+    if (url.pathname.startsWith("/og/") && assetResponse.ok) {
+      const headers = new Headers(assetResponse.headers);
+      headers.set("cache-control", "public, max-age=86400, s-maxage=604800, stale-while-revalidate=2592000");
+      headers.set("x-content-type-options", "nosniff");
+      return new Response(assetResponse.body, {
+        status: assetResponse.status,
+        statusText: assetResponse.statusText,
+        headers,
+      });
+    }
+    return assetResponse;
   },
 };
