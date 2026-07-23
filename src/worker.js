@@ -9,6 +9,13 @@ const SCORE_LEAGUES = {
 };
 
 const SCORE_SOURCE = "https://www.thesportsdb.com/api/v1/json/123";
+const RESEND_API = "https://api.resend.com";
+const RESEND_FROM = "Last Season <briefing@lastseason.co.uk>";
+const RESEND_REPLY_TO = "jack@lastseason.co.uk";
+const RESEND_TOPICS = {
+  briefing: "7656cc08-ff15-4060-aec5-861a35e64eff",
+  supporter: "60b0331e-8471-496c-9205-1d936493295a",
+};
 
 function cleanEvent(event) {
   if (!event) return null;
@@ -60,6 +67,81 @@ function cleanShortText(value, max = 80) {
 function cleanEmail(value) {
   const email = String(value || "").trim().toLowerCase().slice(0, 254);
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) ? email : "";
+}
+
+async function resendRequest(env, path, options = {}) {
+  if (!env.RESEND_API_KEY) return { ok: false, status: 0, data: null };
+  try {
+    const response = await fetch(`${RESEND_API}${path}`, {
+      ...options,
+      headers: {
+        authorization: `Bearer ${env.RESEND_API_KEY}`,
+        "content-type": "application/json",
+        ...(options.headers || {}),
+      },
+    });
+    const data = await response.json().catch(() => null);
+    return { ok: response.ok, status: response.status, data };
+  } catch (error) {
+    console.error("Resend request failed", path, error);
+    return { ok: false, status: 0, data: null };
+  }
+}
+
+function welcomeEmail(email, briefing, supporter) {
+  const chosen = [
+    briefing ? "the fantasy gameweek briefing" : "",
+    supporter ? "optional supporter-plan updates" : "",
+  ].filter(Boolean);
+  const choiceText = chosen.length > 1 ? `${chosen[0]} and ${chosen[1]}` : chosen[0];
+  return {
+    from: RESEND_FROM,
+    to: [email],
+    reply_to: RESEND_REPLY_TO,
+    subject: briefing ? "You're on the Last Season fantasy briefing" : "You're on the Last Season updates list",
+    text: `You're in.\n\nYou've joined ${choiceText}.\n\nStart planning here: https://lastseason.co.uk/fantasy-football/this-week/\n\nFuture briefings include an unsubscribe and preference-management link. Questions? Reply to this email.\n\nLast Season — independent football history and fantasy tools`,
+    html: `<!doctype html><html><body style="margin:0;background:#f4f1e8;color:#17251f;font-family:Arial,sans-serif"><div style="max-width:600px;margin:0 auto;padding:32px 18px"><div style="background:#17251f;color:#fff;border-radius:16px 16px 0 0;padding:24px 28px"><div style="font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#d5ff54">Last Season</div><h1 style="font-size:30px;line-height:1.1;margin:10px 0 0">You're in.</h1></div><div style="background:#fff;border:1px solid #d9d4c7;border-top:0;border-radius:0 0 16px 16px;padding:28px"><p style="font-size:17px;line-height:1.6;margin-top:0">You've joined ${choiceText}.</p><p style="font-size:16px;line-height:1.6">We’ll send useful, independent guidance—not daily noise, paid rankings or false certainty.</p><p style="margin:28px 0"><a href="https://lastseason.co.uk/fantasy-football/this-week/" style="display:inline-block;background:#d5ff54;color:#17251f;text-decoration:none;font-weight:700;padding:13px 18px;border-radius:8px">Open this week’s planner</a></p><p style="font-size:13px;line-height:1.5;color:#66706b;margin-bottom:0">Future briefings include unsubscribe and preference-management links. Questions? Reply to this email.</p></div></div></body></html>`,
+  };
+}
+
+async function syncResendContact(env, email, briefing, supporter, sendWelcome) {
+  if (!env.RESEND_API_KEY) return false;
+  const topics = [
+    { id: RESEND_TOPICS.briefing, subscription: briefing ? "opt_in" : "opt_out" },
+    { id: RESEND_TOPICS.supporter, subscription: supporter ? "opt_in" : "opt_out" },
+  ];
+  let contact = await resendRequest(env, "/contacts", {
+    method: "POST",
+    body: JSON.stringify({ email, unsubscribed: false, topics }),
+  });
+
+  if (!contact.ok && [409, 422].includes(contact.status)) {
+    contact = await resendRequest(env, `/contacts/${encodeURIComponent(email)}`, {
+      method: "PATCH",
+      body: JSON.stringify({ unsubscribed: false }),
+    });
+    if (contact.ok) {
+      const topicUpdate = await resendRequest(env, `/contacts/${encodeURIComponent(email)}/topics`, {
+        method: "PATCH",
+        body: JSON.stringify({ topics }),
+      });
+      if (!topicUpdate.ok) console.error("Resend topic update failed", topicUpdate.status, topicUpdate.data);
+    }
+  }
+
+  if (!contact.ok) {
+    console.error("Resend contact sync failed", contact.status, contact.data);
+    return false;
+  }
+
+  if (sendWelcome) {
+    const sent = await resendRequest(env, "/emails", {
+      method: "POST",
+      body: JSON.stringify(welcomeEmail(email, briefing, supporter)),
+    });
+    if (!sent.ok) console.error("Resend welcome email failed", sent.status, sent.data);
+  }
+  return true;
 }
 
 async function readLeaderboard(env, url) {
@@ -145,6 +227,9 @@ async function writeFantasyInterest(request, env) {
   const briefing = body.briefing !== false ? 1 : 0;
   const supporter = body.supporter ? 1 : 0;
   if (!email || (!briefing && !supporter)) return json({ error: "Enter a valid email and choose at least one update." }, 400);
+  const existing = await env.COMMUNITY_DB.prepare(
+    "SELECT email FROM fantasy_interests WHERE email = ? LIMIT 1"
+  ).bind(email).first();
   await env.COMMUNITY_DB.prepare(
     `INSERT INTO fantasy_interests (email, wants_briefing, wants_supporter, source)
      VALUES (?, ?, ?, ?)
@@ -155,7 +240,14 @@ async function writeFantasyInterest(request, env) {
        updated_at = CURRENT_TIMESTAMP,
        status = 'interested'`
   ).bind(email, briefing, supporter, source).run();
-  return json({ saved: true, message: "You're on the early list." }, 201);
+  const synced = await syncResendContact(env, email, Boolean(briefing), Boolean(supporter), !existing);
+  return json({
+    saved: true,
+    synced,
+    message: synced
+      ? "You're in. Check your inbox for a welcome from Last Season."
+      : "You're in. Your preferences have been saved.",
+  }, 201);
 }
 
 export default {
