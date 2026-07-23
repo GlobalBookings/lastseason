@@ -1,0 +1,30 @@
+---
+import Base from "../../layouts/Base.astro";
+import FantasyHeader from "../../components/FantasyHeader.astro";
+import FantasyDisclaimer from "../../components/FantasyDisclaimer.astro";
+import { clubBySlug, fantasyClubs, fantasyPlayers, fantasySourceUrl, fantasyUpdated, fixtureDifficulty } from "../../data/fantasy";
+
+export function getStaticPaths() {
+  return [2,3,4,5,6].map((week) => ({ params: { gameweek: `gameweek-${week}` }, props: { week } }));
+}
+
+const { week } = Astro.props;
+const fixtures = fantasyClubs.flatMap((club) => club.fixtures.filter((fixture) => fixture.gw === week && fixture.venue === "H").map((fixture) => ({ home:club, away:clubBySlug.get(fixture.opponent)! }))).sort((a,b)=>a.home.name.localeCompare(b.home.name));
+const watch = fantasyPlayers.map((player) => {
+  const fixture = clubBySlug.get(player.clubSlug)?.fixtures.find((item) => item.gw === week);
+  return { player, fixture, score: player.evidence + (fixture ? (6-fixtureDifficulty(fixture.opponent,fixture.venue))*5 : 0) };
+}).filter((item) => item.fixture).sort((a,b)=>b.score-a.score).slice(0,8);
+const schema = JSON.stringify({"@context":"https://schema.org","@type":"Article","headline":`Fantasy football Gameweek ${week} planning guide 2026/27`,"dateModified":"2026-07-23","author":{"@type":"Organization","name":"Last Season"},"mainEntityOfPage":`https://lastseason.co.uk/fantasy-football/gameweek-${week}/`});
+---
+
+<Base title={`Fantasy Football Gameweek ${week} Guide 2026/27`} description={`Plan fantasy football Gameweek ${week} of 2026/27 with all ten fixtures, an evidence-led watchlist, captain questions and transparent uncertainty.`} canonical={`/fantasy-football/gameweek-${week}/`} schema={schema} ogType="article">
+  <FantasyHeader />
+  <div class="fantasy-page">
+    <div class="fantasy-tool-hero"><div class="fantasy-container">
+      <nav class="fantasy-breadcrumbs"><a href="/fantasy-football/">Fantasy</a><span>/</span><span>Gameweek {week}</span></nav><span class="fantasy-eyebrow">Updated {fantasyUpdated}</span><h1>Gameweek {week}, planned early.</h1><p>The published fixture card and an evidence-led watchlist. Revisit near the deadline for updated roles, injuries and official game information.</p>
+    </div></div>
+    <section class="fantasy-section fantasy-section--tint"><div class="fantasy-container"><div class="fantasy-section__head"><div><span class="fantasy-eyebrow">Fixture card</span><h2>The 10 matches</h2></div><a href={fantasySourceUrl} target="_blank" rel="noopener noreferrer">Published schedule ↗</a></div><div class="rotation-grid">{fixtures.map(({home,away})=><article class="rotation-card"><strong>{home.name} v {away.name}</strong><span>{home.short} home · {away.short} away</span></article>)}</div></div></section>
+    <section class="fantasy-section"><div class="fantasy-container"><div class="fantasy-section__head"><div><span class="fantasy-eyebrow">Early watchlist</span><h2>Fixture plus evidence</h2></div><p>A conversation starter, not predicted points.</p></div><div class="ranking-list">{watch.map(({player,fixture},index)=><article class="ranking-card"><b>{index+1}</b><div><strong>{player.name}</strong><span>{player.club} · {player.position} · {clubBySlug.get(fixture!.opponent)?.short} ({fixture!.venue})<br/>{player.note}</span></div><div class="ranking-score"><strong>{player.evidence}</strong><small>evidence</small></div></article>)}</div></div></section>
+    <section class="fantasy-section fantasy-section--tint"><div class="fantasy-container"><div class="fantasy-card-grid"><a class="fantasy-card" href="/fantasy-football/captain-picker/"><span>Decision one</span><strong>Captain shortlist</strong><p>Rank reliable, aggressive and differential captain profiles.</p><small>Open captain picker →</small></a><a class="fantasy-card" href="/fantasy-football/transfer-planner/"><span>Decision two</span><strong>Test a transfer</strong><p>Compare the move with your saved squad and upcoming run.</p><small>Open transfer planner →</small></a><a class="fantasy-card" href="/fantasy-football/my-plan/"><span>Decision three</span><strong>Run the checklist</strong><p>Check minutes, fitness, vice-captain and final saved squad.</p><small>Open my plan →</small></a></div><FantasyDisclaimer /></div></section>
+  </div>
+</Base>

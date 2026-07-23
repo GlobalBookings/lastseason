@@ -57,7 +57,7 @@ const socialImage = image || inferredImage;
 const fullImage = socialImage.startsWith("http") ? socialImage : `${siteUrl}${socialImage}`;
 const socialImageAlt = imageAlt || fullTitle;
 const socialImageType = /\.jpe?g(?:$|\?)/i.test(socialImage) ? "image/jpeg" : "image/png";
-const socialModifiedTime = modifiedTime || (currentPath.startsWith("/fantasy-football/") ? "2026-07-21T00:00:00+01:00" : undefined);
+const socialModifiedTime = modifiedTime || (currentPath.startsWith("/fantasy-football/") ? "2026-07-23T00:00:00+01:00" : undefined);
 const isCurrent = (path: string) => currentPath === path || (path !== "/" && currentPath.startsWith(path));
 ---
 
@@ -442,12 +442,43 @@ const isCurrent = (path: string) => currentPath === path || (path !== "/" && cur
 
       const analyticsKey = "lastseason-analytics-choice";
       const privacyChoice = document.getElementById("privacy-choice");
+      const fantasyCompletionEvents = new Set([
+        "fantasy_name_copy",
+        "fantasy_name_save",
+        "fantasy_name_share",
+        "fantasy_league_name_save",
+        "fantasy_squad_generate",
+        "fantasy_plan_save",
+        "fantasy_squad_download",
+        "fantasy_reminder_download",
+      ]);
+      window.lsTrack = (eventName, parameters = {}) => {
+        if (typeof window.gtag !== "function") return false;
+        const eventParameters = {
+          page_path: window.location.pathname,
+          page_title: document.body.dataset.pageTitle || document.title,
+          ...parameters,
+        };
+        window.gtag("event", eventName, eventParameters);
+        if (fantasyCompletionEvents.has(eventName)) {
+          window.gtag("event", "fantasy_tool_complete", {
+            ...eventParameters,
+            completion_type: eventName,
+          });
+        }
+        return true;
+      };
       const loadAnalytics = () => {
         if (document.querySelector('script[data-lastseason-analytics]')) return;
         window.dataLayer = window.dataLayer || [];
         window.gtag = function(){ window.dataLayer.push(arguments); };
         window.gtag("js", new Date());
-        window.gtag("config", "G-C2K4PMZEDJ", { anonymize_ip: true });
+        window.gtag("config", "G-C2K4PMZEDJ", {
+          anonymize_ip: true,
+          page_location: window.location.href,
+          page_path: window.location.pathname + window.location.search,
+          page_title: document.title,
+        });
         const script = document.createElement("script");
         script.async = true;
         script.dataset.lastseasonAnalytics = "true";
@@ -482,6 +513,45 @@ const isCurrent = (path: string) => currentPath === path || (path !== "/" && cur
           affiliate_link: link.getAttribute("data-affiliate") === "true",
         });
       });
+
+      const fantasyActions = {
+        "generate-squad": "fantasy_squad_generate",
+        "save-squad": "fantasy_plan_save",
+        "share-squad": "fantasy_squad_share",
+        "download-squad": "fantasy_squad_download",
+        "save-chips": "fantasy_plan_save",
+        "save-transfer": "fantasy_plan_save",
+        "regenerate-kit": "fantasy_mini_league_generate",
+        "copy-kit": "fantasy_mini_league_copy",
+      };
+      document.addEventListener("click", (event) => {
+        const element = event.target instanceof Element ? event.target.closest("a,button") : null;
+        if (!element) return;
+        const action = element.id ? fantasyActions[element.id] : null;
+        if (action) window.lsTrack?.(action, { control_id: element.id });
+        if (element instanceof HTMLAnchorElement && element.pathname.endsWith(".ics")) {
+          window.lsTrack?.("fantasy_reminder_download", { reminder: element.pathname });
+        }
+        if (element instanceof HTMLAnchorElement && window.location.pathname.startsWith("/fantasy-football/") && element.pathname.startsWith("/fantasy-football/")) {
+          window.lsTrack?.("fantasy_internal_click", { destination: element.pathname });
+        }
+      });
+
+      if (window.location.pathname.startsWith("/fantasy-football/")) {
+        const seenDepths = new Set();
+        const measureDepth = () => {
+          const available = document.documentElement.scrollHeight - window.innerHeight;
+          if (available <= 0) return;
+          const depth = Math.round((window.scrollY / available) * 100);
+          [50, 90].forEach((threshold) => {
+            if (depth >= threshold && !seenDepths.has(threshold)) {
+              seenDepths.add(threshold);
+              window.lsTrack?.("fantasy_content_depth", { percent_scrolled: threshold });
+            }
+          });
+        };
+        window.addEventListener("scroll", measureDepth, { passive: true });
+      }
     </script>
   </body>
 </html>

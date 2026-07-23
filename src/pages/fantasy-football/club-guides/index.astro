@@ -1,0 +1,13 @@
+---
+import Base from "../../../layouts/Base.astro";
+import FantasyHeader from "../../../components/FantasyHeader.astro";
+import FantasyDisclaimer from "../../../components/FantasyDisclaimer.astro";
+import { averageFixtureDifficulty, fantasyClubs, fantasyPlayers } from "../../../data/fantasy";
+const clubs = fantasyClubs.map((club)=>({club,players:fantasyPlayers.filter((player)=>player.clubSlug===club.slug),difficulty:averageFixtureDifficulty(club.slug)})).sort((a,b)=>a.difficulty-b.difficulty);
+const schema=JSON.stringify({"@context":"https://schema.org","@type":"ItemList","name":"Premier League fantasy football club guides 2026/27","numberOfItems":clubs.length,"itemListElement":clubs.map(({club},index)=>({"@type":"ListItem","position":index+1,"name":`${club.name} fantasy guide`,"url":`https://lastseason.co.uk/fantasy-football/club-guides/${club.slug}/`}))});
+---
+<Base title="Premier League Fantasy Football Club Guides 2026/27" description="Independent fantasy football guides for all 20 Premier League clubs in 2026/27: opening fixtures, player watchlists, minutes questions and team-name ideas." canonical="/fantasy-football/club-guides/" schema={schema}>
+  <FantasyHeader />
+  <div class="fantasy-page"><div class="fantasy-tool-hero"><div class="fantasy-container"><nav class="fantasy-breadcrumbs"><a href="/fantasy-football/">Fantasy</a><span>/</span><span>Club guides</span></nav><span class="fantasy-eyebrow">All 20 Premier League clubs</span><h1>One honest guide per club.</h1><p>Opening fixtures, a selective planning watchlist and the questions still needing a pre-season answer. Ranked here by Last Season's opening-six difficulty.</p></div></div>
+  <section class="fantasy-section fantasy-section--tint"><div class="fantasy-container"><div class="fantasy-card-grid fantasy-card-grid--four">{clubs.map(({club,players,difficulty})=><a class="fantasy-card" href={`/fantasy-football/club-guides/${club.slug}/`}><span>Opening difficulty {difficulty.toFixed(1)} / 5</span><strong>{club.name}</strong><p>{players.length?`${players.length} reviewed player${players.length===1?"":"s"} currently in the planning pool.`:"Awaiting a player who clears the selective planning pool."}</p><small>Open club guide →</small></a>)}</div><FantasyDisclaimer /></div></section></div>
+</Base>

@@ -8,6 +8,7 @@ interface Props {
 
 const { active = "", compact = false } = Astro.props;
 const links = [
+  ["week", "This week", "/fantasy-football/this-week/"],
   ["builder", "Squad assistant", "/fantasy-football/squad-builder/"],
   ["fixtures", "Fixtures", "/fantasy-football/fixture-planner/"],
   ["captain", "Captain picker", "/fantasy-football/captain-picker/"],
@@ -47,6 +48,7 @@ const links = [
           await navigator.clipboard.writeText(`${title}\n${url}`);
           if (label) label.textContent = "Link copied";
         }
+        window.lsTrack?.("fantasy_page_share", { shared_url: url });
         window.setTimeout(() => { if (label) label.textContent = originalLabel; }, 1800);
       } catch (error) {
         if (error?.name !== "AbortError" && label) {

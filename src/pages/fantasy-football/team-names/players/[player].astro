@@ -1,0 +1,41 @@
+---
+import Base from "../../../../layouts/Base.astro";
+import FantasyHeader from "../../../../components/FantasyHeader.astro";
+import FantasyDisclaimer from "../../../../components/FantasyDisclaimer.astro";
+import { fantasyPlayerNameCollections } from "../../../../data/fantasy";
+
+export function getStaticPaths() {
+  return fantasyPlayerNameCollections.map((collection) => ({ params: { player: collection.slug }, props: { collection } }));
+}
+
+const { collection } = Astro.props;
+const schema = JSON.stringify({
+  "@context":"https://schema.org",
+  "@type":"ItemList",
+  "name":`${collection.player} fantasy football team names`,
+  "numberOfItems":collection.names.length,
+  "itemListElement":collection.names.map((name:string,index:number)=>({"@type":"ListItem","position":index+1,"name":name})),
+});
+---
+
+<Base title={`${collection.player} Fantasy Football Team Names 2026/27`} description={`${collection.names.length} funny and clean ${collection.player} fantasy football team names for 2026/27, with instant copy, save and sharing.`} canonical={`/fantasy-football/team-names/players/${collection.slug}/`} schema={schema}>
+  <FantasyHeader active="names" />
+  <div class="fantasy-page">
+    <div class="fantasy-tool-hero"><div class="fantasy-container">
+      <nav class="fantasy-breadcrumbs"><a href="/fantasy-football/">Fantasy</a><span>/</span><a href="/fantasy-football/team-names/">Team names</a><span>/</span><span>{collection.player}</span></nav>
+      <span class="fantasy-eyebrow">{collection.club} · player-inspired</span><h1>{collection.player} fantasy team names.</h1><p>Reviewed, clean puns inspired by {collection.player}. Save a shortlist or jump into the generator with your own favourite player.</p>
+      <a class="fantasy-button" href={`/fantasy-football/team-name-generator/?player=${encodeURIComponent(collection.player)}`}>Generate with {collection.player}</a>
+    </div></div>
+    <section class="fantasy-section"><div class="fantasy-container">
+      <div class="name-list">{collection.names.map((name:string,index:number)=><div class="name-row"><div><span class="fantasy-pill">{String(index+1).padStart(2,"0")}</span> <strong>{name}</strong></div><div class="name-row__actions"><button type="button" data-save-name={name}>Save</button><button type="button" data-share-name={name}>Share</button><button type="button" data-copy-name={name}>Copy</button></div></div>)}</div>
+      <div class="fantasy-next-step"><div><span class="fantasy-eyebrow">Club guide</span><h2>Check the football case too.</h2><p>See {collection.club}'s opening fixtures and the players currently in Last Season's reviewed planning pool.</p></div><a class="fantasy-button fantasy-button--dark" href={`/fantasy-football/club-guides/${collection.club.toLowerCase().replaceAll(" & ","-").replaceAll(" ","-")}/`}>Open club guide</a></div>
+      <FantasyDisclaimer short />
+    </div></section>
+  </div>
+  <script is:inline>
+    const savedKey="lastseason-fantasy-saved-names";const save=(name)=>{let saved=[];try{saved=JSON.parse(localStorage.getItem(savedKey)||"[]")}catch{}saved=[name,...saved.filter(item=>item!==name)].slice(0,20);localStorage.setItem(savedKey,JSON.stringify(saved));window.lsTrack?.("fantasy_name_save",{name,source:"player_page"})};
+    document.querySelectorAll("[data-save-name]").forEach(button=>button.addEventListener("click",()=>{save(button.dataset.saveName||"");button.textContent="Saved"}));
+    document.querySelectorAll("[data-copy-name]").forEach(button=>button.addEventListener("click",async()=>{await navigator.clipboard?.writeText(button.dataset.copyName||"");button.textContent="Copied";window.lsTrack?.("fantasy_name_copy",{name:button.dataset.copyName,source:"player_page"})}));
+    document.querySelectorAll("[data-share-name]").forEach(button=>button.addEventListener("click",async()=>{const name=button.dataset.shareName||"";try{if(navigator.share)await navigator.share({title:name,text:`My fantasy football team name: ${name}`,url:location.href});else await navigator.clipboard?.writeText(`${name}\n${location.href}`);window.lsTrack?.("fantasy_name_share",{name,source:"player_page"})}catch{}}));
+  </script>
+</Base>

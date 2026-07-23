@@ -1,0 +1,41 @@
+---
+import Base from "../../../../layouts/Base.astro";
+import FantasyHeader from "../../../../components/FantasyHeader.astro";
+import FantasyDisclaimer from "../../../../components/FantasyDisclaimer.astro";
+import { fantasyNameStyles } from "../../../../data/fantasy";
+
+export function getStaticPaths() {
+  return fantasyNameStyles.map((style) => ({ params: { style: style.slug }, props: { style } }));
+}
+
+const { style } = Astro.props;
+const schema = JSON.stringify({
+  "@context":"https://schema.org",
+  "@type":"ItemList",
+  "name":`${style.name} fantasy football team names 2026/27`,
+  "numberOfItems":style.names.length,
+  "itemListElement":style.names.map((name:string,index:number)=>({"@type":"ListItem","position":index+1,"name":name})),
+});
+---
+
+<Base title={`${style.name} Fantasy Football Team Names 2026/27`} description={`${style.names.length} ${style.name.toLowerCase()} fantasy football team names for 2026/27. Reviewed, copy-ready ideas plus a free personalised generator.`} canonical={`/fantasy-football/team-names/styles/${style.slug}/`} schema={schema}>
+  <FantasyHeader active="names" />
+  <div class="fantasy-page">
+    <div class="fantasy-tool-hero"><div class="fantasy-container">
+      <nav class="fantasy-breadcrumbs"><a href="/fantasy-football/">Fantasy</a><span>/</span><a href="/fantasy-football/team-names/">Team names</a><span>/</span><span>{style.name}</span></nav>
+      <span class="fantasy-eyebrow">Browse by style</span><h1>{style.name} fantasy football names.</h1><p>{style.description} Every suggestion is reviewed for a general football audience and ready to copy.</p>
+      <a class="fantasy-button" href="/fantasy-football/team-name-generator/">Personalise a name</a>
+    </div></div>
+    <section class="fantasy-section"><div class="fantasy-container">
+      <div class="name-list">{style.names.map((name:string,index:number)=><div class="name-row"><div><span class="fantasy-pill">{String(index+1).padStart(2,"0")}</span> <strong>{name}</strong></div><div class="name-row__actions"><button type="button" data-save-name={name}>Save</button><button type="button" data-share-name={name}>Share</button><button type="button" data-copy-name={name}>Copy</button></div></div>)}</div>
+      <div class="fantasy-next-step"><div><span class="fantasy-eyebrow">Keep going</span><h2>Browse all twenty clubs.</h2><p>Find names tied to current players, club culture and archive favourites.</p></div><a class="fantasy-button fantasy-button--dark" href="/fantasy-football/team-names/">Choose a club</a></div>
+      <FantasyDisclaimer short />
+    </div></section>
+  </div>
+  <script is:inline>
+    const savedKey="lastseason-fantasy-saved-names";const save=(name)=>{let saved=[];try{saved=JSON.parse(localStorage.getItem(savedKey)||"[]")}catch{}saved=[name,...saved.filter(item=>item!==name)].slice(0,20);localStorage.setItem(savedKey,JSON.stringify(saved));window.lsTrack?.("fantasy_name_save",{name,source:"style_page"})};
+    document.querySelectorAll("[data-save-name]").forEach(button=>button.addEventListener("click",()=>{save(button.dataset.saveName||"");button.textContent="Saved"}));
+    document.querySelectorAll("[data-copy-name]").forEach(button=>button.addEventListener("click",async()=>{await navigator.clipboard?.writeText(button.dataset.copyName||"");button.textContent="Copied";window.lsTrack?.("fantasy_name_copy",{name:button.dataset.copyName,source:"style_page"})}));
+    document.querySelectorAll("[data-share-name]").forEach(button=>button.addEventListener("click",async()=>{const name=button.dataset.shareName||"";try{if(navigator.share)await navigator.share({title:name,text:`My fantasy football team name: ${name}`,url:location.href});else await navigator.clipboard?.writeText(`${name}\n${location.href}`);window.lsTrack?.("fantasy_name_share",{name,source:"style_page"})}catch{}}));
+  </script>
+</Base>

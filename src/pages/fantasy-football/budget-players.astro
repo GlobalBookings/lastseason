@@ -1,0 +1,19 @@
+---
+import Base from "../../layouts/Base.astro";
+import FantasyHeader from "../../components/FantasyHeader.astro";
+import FantasyDisclaimer from "../../components/FantasyDisclaimer.astro";
+import { averageFixtureDifficulty, fantasyPlayers, fantasyUpdated } from "../../data/fantasy";
+const limits = { GK:5, DEF:5, MID:7, FWD:8 };
+const groups = (["GK","DEF","MID","FWD"] as const).map((position) => ({
+  position,
+  players: fantasyPlayers.filter((player) => player.position === position && player.planningPrice <= limits[position]).sort((a,b) => (b.evidence-averageFixtureDifficulty(b.clubSlug)*3)-(a.evidence-averageFixtureDifficulty(a.clubSlug)*3)),
+}));
+const labels = { GK:"Goalkeepers", DEF:"Defenders", MID:"Midfielders", FWD:"Forwards" };
+const schema=JSON.stringify({"@context":"https://schema.org","@type":"Article","headline":"Best budget fantasy football players 2026/27","dateModified":"2026-07-23","author":{"@type":"Organization","name":"Last Season"}});
+---
+<Base title="Best Budget Fantasy Football Players 2026/27" description="An independent 2026/27 budget-player watchlist by position, balancing reviewed evidence, opening fixtures, planning cost and minutes risk." canonical="/fantasy-football/budget-players/" schema={schema} ogType="article">
+  <FantasyHeader />
+  <div class="fantasy-page"><div class="fantasy-tool-hero"><div class="fantasy-container"><nav class="fantasy-breadcrumbs"><a href="/fantasy-football/">Fantasy</a><span>/</span><span>Budget players</span></nav><span class="fantasy-eyebrow">Reviewed {fantasyUpdated}</span><h1>Budget picks without false certainty.</h1><p>A selective watchlist using Last Season planning credits, prior evidence, opening fixtures and likely minutes. Official prices can change every conclusion.</p></div></div>
+  {groups.map((group,index)=><section class:list={["fantasy-section",index%2===0&&"fantasy-section--tint"]}><div class="fantasy-container"><div class="fantasy-section__head"><div><span class="fantasy-eyebrow">Planning ceiling {limits[group.position].toFixed(1)}</span><h2>{labels[group.position]}</h2></div><p>Lower planning cost is useful only when minutes and routes to points survive scrutiny.</p></div>{group.players.length?<div class="ranking-list">{group.players.map((player,rank)=><article class="ranking-card"><b>{rank+1}</b><div><strong>{player.name}</strong><span>{player.club} · {player.minutes} minutes confidence<br/>{player.note}</span></div><div class="ranking-score"><strong>{player.planningPrice.toFixed(1)}</strong><small>planning credits</small></div></article>)}</div>:<p class="fantasy-status">No player currently clears this deliberately tight budget filter. Recheck after official prices are available.</p>}</div></section>)}
+  <section class="fantasy-section"><div class="fantasy-container"><div class="fantasy-next-step"><div><span class="fantasy-eyebrow">Test the structure</span><h2>Put value into a complete squad.</h2><p>A cheap player is useful only if the saved credits improve the rest of the team.</p></div><a class="fantasy-button" href="/fantasy-football/squad-builder/">Build a balanced squad</a></div><FantasyDisclaimer /></div></section></div>
+</Base>

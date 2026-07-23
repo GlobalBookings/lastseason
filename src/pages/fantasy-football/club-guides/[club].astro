@@ -1,0 +1,57 @@
+---
+import Base from "../../../layouts/Base.astro";
+import FantasyHeader from "../../../components/FantasyHeader.astro";
+import FantasyDisclaimer from "../../../components/FantasyDisclaimer.astro";
+import { averageFixtureDifficulty, clubBySlug, clubNameCollections, fantasyClubs, fantasyPlayers, fantasySourceUrl, fantasyUpdated, fixtureDifficulty } from "../../../data/fantasy";
+
+export function getStaticPaths() {
+  return fantasyClubs.map((club) => ({ params: { club: club.slug }, props: { club } }));
+}
+
+const { club } = Astro.props;
+const players = fantasyPlayers.filter((player) => player.clubSlug === club.slug).sort((a,b) => b.evidence-a.evidence);
+const names = clubNameCollections.find((collection) => collection.slug === club.slug);
+const runScore = averageFixtureDifficulty(club.slug);
+const runLabel = runScore <= 2.5 ? "Appealing" : runScore <= 3.25 ? "Mixed" : "Demanding";
+const schema = JSON.stringify({
+  "@context":"https://schema.org",
+  "@type":"Article",
+  "headline":`${club.name} fantasy football guide 2026/27`,
+  "dateModified":"2026-07-23",
+  "author":{"@type":"Organization","name":"Last Season"},
+  "mainEntityOfPage":`https://lastseason.co.uk/fantasy-football/club-guides/${club.slug}/`,
+});
+---
+
+<Base title={`${club.name} Fantasy Football Guide 2026/27`} description={`${club.name}'s first six 2026/27 fixtures, independent difficulty ratings, reviewed player watchlist and fantasy team-name ideas.`} canonical={`/fantasy-football/club-guides/${club.slug}/`} schema={schema} ogType="article">
+  <FantasyHeader />
+  <div class="fantasy-page">
+    <div class="fantasy-tool-hero"><div class="fantasy-container">
+      <nav class="fantasy-breadcrumbs"><a href="/fantasy-football/">Fantasy</a><span>/</span><span>Club guides</span><span>/</span><span>{club.name}</span></nav>
+      <span class="fantasy-eyebrow">Reviewed {fantasyUpdated}</span><h1>{club.name} fantasy guide.</h1><p>Opening fixtures, planning-pool players and the pre-season questions worth checking. Advice and data—not an official fantasy game.</p>
+      <div class="fantasy-actions"><a class="fantasy-button" href="/fantasy-football/squad-builder/">Try the squad assistant</a>{names && <a class="fantasy-button fantasy-button--dark" href={`/fantasy-football/team-names/${club.slug}/`}>{club.name} team names</a>}</div>
+    </div></div>
+    <section class="fantasy-section fantasy-section--tint"><div class="fantasy-container">
+      <div class="fantasy-section__head"><div><span class="fantasy-eyebrow">Opening run · {runLabel}</span><h2>Gameweeks 1–6</h2></div><div class="ranking-score"><strong>{runScore.toFixed(1)}</strong><small>average difficulty / 5</small></div></div>
+      <div class="fixture-run">{club.fixtures.map((fixture) => {
+        const opponent = clubBySlug.get(fixture.opponent);
+        const difficulty = fixtureDifficulty(fixture.opponent, fixture.venue);
+        return <article><span>GW{fixture.gw}</span><strong>{opponent?.short} ({fixture.venue})</strong><small class="fixture-chip" data-difficulty={difficulty}>{difficulty}/5</small></article>;
+      })}</div>
+      <p class="fantasy-meta">Last Season difficulty uses previous finishing strength plus venue. It is deliberately transparent and will change when stronger current-season evidence exists. <a href={fantasySourceUrl} target="_blank" rel="noopener noreferrer">Published fixture source ↗</a></p>
+    </div></section>
+    <section class="fantasy-section"><div class="fantasy-container">
+      <div class="fantasy-section__head"><div><span class="fantasy-eyebrow">Reviewed pool</span><h2>{players.length ? `${players.length} players on the board` : "What to monitor"}</h2></div><p>The pool is selective, not a complete squad list. Planning prices are Last Season comparison credits, not official game prices.</p></div>
+      {players.length ? <div class="ranking-list">{players.map((player,index)=><article class="ranking-card"><b>{index+1}</b><div><strong>{player.name}</strong><span>{player.position} · {player.minutes} minutes confidence<br/>{player.note}</span></div><div class="ranking-score"><strong>{player.evidence}</strong><small>evidence</small></div></article>)}</div> : <div class="fantasy-panel"><h3>No player has cleared the reviewed shortlist yet</h3><p>That is a signal to wait, not to ignore {club.name}. Pre-season roles, official prices and secure minutes can quickly create useful options.</p><a href="/fantasy-football/updates/">See what changes next →</a></div>}
+    </div></section>
+    <section class="fantasy-section fantasy-section--tint"><div class="fantasy-container">
+      <div class="fantasy-card-grid">
+        <article class="fantasy-card"><span>Check before buying</span><strong>Minutes</strong><p>Who started the final friendlies, who returned late and which roles are genuinely secure?</p></article>
+        <article class="fantasy-card"><span>Check before buying</span><strong>Set pieces</strong><p>Penalties, corners and direct free-kicks are valuable only when the taker is on the pitch.</p></article>
+        <article class="fantasy-card"><span>Check before buying</span><strong>Position and price</strong><p>Official classification can change the appeal of an attacking player considerably.</p></article>
+      </div>
+      <div class="fantasy-next-step"><div><span class="fantasy-eyebrow">One decision at a time</span><h2>Compare the shortlist.</h2><p>Put two reviewed players side by side or save a watchlist for your next visit.</p></div><div class="fantasy-actions"><a class="fantasy-button" href="/fantasy-football/player-compare/">Compare players</a><a class="fantasy-button fantasy-button--dark" href="/fantasy-football/differentials/">Open watchlist</a></div></div>
+      <FantasyDisclaimer />
+    </div></section>
+  </div>
+</Base>

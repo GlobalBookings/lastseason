@@ -1,0 +1,28 @@
+---
+import Base from "../../layouts/Base.astro";
+import FantasyHeader from "../../components/FantasyHeader.astro";
+import FantasyDisclaimer from "../../components/FantasyDisclaimer.astro";
+---
+<Base title="Fantasy Football Gameweek Briefing 2026/27" description="Join the free Last Season fantasy football briefing list for deadline reminders, fixture swings, captain questions, role changes and new tools." canonical="/fantasy-football/newsletter/">
+  <FantasyHeader />
+  <div class="fantasy-page">
+    <div class="fantasy-hero fantasy-hero--compact"><div class="fantasy-container fantasy-hero__grid"><div class="fantasy-hero__copy"><span class="fantasy-eyebrow">Free · independent · no game account</span><h1>One useful fantasy email.</h1><p>Deadline context, fixture swings, captain questions, minutes risks and what changed—without pretending uncertain information is confirmed.</p></div><aside class="kickoff-card"><small>Planned format</small><strong>5-minute read</strong><p>One briefing near each active deadline. No daily noise and no sold email list.</p></aside></div></div>
+    <section class="fantasy-section"><div class="fantasy-container newsletter-layout">
+      <div><span class="fantasy-eyebrow">The briefing</span><h2>What you will get</h2><div class="ranking-list"><article class="ranking-card"><b>1</b><div><strong>The fixture swing</strong><span>Which runs improved and which tempting one-week move creates a later problem.</span></div></article><article class="ranking-card"><b>2</b><div><strong>The role check</strong><span>Minutes, penalties, set pieces, injuries and important uncertainty.</span></div></article><article class="ranking-card"><b>3</b><div><strong>The decision shortlist</strong><span>Captain, transfer and differential questions linked to transparent tools.</span></div></article></div></div>
+      <form class="fantasy-panel newsletter-form" id="fantasy-interest-form">
+        <span class="fantasy-eyebrow">Early list</span><h2>Join before Gameweek 1</h2>
+        <label class="fantasy-field">Email address<input type="email" name="email" autocomplete="email" required placeholder="you@example.com" /></label>
+        <label class="honey-field" aria-hidden="true">Company<input type="text" name="company" tabindex="-1" autocomplete="off" /></label>
+        <label class="consent-row"><input type="checkbox" name="briefing" checked /> <span>Send me the free fantasy briefing when delivery begins.</span></label>
+        <label class="consent-row"><input type="checkbox" name="supporter" /> <span>Also tell me if an optional ad-free supporter plan launches.</span></label>
+        <button class="fantasy-button" type="submit">Join the early list</button>
+        <p class="fantasy-status" id="interest-status" aria-live="polite">Your address is stored securely in Last Season's Cloudflare database. It will not be sold. You can request deletion at any time.</p>
+      </form>
+    </div></section>
+    <section class="fantasy-section fantasy-section--tint"><div class="fantasy-container"><div class="fantasy-card-grid"><article class="fantasy-card"><span>Editorial</span><strong>No paid rankings</strong><p>Sponsorship will never change a captain, transfer or player recommendation.</p></article><article class="fantasy-card"><span>Privacy</span><strong>No advertising profile</strong><p>The list records the address, chosen interests, signup source and consent time.</p></article><article class="fantasy-card"><span>Control</span><strong>Leave whenever you like</strong><p>Every delivered email will need a working unsubscribe route before the briefing launches.</p></article></div><FantasyDisclaimer /></div></section>
+  </div>
+  <script is:inline>
+    const form=document.getElementById("fantasy-interest-form"),status=document.getElementById("interest-status");
+    form?.addEventListener("submit",async(event)=>{event.preventDefault();const button=form.querySelector("button[type=submit]"),data=new FormData(form);button.disabled=true;button.textContent="Joining…";status.textContent="Saving your preferences…";try{const response=await fetch("/api/fantasy-interest",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({email:data.get("email"),company:data.get("company"),briefing:data.get("briefing")==="on",supporter:data.get("supporter")==="on",source:"fantasy_newsletter"})});const result=await response.json();if(!response.ok)throw new Error(result.error||result.message||"Signup failed");status.textContent=result.message||"You're on the early list.";status.dataset.tone="success";button.textContent="You're on the list";window.lsTrack?.("newsletter_signup",{source:"fantasy_newsletter",supporter_interest:String(data.get("supporter")==="on")})}catch(error){status.textContent=error.message||"Signup is temporarily unavailable. Please try again.";status.dataset.tone="warning";button.disabled=false;button.textContent="Try again"}});
+  </script>
+</Base>

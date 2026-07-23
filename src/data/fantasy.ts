@@ -29,7 +29,7 @@ export interface FantasyPlayer {
   tags: string[];
 }
 
-export const fantasyUpdated = "21 July 2026";
+export const fantasyUpdated = "23 July 2026";
 export const fantasyKickoff = "2026-08-21T20:00:00+01:00";
 export const fantasySourceUrl = "https://resources.premierleague.pulselive.com/premierleague/document/2026/06/19/6ca67658-af7f-41ac-872c-91e7140b4531/FDR-complete-season-2026-27-19-June-2026-v2.pdf";
 
@@ -150,15 +150,138 @@ export const generalTeamNames = [
   ["VAR and Peace","clever"],["Terms and Kondogbia","retro"],["No More Mr Nice Gaffer","classic"],["Moves Like Agger","retro"],
 ] as const;
 
-export const clubNameCollections = [
-  { slug:"arsenal", name:"Arsenal", intro:"Names inspired by Arsenal's title-winning squad, North London and familiar terrace references.", names:["Rice Rice Baby","Livin' Saliba Loca","Saka Potatoes","Ode to Joy","Gunners and Roses","Gabriel's Inferno","North Bank Notes","Arteta Than Ever","Raya Sunshine","Ødegaardians","The Invinciballs","Emirates of Mind"] },
-  { slug:"chelsea", name:"Chelsea", intro:"Clean Chelsea puns built around the current squad and Stamford Bridge.", names:["Palmer Violets","Cole Blooded","Cucurella De Vil","The Neto Result","Stamford Fridge","Blue Is the Colour","Bridge Over Troubled Water","João Must Go On","Caicedo With Me","Enzo the Night","London Is Blue-ish","Chelsea Dagger"] },
-  { slug:"liverpool", name:"Liverpool", intro:"Liverpool team names spanning the current side, Anfield and a little archive nostalgia.", names:["Virgil's on Fire","Alisson Wonderland","Szobo Cop","Mac Allisterpiece","Slot Machines","You'll Never Walk Alonso","Anfield of Dreams","Red Letter Day","The Kop Idles","Mo Problems","Gakpo and Roll","Heavy Metal Football"] },
-  { slug:"manchester-city", name:"Manchester City", intro:"Manchester City names featuring the champions' familiar stars and Pep-era references.", names:["Haalandaise Sauce","Gvardiol of Honour","Foden Around","Pep Talk","Doku and the Beast","Blue Moon Rising","Etihad and Seek","City Slickers","Semenyo Business","Guéhi Whiz","No Rodri No Party","Sky Blue Thinking"] },
-  { slug:"manchester-united", name:"Manchester United", intro:"Manchester United puns for managers who still believe every August can be the one.", names:["Bruno Mars","Mainoo Event","Shaw Thing","Diallo M for Murder","Red Fred Redemption","Old Trafford Traffic","Carrick On Winning","The Theatre of Memes","United We Standings","Amad World","Devils in Detail","Class of Twenty-Six"] },
-  { slug:"tottenham-hotspur", name:"Tottenham Hotspur", intro:"Spurs team names with enough optimism to survive the first difficult Gameweek.", names:["Porro Decisions","Madd About You","Solanke You Very Much","Vicario Secret","Spurs of the Moment","Hotspur Summer","Son and Done","North London Calling","Tottenham Court Road","White Hart Lane Brain","Lilywhite Lies","To Dare Is to Do Points"] },
-  { slug:"newcastle-united", name:"Newcastle United", intro:"Newcastle names built around St James' Park, current players and familiar Geordie references.", names:["Isak and You Shall Find","Gordon Bennett","Bruno G Force","Howe's That","Toon Soon","The Magpie High Club","St James' Parklife","Black and White Noise","Geordie Shoreline","Pope Fiction","Tyneside Story","Newcastle Brown Goals"] },
-  { slug:"leeds-united", name:"Leeds United", intro:"Leeds names for the return to the top flight, from Elland Road to the current squad.", names:["Gnonto Stop Me Now","Meslier Than Thou","Leeds by Example","Elland Back","Marching On Together-ish","White Noise","Yorkshire Puddings XI","Leeds the Way","Bielsa Memories","The Peacock Strut","West Yorkshire XI","All Leeds Aren't We"] },
+export type FantasyNameGroup = {
+  label: "Current squad" | "Club culture" | "Retro & clean";
+  names: string[];
+};
+
+export type ClubNameCollection = {
+  slug: string;
+  name: string;
+  intro: string;
+  groups: FantasyNameGroup[];
+  names: string[];
+};
+
+const nameCollection = (
+  slug: string,
+  name: string,
+  intro: string,
+  current: string[],
+  culture: string[],
+  retro: string[],
+): ClubNameCollection => ({
+  slug,
+  name,
+  intro,
+  groups: [
+    { label: "Current squad", names: current },
+    { label: "Club culture", names: culture },
+    { label: "Retro & clean", names: retro },
+  ],
+  names: [...current, ...culture, ...retro],
+});
+
+export const clubNameCollections: ClubNameCollection[] = [
+  nameCollection("arsenal", "Arsenal", "Names inspired by Arsenal's current squad, North London and familiar terrace references.",
+    ["Rice Rice Baby","Livin' Saliba Loca","Saka Potatoes","Raya Sunshine","Øde to Joy","Gabriel's Inferno","Havertz Your Way","Timber Land"],
+    ["Gunners and Roses","North Bank Notes","Emirates of Mind","Cannon Fodder FC","Arteta Than Ever","Red Side Story","Clock End Credits","Highbury Revisited"],
+    ["The Invinciballs","Bergkamp and Roll","Wright Said Fred","Thierry and Now","Petit Filous XI","Adams Family Values","Good Ebening XI","One Nil to the Arsenal"]),
+  nameCollection("aston-villa", "Aston Villa", "Villa Park, claret-and-blue history and current-player ideas for Aston Villa managers.",
+    ["Watkins the Dog","Rogers That","Onana What's My Name","Konsa Business","Cash Converter XI","Mings Dynasty"],
+    ["Villa Thriller","Claret Expectations","Holte End Heroes","Villa Parklife","B6 and the City","Lions Share FC"],
+    ["McGrath Expectations","Gabby Road","Benteke Fried Chicken","Bosnich and Chips","Dwight Stuff","European Cupboard"]),
+  nameCollection("bournemouth", "AFC Bournemouth", "Bournemouth names drawn from the current side, the south coast and Dean Court.",
+    ["Evanilson Wonderland","Semenyo Business","Kluivert Acts","Cook the Books","Tavernier Please","Cherries on Top"],
+    ["Dean Court Drama","Boscombe Ballers","South Coast Goals","Cherry Pickers XI","Vitality Check","Red and Black Attack"],
+    ["Howe About That","Jermaine Defoe-nitely","Begovic and Chips","Cherries Jubilee","Coast Is Clear","Boscombe Back Again"]),
+  nameCollection("brentford", "Brentford", "Bee-themed, west-London and current-player names for Brentford fantasy teams.",
+    ["Thiago a Go Go","Mbeumo No More","Wissa Business","Collins Dictionary","Flekken Brilliant","Nørgaardians"],
+    ["Bees Knees XI","Gtech Support","Brentford and Beyond","Hive Mind FC","West London Buzz","Bee Positive"],
+    ["Griffin Parklife","Marcondes of Quality","Toney Award Winners","Bees Back Catalogue","Buzz Light XI","The Old Braemar Road"]),
+  nameCollection("brighton", "Brighton & Hove Albion", "Seagulls, south-coast culture and Brighton player puns for the new season.",
+    ["Mitoma Prime","Dunk and Disorderly","Verbruggen Rights","Baleba Believe It","João Must Go On","Minteh Fresh"],
+    ["Seagulls and Chips","Amex Appeal","Hove Actually","Brighton Up","Pier Pressure XI","Sussex by the Sea"],
+    ["Gross Misconduct","Murray Christmas","Zamora the Merrier","Withdean Warriors","Albion Again","Potter Than Ever"]),
+  nameCollection("chelsea", "Chelsea", "Clean Chelsea puns built around the current squad, Stamford Bridge and archive favourites.",
+    ["Palmer Violets","Cole Blooded","Cucurella De Vil","The Neto Result","João Must Go On","Caicedo With Me","Enzo the Night","Gusto Be Kidding"],
+    ["Stamford Fridge","Blue Is the Colour","Bridge Over Troubled Water","London Is Blue-ish","Kings Road Runners","Pensioners Plan","Blue Borough XI","West London Calling"],
+    ["Drogba the Builder","Hazard Warning","Lampard in the Dark","Cech Yourself","Makelele Believe","Zola Eclipse","JT Phone Home","Di Matteo Fact"]),
+  nameCollection("coventry-city", "Coventry City", "Sky Blues, Coventry culture and archive-inspired names for the promoted club.",
+    ["Sky Blue Thinking","Coventry Calling","City of Goals","CBS Arena Ballers","Promotion Motion","Blue Ribbon XI"],
+    ["Lady Godiva's XI","Two-Tone Tactics","Ring Road Runners","Sent to Coventry","Sky Blue Army","Cathedral City FC"],
+    ["Huckerby Finn","Dion and On","Hadji's Heroes","Highfield Roadies","Keane to Score","Micky Quinn It"]),
+  nameCollection("crystal-palace", "Crystal Palace", "South London, Selhurst Park and current Palace player puns.",
+    ["Eze Come Eze Go","Mateta of Fact","Muñoz Better Blues","Wharton Earth","Guehi Whiz","Henderson Rules"],
+    ["Palace Intrigue","Selhurst and Found","Eagle Eyed XI","South London Calling","Glaziers Gonna Glaze","Red and Blue Moon"],
+    ["Zaha Hadid XI","Jedinak's Midnight Runners","AJ Tracey Goals","Wright Place Wright Time","Bolasie Through Life","The Crystals"]),
+  nameCollection("everton", "Everton", "Goodison memories, the new stadium era and current Everton-player ideas.",
+    ["Pickford and Mix","Ndiaye Another Day","Branthwaite Here","Garner Attention","Myko Drop","Beto Together"],
+    ["Toffee Crisp XI","Goodison Goodbye","School of Science","Royal Blue Moon","Dockside Blues","Nil Satis XI"],
+    ["Cahill the Gang","Arteta Believe It","Baines on Toast","Fellaini the Roof","Yakubu Can Dance","Southall Stars"]),
+  nameCollection("fulham", "Fulham", "Craven Cottage, west London and clean Fulham fantasy football names.",
+    ["Leno Me Your Ears","Iwobi-Wan Kenobi","Smith Rowe Your Boat","Andersen Shelter","Robinson Crusoe XI","Muniz Business"],
+    ["Cottage Industry","Putney End Product","Thames the Day","Fulham and Void","Black and White Night","Riverside XI"],
+    ["Boa Morte Than Words","Dempsey Roll","Saha So Good","The Tigana Turn","Craven Haven","Johnny Haynes Train"]),
+  nameCollection("hull-city", "Hull City", "Tigers, the Humber and promoted-club optimism for Hull City managers.",
+    ["McBurnie Notice","Tigers on Tour","Hull or High Water","City of Culture XI","Black and Amber","Humber Goals"],
+    ["The Deep Defence","KC and the Sunshine","East Yorkshire XI","Tiger Feet","Boothferry Ballers","Hull Yeah"],
+    ["Windass in the Willows","Bullard Market","Geovanni Be Good","Barmby Army","Dean Windass Again","Fer Ark It"]),
+  nameCollection("ipswich-town", "Ipswich Town", "Portman Road, Suffolk and Tractor Boys ideas for the new campaign.",
+    ["Tractor Beam XI","Portman Roadies","Suffolk Punch","Town Called Malice","Blue Action","Ipswich Please"],
+    ["Tractor Boys Club","East Anglian Express","Blue Suffolk Sky","The Orwell XI","Portman Pressure","Harvesting Points"],
+    ["Kieran and Able","Bent Goals","Magic of Mariner","Wark This Way","Burley's Heroes","Sir Alf's XI"]),
+  nameCollection("leeds-united", "Leeds United", "Leeds names from Elland Road, Yorkshire culture and the current squad.",
+    ["Gnonto Stop Me Now","Meslier Than Thou","Leeds by Example","Ampadu About You","James and the Giant Points","Struijk a Light"],
+    ["Elland Back","Marching On Together-ish","Yorkshire Puddings XI","Leeds the Way","The Peacock Strut","West Yorkshire XI","All Leeds Aren't We","White Noise"],
+    ["Bielsa Memories","Viduka Feel Good","Kewell Runnings","Batty Boys XI","Yeboah Constrictor","Radebe or Not","Lorimerick FC","Revie Revival"]),
+  nameCollection("liverpool", "Liverpool", "Liverpool team names spanning the current side, Anfield and archive nostalgia.",
+    ["Virgil's on Fire","Alisson Wonderland","Szobo Cop","Mac Allisterpiece","Slot Machines","Gakpo and Roll","Konaté Kid","Gravenberch Day"],
+    ["Anfield of Dreams","Red Letter Day","The Kop Idles","Heavy Metal Football","You'll Never Score Alone","Mersey Paradise","This Is Anfield XI","Boot Room Reloaded"],
+    ["Mo Problems","You'll Never Walk Alonso","Kenny Loggins XI","Rush Hour","Fowler Play","Gerrard Way","Torres de France","Paisley Patterns"]),
+  nameCollection("manchester-city", "Manchester City", "Manchester City names featuring current stars, Pep-era references and Maine Road nostalgia.",
+    ["Haalandaise Sauce","Gvardiol of Honour","Foden Around","Doku and the Beast","Semenyo Business","Guéhi Whiz","Pep Talk","Rico Suave XI"],
+    ["Blue Moon Rising","Etihad and Seek","City Slickers","Sky Blue Thinking","Manchester Is Blue-ish","Treble Makers","Possession Obsession","Noisy Neighbours XI"],
+    ["No Rodri No Party","Kinkladze of Glory","Maine Roadies","Goater Than Ever","Aguero Somewhere","Silva Service","Yaya Ding Dong","Kompany Policy"]),
+  nameCollection("manchester-united", "Manchester United", "Manchester United puns for managers who still believe every August can be the one.",
+    ["Bruno Mars","Mainoo Event","Shaw Thing","Diallo M for Murder","Amad World","De Ligt Club","Onana Matata","Mount Rushmore XI"],
+    ["Old Trafford Traffic","Carrick On Winning","The Theatre of Memes","United We Standings","Devils in Detail","Stretford End Product","Red Letter Devils","M16 and Counting"],
+    ["Class of Twenty-Six","Cantona Believe It","Scholes Goals","Giggs Economy","Beckham Palace","Keane and Able","Neville Wears Prada","Rooney Tunes"]),
+  nameCollection("newcastle-united", "Newcastle United", "Newcastle names built around St James' Park, current players and familiar Geordie references.",
+    ["Isak and You Shall Find","Gordon Bennett","Bruno G Force","Pope Fiction","Tonali Vision","Barnes and Noble"],
+    ["Howe's That","Toon Soon","The Magpie High Club","St James' Parklife","Black and White Noise","Geordie Shoreline"],
+    ["Newcastle Brown Goals","Shearer Delight","Given Sunday","Nobby's Nuts","Beardsley's XI","Cole Powered"]),
+  nameCollection("nottingham-forest", "Nottingham Forest", "City Ground, Trentside and current Forest-player fantasy names.",
+    ["Wood You Believe It","Gibbs White Noise","Murillo on the Wall","Sels Like Team Spirit","Elanga Language","Danilo and Stitch"],
+    ["Forest Gumption","City Ground Control","Tricky Trees XI","Robin Hood Press","Trent End Product","Garibaldi Goals"],
+    ["Clough Said Fred","Pearce Pressure","Collymore Please","Birtles and Pieces","European Cupboard","Forest Forever"]),
+  nameCollection("sunderland", "Sunderland", "Stadium of Light, Wearside and Black Cats names for the new campaign.",
+    ["Black Cat Energy","Wearside Story","Light Work XI","Mackem Believe","Roker Rollers","Sunderland Till Half-Time"],
+    ["Stadium of Delight","Red and White Night","Tyne-Wear Tactics","The Mackem XI","North East Express","Wise Men Say XI"],
+    ["Quinn It to Win It","Phillips Screw XI","Defoe Sure","Roker Parklife","Super Kev Seven","Montgomery Burns"]),
+  nameCollection("tottenham-hotspur", "Tottenham Hotspur", "Spurs team names with enough optimism to survive the first difficult Gameweek.",
+    ["Porro Decisions","Madd About You","Solanke You Very Much","Vicario Secret","Spurs of the Moment","Kulusevski Business","Bentancur Feel It","Van de Ven Diagram"],
+    ["Hotspur Summer","North London Calling","Tottenham Court Road","Lilywhite Lies","To Dare Is to Do Points","N17 Forever","White Hart Brain","The Cockerel Crew"],
+    ["Son and Done","Bale Force","Defoe Sure","Moura the Merrier","Ginola Tonic","Ledley Goals","Klinsmann Machine","Gascoigne Up"]),
+];
+
+export const fantasyNameStyles = [
+  { slug:"funny", name:"Funny", description:"Quick, recognisable puns for a group chat or mini-league.", names:["Game of Throw-Ins","Expected Toulouse","Rice Rice Baby","Haalandaise Sauce","Ctrl Alt De Ligt","Palmer Violets","Eze Come Eze Go","VAR and Peace","Clean Sheet Happens","Watkins the Dog","Isak and You Shall Find","Gvardiol of Honour","Bruno Mars","Saka Potatoes","Obi-Wan Iwobi","Net Six and Chill"] },
+  { slug:"clean", name:"Clean", description:"Work-league and family-friendly names without awkward explanations.", names:["The Assistants","Net Results","Goals Aloud","Expected Success","Top Bins Society","The Set Piece","Monday Review FC","The Clean Sheets","Eleven Up","The Final Whistle","The Touchline Thinkers","The Dugout Club","Weekend Wanderers","The Away End","One More Transfer","Deadline Day XI"] },
+  { slug:"clever", name:"Clever", description:"Football language, statistics and tactics with a sharper twist.", names:["The xG Files","Expected Toulouse","VAR and Peace","Low Block Party","The Half-Space Cadets","False Nine to Five","The Overlap Society","Pressing Matters","Marginal Gains XI","The Rest Defence","Box Midfield Office","Transition Period","The Inverted Fullbacks","Possession Is Nine Tenths","Return of the xG","The Bonus Point"] },
+  { slug:"retro", name:"Retro", description:"Archive favourites and player puns that deserve another season.", names:["Crouch Potato","Neville Wears Prada","Enter Shaqiri","Lallanas in Pyjamas","Murder on Zidane's Floor","Teenage Mutant Ninja Skrtels","Gangsters Allardyce","Flying Without Ings","Moves Like Agger","Wright Said Fred","Bergkamp and Roll","Cantona Believe It","Scholes Goals","Zola Eclipse","Shearer Delight","Drogba the Builder"] },
+  { slug:"mini-league", name:"Mini-league", description:"Names for the whole league rather than one manager's team.", names:["The Monday Morning Review","Champions of the Group Chat","The Expected Goals Society","The Last-Minute Wildcards","The Bench Warmers Union","The Accidental Captains","Spreadsheet Ultras","Gameweek and the City","The Office VAR Room","The Transfer Window Shoppers","Deadline Dodgers","The Captaincy Committee","The Kneejerk Society","The Bonus Point Club","No Context Transfers","The Sunday Night Rankings"] },
+];
+
+export const fantasyPlayerNameCollections = [
+  { slug:"erling-haaland", player:"Erling Haaland", club:"Manchester City", names:["Haalandaise Sauce","Haaland Oates","Haaland Before Time","Haaland Globetrotters","Erling Warning","Haaland Order","Haaland Days Night","Haaland Drive","Haaland Seek","Haaland Empire","Haaland About That","Erling Doors"] },
+  { slug:"bukayo-saka", player:"Bukayo Saka", club:"Arsenal", names:["Saka Potatoes","Saka Punch","Saka the Net","Saka Service","Saka Tomorrow","Saka and Awe","Saka to the Future","Bukayo Believe It","Saka Claus XI","Saka Race","Saka the Difference","Saka Lot"] },
+  { slug:"cole-palmer", player:"Cole Palmer", club:"Chelsea", names:["Palmer Violets","Cole Blooded","Cold Palmer","Palmer Calmly","No Palmer No Party","Cole of Duty","Palmer Chameleon","Ice Cole XI","Cole Standard","Palm Reading XI","Cole Play","Palmer Lucky"] },
+  { slug:"bruno-fernandes", player:"Bruno Fernandes", club:"Manchester United", names:["Bruno Mars","Bruno Direction","Fernandes and Found","We Don't Talk About Bruno","Bruno Your Mind","Bruno Service","Bruno Point","Fernandes Club","Bruno Again","Bruno There","Captain Bruno","Bruno the Red"] },
+  { slug:"alexander-isak", player:"Alexander Isak", club:"Newcastle United", names:["Isak and You Shall Find","Isak Newton","Isak the Net","Isak of You","Isak Attack","Isakly Business","Isak Time","Isak to Basics","Isak the Difference","Isak in the City","Isak and Roll","Isakly Right"] },
+  { slug:"ollie-watkins", player:"Ollie Watkins", club:"Aston Villa", names:["Watkins the Dog","Watkins on Sunshine","Watkins This Way","Watkins Tall","Watkins Wonder","Watkins the Line","Ollie Good Time","Watkins the Park","Ollie or Nothing","Watkins Around","Watkins to Glory","Watkins Point"] },
+  { slug:"eberechi-eze", player:"Eberechi Eze", club:"Crystal Palace", names:["Eze Come Eze Go","Eze Does It","Eze Like Sunday Morning","Eze Street","Eze Rider","Eze Peasy XI","Take It Eze","Eze Money","Eze Choice","Eze Target","Eze Living","Eze on the Eye"] },
+  { slug:"phil-foden", player:"Phil Foden", club:"Manchester City", names:["Foden Around","Foden the Gap","Phil Your Boots","Foden Opportunity","Phil Good XI","Foden Telephone","Foden Finish","Phil the Points","Foden Chair","Foden Service","Phil Time","Foden Motion"] },
 ];
 
 export const leagueNameIdeas = ["The Expected Goals Society","No Kane No Gain League","The Monday Morning Review","Net Six and Chill","The Office VAR Room","Gameweek and the City","The Transfer Window Shoppers","The Bench Warmers Union","Champions of the Group Chat","The Accidental Captains","Spreadsheet Ultras","The Last-Minute Wildcards"];
