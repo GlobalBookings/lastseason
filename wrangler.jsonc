@@ -1,6 +1,7 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "lastseason",
+  "account_id": "b415cfc2a65540149ebe9227f454d2f6",
   "compatibility_date": "2026-07-15",
   "main": "./src/worker.js",
   "assets": {
