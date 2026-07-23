@@ -4,7 +4,7 @@ import sitemap from "@astrojs/sitemap";
 export default defineConfig({
   site: "https://lastseason.co.uk",
   integrations: [sitemap({
-    filter: (page) => ![
+    filter: (page) => new URL(page).pathname === "/kits/vault/" || ![
       "/clubs/",
       "/players/",
       "/kits/",

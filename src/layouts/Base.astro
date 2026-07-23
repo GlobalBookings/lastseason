@@ -44,7 +44,7 @@ const inferredImage = currentPath.startsWith("/fantasy-football/squad-builder/")
       ? "/og/fantasy-captain-picker.png"
       : currentPath.includes("/fantasy-football/team-name") || currentPath.startsWith("/fantasy-football/mini-league-kit/")
         ? "/og/fantasy-team-names.png"
-        : ["/player-compare/", "/transfer-planner/", "/chip-planner/", "/differentials/", "/my-plan/"].some((route) => currentPath.startsWith(`/fantasy-football${route}`))
+        : ["/player-compare/", "/transfer-planner/", "/chip-planner/", "/differentials/", "/my-plan/", "/control-room/", "/squad-doctor/", "/preseason-tracker/", "/mini-league-report/"].some((route) => currentPath.startsWith(`/fantasy-football${route}`))
           ? "/og/fantasy-planner.png"
           : currentPath.startsWith("/fantasy-football/")
             ? "/og/fantasy.png"

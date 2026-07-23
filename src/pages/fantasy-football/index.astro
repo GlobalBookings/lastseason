@@ -2,7 +2,7 @@
 import Base from "../../layouts/Base.astro";
 import FantasyHeader from "../../components/FantasyHeader.astro";
 import FantasyDisclaimer from "../../components/FantasyDisclaimer.astro";
-import { fantasyKickoff, fantasyPlayers, fantasyUpdated } from "../../data/fantasy";
+import { fantasyDeadline, fantasyDeadlineLabel, fantasyPlayers, fantasyUpdated } from "../../data/fantasy";
 
 const evidenceLeaders = [...fantasyPlayers].sort((a,b) => b.evidence-a.evidence).slice(0,5);
 const schema = JSON.stringify({
@@ -20,13 +20,14 @@ const schema = JSON.stringify({
   <div class="fantasy-page">
     <section class="fantasy-hero">
       <div class="fantasy-container fantasy-hero__grid">
-        <div class="fantasy-hero__copy"><span class="fantasy-eyebrow">Independent 2026/27 planning lab</span><h1>Make a smarter first draft.</h1><p>Build a balanced squad, see the fixtures clearly and pressure-test every tempting pick. Advice and data—not another fantasy game.</p><div class="fantasy-actions"><a class="fantasy-button" href="/fantasy-football/squad-builder/">Build my squad</a><a class="fantasy-button fantasy-button--secondary" href="/fantasy-football/team-name-generator/">Find a team name</a></div></div>
-        <aside class="kickoff-card" data-kickoff={fantasyKickoff}><small>Premier League kick-off</small><strong data-kickoff-countdown>Calculating…</strong><p>Friday 21 August · Arsenal v Coventry City. The official fantasy deadline remains subject to confirmation.</p></aside>
+        <div class="fantasy-hero__copy"><span class="fantasy-eyebrow">Independent 2026/27 planning lab</span><h1>Make a smarter first draft.</h1><p>Build a balanced squad, see the fixtures clearly and pressure-test every tempting pick. Advice and data—not another fantasy game.</p><div class="fantasy-actions"><a class="fantasy-button" href="/fantasy-football/control-room/">Open control room</a><a class="fantasy-button fantasy-button--secondary" href="/fantasy-football/squad-doctor/">Check my squad</a></div></div>
+        <aside class="kickoff-card" data-kickoff={fantasyDeadline}><small>Confirmed Gameweek 1 deadline</small><strong data-kickoff-countdown>Calculating…</strong><p>{fantasyDeadlineLabel}. Set a reminder, then return for the final pre-deadline checks.</p></aside>
       </div>
     </section>
 
     <section class="fantasy-section fantasy-section--tint"><div class="fantasy-container"><div class="fantasy-section__head"><div><span class="fantasy-eyebrow">Start here</span><h2>Your pre-season toolkit</h2></div><p>Each tool saves privately in this browser, so you can return without creating an account.</p></div><div class="fantasy-card-grid fantasy-card-grid--four">
       <a class="fantasy-card" href="/fantasy-football/this-week/"><span>Return desk</span><strong>What matters this week</strong><p>Continue saved work and see the latest role, fixture and evidence changes.</p><small>Open the briefing →</small></a>
+      <a class="fantasy-card fantasy-card--feature" href="/fantasy-football/control-room/"><span>Deadline HQ</span><strong>Control room</strong><p>One live view of confirmed news, saved plans, watch items and what to do next.</p><small>Open control room →</small></a>
       <a class="fantasy-card fantasy-card--feature" href="/fantasy-football/squad-builder/"><span>Smart assistant</span><strong>Build a squad</strong><p>Balance evidence, fixtures, minutes and planning value under transparent constraints.</p><small>Open the builder →</small></a>
       <a class="fantasy-card" href="/fantasy-football/fixture-planner/"><span>Gameweeks 1–6</span><strong>Fixture planner</strong><p>Compare every opening run and find useful defensive rotation pairs.</p><small>View fixtures →</small></a>
       <a class="fantasy-card" href="/fantasy-football/captain-picker/"><span>Ranked evidence</span><strong>Captain picker</strong><p>Shortlist reliable, aggressive or differential captain candidates.</p><small>Rank candidates →</small></a>
@@ -51,6 +52,9 @@ const schema = JSON.stringify({
       <a class="fantasy-card" href="/fantasy-football/set-piece-takers/"><span>Role watch</span><strong>Penalties & set pieces</strong><p>The signals to verify before treating responsibility as secure.</p><small>Check roles →</small></a>
       <a class="fantasy-card" href="/fantasy-football/promoted-teams/"><span>Coventry · Hull · Ipswich</span><strong>Promoted-team guide</strong><p>Separate genuine value from last season's out-of-context totals.</p><small>Read the guide →</small></a>
       <a class="fantasy-card" href="/fantasy-football/newsletter/"><span>Free early list</span><strong>Gameweek briefing</strong><p>One useful email with fixture swings, roles and decisions.</p><small>Join the list →</small></a>
+      <a class="fantasy-card" href="/fantasy-football/players/"><span>Reviewed profiles</span><strong>Player guides</strong><p>Fixtures, minutes, evidence, planning value and alternatives for every current watchlist pick.</p><small>Research a player →</small></a>
+      <a class="fantasy-card" href="/fantasy-football/mini-league-report/"><span>Group-chat ready</span><strong>Mini-league report</strong><p>Paste weekly scores and create a ranked report with shareable awards.</p><small>Make a report →</small></a>
+      <a class="fantasy-card" href="/fantasy-football/preseason-tracker/"><span>Minutes and roles</span><strong>Pre-season tracker</strong><p>Keep a private watchlist of every current uncertainty and position change.</p><small>Track the news →</small></a>
     </div></div></section>
 
     <section class="fantasy-section"><div class="fantasy-container"><div class="fantasy-section__head"><div><span class="fantasy-eyebrow">Plan ahead</span><h2>Gameweeks 1–6</h2></div><p>Each guide starts with the published fixtures and will be reviewed again near its deadline.</p></div><div class="gameweek-links">{[1,2,3,4,5,6].map((week)=><a href={`/fantasy-football/gameweek-${week}/`}><span>GW</span><strong>{week}</strong><small>Open guide →</small></a>)}</div></div></section>

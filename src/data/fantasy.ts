@@ -31,6 +31,25 @@ export interface FantasyPlayer {
 
 export const fantasyUpdated = "23 July 2026";
 export const fantasyKickoff = "2026-08-21T20:00:00+01:00";
+export const fantasyDeadline = "2026-08-21T18:30:00+01:00";
+export const fantasyDeadlineLabel = "Friday 21 August · 18:30 BST";
+export const fantasyRulesUrl = "https://www.premierleague.com/en/news/4679879/whats-happening-with-fpl-chips-in-202627";
+export const fantasyPositionChangesUrl = "https://www.premierleague.com/en/news/4679886/position-changes-for-202627-fantasy-premier-league";
+export const fantasyBonusChangesUrl = "https://www.premierleague.com/en/news/4679946/whats-new-in-202627-fantasy-changes-to-bonus-points-system";
+export const fantasyLiveRankingsUrl = "https://www.premierleague.com/en/news/4680230/whats-new-in-202627-fantasy-league-rankings-change-in-real-time";
+export const fantasyPositionChanges = [
+  { player:"Myles Lewis-Skelly", club:"Arsenal", previous:"DEF", current:"MID" },
+  { player:"Lamare Bogarde", club:"Aston Villa", previous:"DEF", current:"MID" },
+  { player:"Eli Junior Kroupi", club:"AFC Bournemouth", previous:"FWD", current:"MID" },
+  { player:"Keane Lewis-Potter", club:"Brentford", previous:"DEF", current:"MID" },
+  { player:"Mats Wieffer", club:"Brighton", previous:"MID", current:"DEF" },
+  { player:"Georginio Rutter", club:"Brighton", previous:"MID", current:"FWD" },
+  { player:"Rio Cardines", club:"Crystal Palace", previous:"MID", current:"DEF" },
+  { player:"Ryan Sessegnon", club:"Fulham", previous:"MID", current:"DEF" },
+  { player:"Omar Marmoush", club:"Manchester City", previous:"MID", current:"FWD" },
+  { player:"Patrick Dorgu", club:"Manchester United", previous:"DEF", current:"MID" },
+  { player:"Eric Moreira", club:"Nottingham Forest", previous:"MID", current:"DEF" },
+] as const;
 export const fantasySourceUrl = "https://resources.premierleague.pulselive.com/premierleague/document/2026/06/19/6ca67658-af7f-41ac-872c-91e7140b4531/FDR-complete-season-2026-27-19-June-2026-v2.pdf";
 
 const rawFixtures: Record<string, [string, Venue][]> = {
@@ -135,6 +154,11 @@ export const fantasyPlayers: FantasyPlayer[] = [
 
 export const fantasySources = [
   { name:"2026/27 opening fixtures", url:fantasySourceUrl },
+  { name:"2026/27 chips and half-season reset", url:fantasyRulesUrl },
+  { name:"2026/27 position changes", url:fantasyPositionChangesUrl },
+  { name:"2026/27 Bonus Points System changes", url:fantasyBonusChangesUrl },
+  { name:"2026/27 live rankings and projected bonus", url:fantasyLiveRankingsUrl },
+  { name:"Gameweek 1 deadline and price-change predictor", url:"https://www.premierleague.com/en/news/4680462/whats-new-in-202627-fantasy-price-change-predictor" },
   { name:"2025/26 fantasy team of the season", url:"https://www.premierleague.com/en/news/4671444/fpl-202526-team-of-the-season" },
   { name:"2026 summer transfer tracker", url:"https://www.premierleague.com/en/transfers/2026-27/summer" },
 ];
