@@ -134,6 +134,17 @@ async function syncResendContact(env, email, briefing, supporter, sendWelcome) {
     return false;
   }
 
+  if (briefing && env.RESEND_BRIEFING_SEGMENT_ID) {
+    const segment = await resendRequest(
+      env,
+      `/contacts/${encodeURIComponent(email)}/segments/${encodeURIComponent(env.RESEND_BRIEFING_SEGMENT_ID)}`,
+      { method: "POST" },
+    );
+    if (!segment.ok && segment.status !== 409) {
+      console.error("Resend briefing segment sync failed", segment.status, segment.data);
+    }
+  }
+
   if (sendWelcome) {
     const sent = await resendRequest(env, "/emails", {
       method: "POST",

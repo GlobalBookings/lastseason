@@ -1,5 +1,5 @@
 const apiKey = process.env.RESEND_API_KEY;
-const segmentId = process.env.RESEND_BRIEFING_SEGMENT_ID;
+const segmentId = process.env.RESEND_BRIEFING_SEGMENT_ID || "7f8b7497-d2fe-4923-bbca-5a4a8c98c33f";
 const args = Object.fromEntries(process.argv.slice(2).map((arg) => {
   const [key, ...rest] = arg.replace(/^--/, "").split("=");
   return [key, rest.join("=") || true];

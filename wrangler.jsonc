@@ -4,6 +4,9 @@
   "account_id": "b415cfc2a65540149ebe9227f454d2f6",
   "compatibility_date": "2026-07-15",
   "main": "./src/worker.js",
+  "vars": {
+    "RESEND_BRIEFING_SEGMENT_ID": "7f8b7497-d2fe-4923-bbca-5a4a8c98c33f"
+  },
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
